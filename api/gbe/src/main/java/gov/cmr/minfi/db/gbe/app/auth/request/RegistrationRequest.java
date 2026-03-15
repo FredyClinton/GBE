@@ -53,7 +53,7 @@ public record RegistrationRequest(
         @Schema(example = "+237655555555")
         String phoneNumber,
         String dateOfBirth,
-        boolean mfaEnabled,
-        String secretImgUri
+        boolean mfaEnabled
+        
 ) {
 }

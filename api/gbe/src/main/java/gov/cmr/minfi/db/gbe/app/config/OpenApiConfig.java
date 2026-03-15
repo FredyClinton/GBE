@@ -27,6 +27,10 @@ import io.swagger.v3.oas.annotations.servers.Server;
         ),
         servers = {
                 @Server(
+                        url = "https://gbe-8clf.onrender.com",
+                        description = "Production server"
+                ),
+                @Server(
                         url = "http://localhost:8080",
                         description = "Development server"
                 )
