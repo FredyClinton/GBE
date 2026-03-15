@@ -3,11 +3,11 @@ package gov.cmr.minfi.db.gbe.app.auth;
 import gov.cmr.minfi.db.gbe.app.auth.request.AuthenticationRequest;
 import gov.cmr.minfi.db.gbe.app.auth.request.RefreshRequest;
 import gov.cmr.minfi.db.gbe.app.auth.request.RegistrationRequest;
+import gov.cmr.minfi.db.gbe.app.auth.request.VerificationRequest;
 import gov.cmr.minfi.db.gbe.app.auth.response.AuthenticationResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,12 +29,15 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Void> register(
+    public ResponseEntity<?> register(
             @Valid @RequestBody
             RegistrationRequest request) {
 
-        this.authenticationService.register(request);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        var response = this.authenticationService.register(request);
+        if (request.mfaEnabled()) {
+            return ResponseEntity.ok(response);
+        }
+        return ResponseEntity.accepted().build();
     }
 
     @PostMapping("/refresh")
@@ -43,6 +46,14 @@ public class AuthenticationController {
             @RequestBody
             RefreshRequest request) {
         return ResponseEntity.ok(this.authenticationService.refreshToken(request));
+    }
+
+    @PostMapping("/verify")
+    public ResponseEntity<?> verify(
+            @RequestBody VerificationRequest verificationRequest
+    ) {
+        return ResponseEntity.ok(this.authenticationService.verifyCode(verificationRequest));
+
     }
 
 }

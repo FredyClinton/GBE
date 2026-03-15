@@ -4,12 +4,14 @@ import gov.cmr.minfi.db.gbe.app.auth.AuthenticationService;
 import gov.cmr.minfi.db.gbe.app.auth.request.AuthenticationRequest;
 import gov.cmr.minfi.db.gbe.app.auth.request.RefreshRequest;
 import gov.cmr.minfi.db.gbe.app.auth.request.RegistrationRequest;
+import gov.cmr.minfi.db.gbe.app.auth.request.VerificationRequest;
 import gov.cmr.minfi.db.gbe.app.auth.response.AuthenticationResponse;
 import gov.cmr.minfi.db.gbe.app.exception.BusinessException;
 import gov.cmr.minfi.db.gbe.app.exception.ErrorCode;
 import gov.cmr.minfi.db.gbe.app.role.Role;
 import gov.cmr.minfi.db.gbe.app.role.RoleRepository;
 import gov.cmr.minfi.db.gbe.app.security.JwtService;
+import gov.cmr.minfi.db.gbe.app.tfa.TwoFactorAuthenticationService;
 import gov.cmr.minfi.db.gbe.app.user.User;
 import gov.cmr.minfi.db.gbe.app.user.UserMapper;
 import gov.cmr.minfi.db.gbe.app.user.UserRepository;
@@ -36,6 +38,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final UserMapper userMapper;
+    private final TwoFactorAuthenticationService tfaService;
 
 
     @Override
@@ -48,19 +51,32 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         );
 
         final User user = (User) auth.getPrincipal();
-        final String accesToken = this.jwtService.generateAccesToken(user.getUsername());
-        final String refrechToken = this.jwtService.generateRefreshToken(user.getUsername());
+        if (user == null) {
+            throw new EntityNotFoundException("User not found");
+        }
+
+        // Cas du 2FA ACTIF
+        if (user.isMfaEnabled()) {
+            return AuthenticationResponse.builder()
+                    .mfaEnabled(true)
+                    .build();
+        }
+        final String accessToken = this.jwtService.generateAccessToken(user.getUsername());
+        final String refreshToken = this.jwtService.generateRefreshToken(user.getUsername());
         final String tokenType = "Bearer";
 
-        return new AuthenticationResponse(accesToken, refrechToken, tokenType);
+        return AuthenticationResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .tokenType(tokenType)
+                .mfaEnabled(false)
+                .build();
     }
 
     @Override
     @Transactional
-    public void register(RegistrationRequest request) {
-        checkUserEmail(request.email());
-        checkUserPhoneNumber(request.phoneNumber());
-        checkPasswords(request.password(), request.confirmPassword());
+    public AuthenticationResponse register(RegistrationRequest request) {
+        checkValidity(request);
 
         final Role userRole = this.roleRepository.findByName("ROLE_USER")
                 .orElseThrow(() -> new EntityNotFoundException("Role user does not exists"));
@@ -70,29 +86,69 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         final User user = this.userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.password()));
         user.setRoles(roles);
+
         log.debug("Saving user {}", user);
+
+        // Gestion du cas 2FA actif, generer le secret
+        if (request.mfaEnabled()) {
+            String secret = tfaService.generateNewSecret();
+            user.setSecret(secret);
+            user.setMfaEnabled(true);
+        }
+
         this.userRepository.save(user);
 
-        final List<User> users = new ArrayList<>();
-        users.add(user);
-        userRole.setUsers(users);
+        if (request.mfaEnabled()) {
+            String secret = user.getSecret();
+            String secretImageUri = tfaService.generateQrCodeImageUri(secret);
 
-        this.roleRepository.save(userRole);
+            return AuthenticationResponse.builder()
+                    .mfaEnabled(true)
+                    .secretImageUri(secretImageUri)
+                    .build();
+        }
 
+        // Cas du 2FA INACTIF
+        String accessToken = jwtService.generateAccessToken(user.getUsername());
+        String refreshToken = jwtService.generateRefreshToken(user.getUsername());
+
+        return AuthenticationResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .tokenType("Bearer")
+                .mfaEnabled(false)
+                .build();
+    }
+
+
+    @Override
+    public AuthenticationResponse refreshToken(RefreshRequest request) {
+        final String newAccesToken = this.jwtService.refreshAccessToken(request.refreshToken());
+        final String tokenType = "Bearer";
+
+        return AuthenticationResponse.builder()
+                .accessToken(newAccesToken)
+                .refreshToken(request.refreshToken())
+                .tokenType(tokenType)
+                .build();
 
     }
 
     @Override
-    public AuthenticationResponse refreshToken(RefreshRequest request) {
-        final String newAccesToken = this.jwtService.refresAccessToken(request.refreshToken());
-        final String tokenType = "Bearer";
-
-        return new AuthenticationResponse(
-                newAccesToken,
-                request.refreshToken(),
-                tokenType
-        );
-
+    public AuthenticationResponse verifyCode(VerificationRequest request) {
+        User user = this.userRepository.findByEmailIgnoreCase(request.email())
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        if (tfaService.isNonOtpValid(user.getSecret(), request.code())) {
+            throw new BusinessException(ErrorCode.BAD_CREDENTIALS, "Code is not correct");
+        }
+        String accessToken = this.jwtService.generateAccessToken(user.getUsername());
+        String refreshToken = this.jwtService.generateRefreshToken(user.getUsername());
+        return AuthenticationResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .tokenType("Bearer")
+                .mfaEnabled(user.isMfaEnabled())
+                .build();
     }
 
 
@@ -114,5 +170,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (emailExists) {
             throw new BusinessException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
+    }
+
+    private void checkValidity(RegistrationRequest request) {
+        checkUserEmail(request.email());
+        checkUserPhoneNumber(request.phoneNumber());
+        checkPasswords(request.password(), request.confirmPassword());
     }
 }

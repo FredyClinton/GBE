@@ -44,7 +44,7 @@ public record RegistrationRequest(
                 regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*\\W).*$",
                 message = " VALIDATION.REGISTRATION.CONFIRM_PASSWORD.WEAK"
         )
-        @Schema(example = "P@ssw0rd")
+        @Schema(example = "minfi@email.com")
         String confirmPassword,
         @Pattern(
                 regexp = "^\\+?[0-9]{10,13}",
@@ -52,5 +52,8 @@ public record RegistrationRequest(
         )
         @Schema(example = "+237655555555")
         String phoneNumber,
-        String dateOfBirth) {
+        String dateOfBirth,
+        boolean mfaEnabled,
+        String secretImgUri
+) {
 }

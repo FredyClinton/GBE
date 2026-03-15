@@ -33,7 +33,7 @@ public class JwtService {
         this.publicKey = KeyUtils.loadPublicKey("/keys/local-only/public_key.pem");
     }
 
-    public String generateAccesToken(final String username) {
+    public String generateAccessToken(final String username) {
         final Map<String, Object> claims = Map.of(TOKEN_TYPE, "ACCES_TOKEN");
         return buildToken(username, claims, this.accesTokenExpiration);
     }
@@ -78,7 +78,7 @@ public class JwtService {
         }
     }
 
-    public String refresAccessToken(final String refreshToken) {
+    public String refreshAccessToken(final String refreshToken) {
         final Claims claims = extractClaims(refreshToken);
         if (!"REFRESH_TOKEN".equals(claims.get(TOKEN_TYPE))) {
             throw new RuntimeException("Invalid  token type");
@@ -89,7 +89,7 @@ public class JwtService {
         }
         final String username = claims.getSubject();
 
-        return generateAccesToken(username);
+        return generateAccessToken(username);
     }
 
 

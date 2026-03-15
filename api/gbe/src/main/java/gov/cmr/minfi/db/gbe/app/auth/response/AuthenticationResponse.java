@@ -1,12 +1,14 @@
 package gov.cmr.minfi.db.gbe.app.auth.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
 
+@Builder
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public record AuthenticationResponse(
-        @JsonProperty("access_token")
         String accessToken,
-        @JsonProperty("refresh_token")
         String refreshToken,
-        @JsonProperty("token_type")
-        String tokenType) {
+        String tokenType,
+        boolean mfaEnabled,
+        String secretImageUri) {
 }

@@ -11,7 +11,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.CollectionUtils;
 
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -44,38 +43,40 @@ public class User implements UserDetails {
     @Column(name = "PHONE_NUMBER", nullable = false, unique = true)
     private String phoneNumber;
 
-    @Column(name="PASSWORD", nullable = false)
+    @Column(name = "PASSWORD", nullable = false)
     private String password;
 
     @Column(name = "DATE_OF_BIRTH")
     private LocalDate dateOfBirth;
 
     @Column(name = "IS_ENABLED")
-    private  boolean enabled;
+    private boolean enabled;
 
     @Column(name = "IS_ACCOUNT_LOCKED")
-    private  boolean locked;
+    private boolean locked;
 
     @Column(name = "IS_CREDENTIALS_EXPIRED")
-    private  boolean expired;
+    private boolean expired;
 
     @Column(name = "IS_EMAIL_VERIFIED")
-    private  boolean emailVerified;
+    private boolean emailVerified;
 
     @Column(name = "PHONE_VERIFIED")
-    private  boolean phoneVerified;
+    private boolean phoneVerified;
 
     @Column(name = "CREDENTIALS_EXPIRED")
-    private  boolean credentialsExpired;
+    private boolean credentialsExpired;
 
     @CreatedDate
     @Column(name = "CREATED_DATE", updatable = false, nullable = false)
-    private  LocalDate createdDate;
+    private LocalDate createdDate;
 
     @LastModifiedDate
     @Column(name = "LAST_MODIFIED_DATE", insertable = false)
     private LocalDateTime lastModifiedAt;
 
+    private boolean mfaEnabled;
+    private String secret;
 
 
     @ManyToMany(
@@ -96,7 +97,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if(CollectionUtils.isEmpty(this.roles)){
+        if (CollectionUtils.isEmpty(this.roles)) {
             return List.of();
         }
         return this.roles.stream()
@@ -109,7 +110,7 @@ public class User implements UserDetails {
     }
 
     @Override
-    public  String getPassword() {
+    public String getPassword() {
         return this.password;
     }
 
@@ -127,7 +128,6 @@ public class User implements UserDetails {
     public boolean isCredentialsNonExpired() {
         return !this.credentialsExpired;
     }
-
 
 
 }
