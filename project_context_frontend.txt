@@ -1,0 +1,2672 @@
+﻿Next.js Project Context
+Generated On: 2026-03-15 00:27:23
+Root: C:\Users\steve\Documents\Stage_MINFI\Front-end_GBE\front-gbe
+===============================================
+
+// FILE: src/app/forgot-password/page.tsx
+-----------------------------------------------
+'use client';
+
+// ============================================================
+// FICHIER  : src/app/forgot-password/page.tsx
+// RÔLE     : Page "Mot de passe oublié".
+//            Saisie de l'email → envoi d'un lien de réinit.
+//            Affiche un écran de confirmation après envoi.
+// ============================================================
+
+import React, { useState } from 'react';
+import Link      from 'next/link';
+import AuthLayout from '@/components/auth/AuthLayout';
+import Input      from '@/components/ui/Input';
+import Button     from '@/components/ui/Button';
+import { forgotPassword } from '@/lib/authService';
+import { APP_ROUTES } from '@/constants/auth';
+
+// ── Icônes ──────────────────────────────────────────────────
+const IconMail = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="2" y="4" width="20" height="16" rx="2"/>
+    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+  </svg>
+);
+const IconAlert = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2" className="alert__icon">
+    <circle cx="12" cy="12" r="10"/>
+    <line x1="12" y1="8"  x2="12" y2="12"/>
+    <line x1="12" y1="16" x2="12.01" y2="16"/>
+  </svg>
+);
+const IconInfo = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2" className="alert__icon">
+    <circle cx="12" cy="12" r="10"/>
+    <line x1="12" y1="16" x2="12" y2="12"/>
+    <line x1="12" y1="8"  x2="12.01" y2="8"/>
+  </svg>
+);
+
+// ─────────────────────────────────────────────────────────────
+// COMPOSANT PAGE
+// ─────────────────────────────────────────────────────────────
+export default function ForgotPasswordPage() {
+  const [email,       setEmail]       = useState('');
+  const [emailError,  setEmailError]  = useState('');
+  const [globalError, setGlobalError] = useState('');
+  const [submitted,   setSubmitted]   = useState(false);
+  const [isLoading,   setIsLoading]   = useState(false);
+
+  // ── Validation locale de l'email ──
+  const validateEmail = () => {
+    if (!email.trim()) {
+      setEmailError("L'adresse email est requise");
+      return false;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setEmailError('Adresse email invalide');
+      return false;
+    }
+    return true;
+  };
+
+  // ── Soumission ──
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateEmail()) return;
+
+    setIsLoading(true);
+    setGlobalError('');
+    try {
+      await forgotPassword({ email });
+      // Toujours afficher la confirmation, même si l'email
+      // n'existe pas (sécurité : ne pas divulguer les comptes)
+      setSubmitted(true);
+    } catch (err) {
+      setGlobalError(err instanceof Error ? err.message : 'Une erreur est survenue.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <AuthLayout
+      title="Mot de passe oublié"
+      subtitle="Renseignez votre email pour recevoir un lien de réinitialisation"
+    >
+      {submitted ? (
+        /* ── État : email envoyé ── */
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', textAlign: 'center' }}>
+
+          {/* Icône succès */}
+          <div style={{
+            width: 72, height: 72, borderRadius: '50%',
+            background: '#F0FDF4', border: '2px solid #BBF7D0',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '8px auto 0',
+          }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none"
+              stroke="var(--clr-green)" strokeWidth="2">
+              <rect x="2" y="4" width="20" height="16" rx="2"/>
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+            </svg>
+          </div>
+
+          {/* Message */}
+          <div>
+            <h3 style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: '1.15rem',
+              color: 'var(--clr-navy)',
+              marginBottom: '8px',
+            }}>
+              Email envoyé !
+            </h3>
+            <p style={{ fontSize: '.875rem', color: 'var(--clr-gray-600)', lineHeight: 1.6 }}>
+              Si un compte est associé à{' '}
+              <strong style={{ color: 'var(--clr-navy)' }}>{email}</strong>,
+              vous recevrez un lien de réinitialisation sous peu.
+            </p>
+          </div>
+
+          {/* Conseil spam */}
+          <div className="alert alert--info">
+            <IconInfo />
+            Vérifiez également vos dossiers spam et courrier indésirable.
+          </div>
+
+          {/* Retour */}
+          <Link href={APP_ROUTES.LOGIN}>
+            <Button variant="ghost" fullWidth>
+              Retour à la connexion
+            </Button>
+          </Link>
+
+        </div>
+      ) : (
+        /* ── État : formulaire ── */
+        <>
+          {globalError && (
+            <div className="alert alert--error" role="alert">
+              <IconAlert /> {globalError}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} noValidate>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+              <Input
+                id="email" name="email" type="email"
+                label="Adresse email"
+                placeholder="vous@exemple.cm"
+                value={email}
+                onChange={e => {
+                  setEmail(e.target.value);
+                  setEmailError('');
+                  setGlobalError('');
+                }}
+                error={emailError}
+                icon={<IconMail />}
+                autoComplete="email"
+                autoFocus
+                disabled={isLoading}
+              />
+
+              <Button type="submit" isLoading={isLoading} fullWidth>
+                Envoyer le lien
+              </Button>
+
+            </div>
+          </form>
+
+          <p className="auth-switch">
+            <Link href={APP_ROUTES.LOGIN}>← Retour à la connexion</Link>
+          </p>
+        </>
+      )}
+    </AuthLayout>
+  );
+}
+
+// END OF FILE: src/app/forgot-password/page.tsx
+
+
+// FILE: src/app/login/page.tsx
+-----------------------------------------------
+'use client';
+
+// ============================================================
+// FICHIER  : src/app/login/page.tsx
+// RÔLE     : Page de connexion.
+//            Champs  : email, matricule, mot de passe.
+//            Extras  : toggle visibilité mdp, lien "oublié ?",
+//                      redirection vers 2FA si activé.
+// ============================================================
+
+import React, { useState } from 'react';
+import Link        from 'next/link';
+import { useRouter } from 'next/navigation';
+import AuthLayout  from '@/components/auth/AuthLayout';
+import Input       from '@/components/ui/Input';
+import Button      from '@/components/ui/Button';
+import { loginUser } from '@/lib/authService';
+import { LoginPayload, FormErrors } from '@/types/auth';
+import { APP_ROUTES }  from '@/constants/auth';
+
+// ── Icônes SVG (inline, sans dépendance externe) ────────────
+const IconMail = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2">
+    <rect x="2" y="4" width="20" height="16" rx="2"/>
+    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+  </svg>
+);
+const IconLock = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2">
+    <rect x="3" y="11" width="18" height="11" rx="2"/>
+    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+  </svg>
+);
+const IconId = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2">
+    <rect x="2" y="5" width="20" height="14" rx="2"/>
+    <path d="M16 10h2M16 14h2M6 10h4v4H6z"/>
+  </svg>
+);
+const IconEye = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+    <circle cx="12" cy="12" r="3"/>
+  </svg>
+);
+const IconEyeOff = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2">
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8
+             a18.45 18.45 0 0 1 5.06-5.94"/>
+    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8
+             a18.5 18.5 0 0 1-2.16 3.19"/>
+    <line x1="1" y1="1" x2="23" y2="23"/>
+  </svg>
+);
+const IconShield = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+  </svg>
+);
+const IconAlert = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2" className="alert__icon">
+    <circle cx="12" cy="12" r="10"/>
+    <line x1="12" y1="8"  x2="12" y2="12"/>
+    <line x1="12" y1="16" x2="12.01" y2="16"/>
+  </svg>
+);
+
+// ─────────────────────────────────────────────────────────────
+// Validation locale du formulaire de connexion
+// ─────────────────────────────────────────────────────────────
+function validate(values: LoginPayload): FormErrors {
+  const e: FormErrors = {};
+
+  if (!values.email.trim()) {
+    e.email = "L'adresse email est requise";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
+    e.email = 'Adresse email invalide';
+  }
+
+  if (!values.matricule.trim()) {
+    e.matricule = 'Le matricule est requis';
+  }
+
+  if (!values.password) {
+    e.password = 'Le mot de passe est requis';
+  }
+
+  return e;
+}
+
+// ─────────────────────────────────────────────────────────────
+// COMPOSANT PAGE
+// ─────────────────────────────────────────────────────────────
+export default function LoginPage() {
+  const router = useRouter();
+
+  // ── État du formulaire ──
+  const [values, setValues] = useState<LoginPayload>({
+    email:     '',
+    matricule: '',
+    password:  '',
+  });
+  const [errors,      setErrors]      = useState<FormErrors>({});
+  const [globalError, setGlobalError] = useState('');
+  const [isLoading,   setIsLoading]   = useState(false);
+  const [showPwd,     setShowPwd]     = useState(false);
+
+  // ── Mise à jour d'un champ + effacement de son erreur ──
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setValues(prev => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: undefined }));
+    setGlobalError('');
+  };
+
+  // ── Soumission ──
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // 1. Validation locale
+    const fieldErrors = validate(values);
+    if (Object.keys(fieldErrors).length > 0) {
+      setErrors(fieldErrors);
+      return;
+    }
+
+    // 2. Appel API
+    setIsLoading(true);
+    setGlobalError('');
+    try {
+      const res = await loginUser(values);
+
+      if (res.success) {
+        if (res.data?.sessionToken) {
+          // Back-end demande une vérification 2FA
+          sessionStorage.setItem('gbe_session_token', res.data.sessionToken);
+          router.push(APP_ROUTES.TWO_FACTOR);
+        } else {
+          // Connexion directe (2FA désactivé)
+          router.push(APP_ROUTES.DASHBOARD);
+        }
+      } else {
+        setGlobalError(res.message || 'Identifiants incorrects. Veuillez réessayer.');
+      }
+    } catch (err) {
+      setGlobalError(
+        err instanceof Error ? err.message : 'Une erreur est survenue.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <AuthLayout
+      title="Connexion"
+      subtitle="Accédez à votre espace de gestion budgétaire"
+    >
+      {/* ── Erreur globale API ── */}
+      {globalError && (
+        <div className="alert alert--error" role="alert">
+          <IconAlert />
+          {globalError}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} noValidate>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+          {/* Email */}
+          <Input
+            id="email" name="email" type="email"
+            label="Adresse email"
+            placeholder="vous@exemple.cm"
+            value={values.email}
+            onChange={handleChange}
+            error={errors.email}
+            icon={<IconMail />}
+            autoComplete="email"
+            autoFocus
+            disabled={isLoading}
+          />
+
+          {/* Matricule */}
+          <Input
+            id="matricule" name="matricule" type="text"
+            label="Matricule"
+            placeholder="Ex : 123456A"
+            value={values.matricule}
+            onChange={handleChange}
+            error={errors.matricule}
+            icon={<IconId />}
+            autoComplete="username"
+            disabled={isLoading}
+          />
+
+          {/* Mot de passe + lien oublié */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <Input
+              id="password" name="password"
+              type={showPwd ? 'text' : 'password'}
+              label="Mot de passe"
+              placeholder="••••••••"
+              value={values.password}
+              onChange={handleChange}
+              error={errors.password}
+              icon={<IconLock />}
+              autoComplete="current-password"
+              disabled={isLoading}
+              rightElement={
+                <button
+                  type="button"
+                  className="pwd-toggle"
+                  onClick={() => setShowPwd(v => !v)}
+                  aria-label={showPwd ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                >
+                  {showPwd ? <IconEyeOff /> : <IconEye />}
+                </button>
+              }
+            />
+            {/* Lien mot de passe oublié */}
+            <Link href={APP_ROUTES.FORGOT_PASSWORD} className="forgot-link">
+              Mot de passe oublié ?
+            </Link>
+          </div>
+
+          {/* Bouton connexion */}
+          <Button type="submit" isLoading={isLoading} fullWidth>
+            Se connecter
+          </Button>
+
+          {/* Badge sécurité */}
+          <div className="secure-badge">
+            <IconShield />
+            Connexion sécurisée – MINFI Cameroun
+          </div>
+
+        </div>
+      </form>
+
+      {/* Lien vers l'inscription */}
+      <p className="auth-switch">
+        Pas encore de compte ?{' '}
+        <Link href={APP_ROUTES.REGISTER}>Créer un compte</Link>
+      </p>
+    </AuthLayout>
+  );
+}
+
+// END OF FILE: src/app/login/page.tsx
+
+
+// FILE: src/app/register/page.tsx
+-----------------------------------------------
+'use client';
+
+// ============================================================
+// FICHIER  : src/app/register/page.tsx
+// RÔLE     : Page d'inscription.
+//            Champs  : prénom, nom, email, matricule,
+//                      téléphone, date de naissance,
+//                      mot de passe, confirmation mdp.
+//            Extras  : indicateur force mdp, grille 2 colonnes.
+// ============================================================
+
+import React, { useState } from 'react';
+import Link        from 'next/link';
+import { useRouter } from 'next/navigation';
+import AuthLayout  from '@/components/auth/AuthLayout';
+import Input       from '@/components/ui/Input';
+import Button      from '@/components/ui/Button';
+import { registerUser } from '@/lib/authService';
+import { RegisterPayload, FormErrors } from '@/types/auth';
+import { APP_ROUTES } from '@/constants/auth';
+
+// ── Icônes SVG ──────────────────────────────────────────────
+const IconUser = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+    <circle cx="12" cy="7" r="4"/>
+  </svg>
+);
+const IconMail = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="2" y="4" width="20" height="16" rx="2"/>
+    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+  </svg>
+);
+const IconPhone = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07
+             A19.5 19.5 0 0 1 4.69 13.5a19.79 19.79 0 0 1-3.07-8.67
+             A2 2 0 0 1 3.6 2.69h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81
+             a2 2 0 0 1-.45 2.11L7.91 10.09a16 16 0 0 0 6 6l.91-.91
+             a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 17z"/>
+  </svg>
+);
+const IconCalendar = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="3" y="4" width="18" height="18" rx="2"/>
+    <line x1="16" y1="2" x2="16" y2="6"/>
+    <line x1="8"  y1="2" x2="8"  y2="6"/>
+    <line x1="3"  y1="10" x2="21" y2="10"/>
+  </svg>
+);
+const IconId = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="2" y="5" width="20" height="14" rx="2"/>
+    <path d="M16 10h2M16 14h2M6 10h4v4H6z"/>
+  </svg>
+);
+const IconLock = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="3" y="11" width="18" height="11" rx="2"/>
+    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+  </svg>
+);
+const IconEye = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+    <circle cx="12" cy="12" r="3"/>
+  </svg>
+);
+const IconEyeOff = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8
+             a18.45 18.45 0 0 1 5.06-5.94"/>
+    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8
+             a18.5 18.5 0 0 1-2.16 3.19"/>
+    <line x1="1" y1="1" x2="23" y2="23"/>
+  </svg>
+);
+const IconCheck = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2" className="alert__icon">
+    <polyline points="20,6 9,17 4,12"/>
+  </svg>
+);
+const IconAlert = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2" className="alert__icon">
+    <circle cx="12" cy="12" r="10"/>
+    <line x1="12" y1="8"  x2="12" y2="12"/>
+    <line x1="12" y1="16" x2="12.01" y2="16"/>
+  </svg>
+);
+
+// ─────────────────────────────────────────────────────────────
+// Force du mot de passe (0 = vide, 1 = faible, 2 = moyen, 3 = fort)
+// ─────────────────────────────────────────────────────────────
+function passwordStrength(pwd: string): 0 | 1 | 2 | 3 {
+  if (!pwd) return 0;
+  let score = 0;
+  if (pwd.length >= 8)                                        score++;
+  if (/[A-Z]/.test(pwd) && /[a-z]/.test(pwd))               score++;
+  if (/[0-9]/.test(pwd) && /[^A-Za-z0-9]/.test(pwd))        score++;
+  return score as 0 | 1 | 2 | 3;
+}
+
+const STRENGTH_LABELS = ['', 'Faible', 'Moyen', 'Fort']        as const;
+const STRENGTH_MODS   = ['', 'weak',   'medium', 'strong']     as const;
+const STRENGTH_COLORS = ['', 'var(--clr-red)', 'var(--clr-yellow-dark)', 'var(--clr-green)'] as const;
+
+// ─────────────────────────────────────────────────────────────
+// Validation du formulaire d'inscription
+// ─────────────────────────────────────────────────────────────
+function validate(v: RegisterPayload): FormErrors {
+  const e: FormErrors = {};
+
+  if (!v.firstName.trim())   e.firstName = 'Le prénom est requis';
+  if (!v.lastName.trim())    e.lastName  = 'Le nom est requis';
+
+  if (!v.email.trim()) {
+    e.email = "L'adresse email est requise";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email)) {
+    e.email = 'Adresse email invalide';
+  }
+
+  if (!v.matricule.trim())   e.matricule = 'Le matricule est requis';
+
+  if (!v.phoneNumber.trim()) {
+    e.phoneNumber = 'Le numéro de téléphone est requis';
+  } else if (!/^\+?[0-9\s\-]{8,15}$/.test(v.phoneNumber)) {
+    e.phoneNumber = 'Format attendu : +237 6XX XXX XXX';
+  }
+
+  if (!v.dateOfBirth) {
+    e.dateOfBirth = 'La date de naissance est requise';
+  } else {
+    const age = (Date.now() - new Date(v.dateOfBirth).getTime())
+                / (365.25 * 24 * 3600 * 1000);
+    if (age < 18) e.dateOfBirth = 'Vous devez avoir au moins 18 ans';
+  }
+
+  if (!v.password) {
+    e.password = 'Le mot de passe est requis';
+  } else if (v.password.length < 8) {
+    e.password = 'Minimum 8 caractères';
+  } else if (!/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z\d])/.test(v.password)) {
+    e.password = 'Requiert majuscule, minuscule, chiffre et caractère spécial';
+  }
+
+  if (!v.confirmPassword) {
+    e.confirmPassword = 'Veuillez confirmer votre mot de passe';
+  } else if (v.password !== v.confirmPassword) {
+    e.confirmPassword = 'Les mots de passe ne correspondent pas';
+  }
+
+  return e;
+}
+
+// ─────────────────────────────────────────────────────────────
+// COMPOSANT PAGE
+// ─────────────────────────────────────────────────────────────
+export default function RegisterPage() {
+  const router = useRouter();
+
+  const [values, setValues] = useState<RegisterPayload>({
+    firstName: '', lastName: '', email: '', matricule: '',
+    phoneNumber: '', dateOfBirth: '', password: '', confirmPassword: '',
+  });
+  const [errors,      setErrors]      = useState<FormErrors>({});
+  const [globalError, setGlobalError] = useState('');
+  const [success,     setSuccess]     = useState('');
+  const [isLoading,   setIsLoading]   = useState(false);
+  const [showPwd,     setShowPwd]     = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  // Calculer la force du mot de passe courant
+  const strength = passwordStrength(values.password);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setValues(prev => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: undefined }));
+    setGlobalError('');
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const fieldErrors = validate(values);
+    if (Object.keys(fieldErrors).length > 0) {
+      setErrors(fieldErrors);
+      return;
+    }
+
+    setIsLoading(true);
+    setGlobalError('');
+    try {
+      const res = await registerUser(values);
+
+      if (res.success) {
+        setSuccess(res.message || 'Compte créé avec succès ! Redirection en cours…');
+        setTimeout(() => router.push(APP_ROUTES.LOGIN), 2500);
+      } else {
+        setGlobalError(res.message || "Échec de l'inscription.");
+      }
+    } catch (err) {
+      setGlobalError(
+        err instanceof Error ? err.message : 'Une erreur est survenue.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <AuthLayout
+      title="Créer un compte"
+      subtitle="Renseignez vos informations pour accéder à la plateforme GBE"
+    >
+      {/* Succès */}
+      {success && (
+        <div className="alert alert--success" role="status">
+          <IconCheck /> {success}
+        </div>
+      )}
+
+      {/* Erreur globale */}
+      {globalError && (
+        <div className="alert alert--error" role="alert">
+          <IconAlert /> {globalError}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} noValidate>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+
+          {/* Prénom / Nom */}
+          <div className="form-grid-2">
+            <Input id="firstName" name="firstName" type="text"
+              label="Prénom" placeholder="Ali"
+              value={values.firstName} onChange={handleChange}
+              error={errors.firstName} icon={<IconUser />}
+              autoComplete="given-name" disabled={isLoading} />
+
+            <Input id="lastName" name="lastName" type="text"
+              label="Nom" placeholder="Bello"
+              value={values.lastName} onChange={handleChange}
+              error={errors.lastName} icon={<IconUser />}
+              autoComplete="family-name" disabled={isLoading} />
+          </div>
+
+          {/* Email */}
+          <Input id="email" name="email" type="email"
+            label="Adresse email" placeholder="vous@exemple.cm"
+            value={values.email} onChange={handleChange}
+            error={errors.email} icon={<IconMail />}
+            autoComplete="email" disabled={isLoading} />
+
+          {/* Matricule / Téléphone */}
+          <div className="form-grid-2">
+            <Input id="matricule" name="matricule" type="text"
+              label="Matricule" placeholder="123456A"
+              value={values.matricule} onChange={handleChange}
+              error={errors.matricule} icon={<IconId />}
+              disabled={isLoading} />
+
+            <Input id="phoneNumber" name="phoneNumber" type="tel"
+              label="Téléphone" placeholder="+237 6XX XXX XXX"
+              value={values.phoneNumber} onChange={handleChange}
+              error={errors.phoneNumber} icon={<IconPhone />}
+              autoComplete="tel" disabled={isLoading} />
+          </div>
+
+          {/* Date de naissance */}
+          <Input id="dateOfBirth" name="dateOfBirth" type="date"
+            label="Date de naissance"
+            value={values.dateOfBirth} onChange={handleChange}
+            error={errors.dateOfBirth} icon={<IconCalendar />}
+            autoComplete="bday" disabled={isLoading} />
+
+          {/* Mot de passe + indicateur de force */}
+          <div>
+            <Input id="password" name="password"
+              type={showPwd ? 'text' : 'password'}
+              label="Mot de passe" placeholder="••••••••"
+              value={values.password} onChange={handleChange}
+              error={errors.password} icon={<IconLock />}
+              autoComplete="new-password" disabled={isLoading}
+              rightElement={
+                <button type="button" className="pwd-toggle"
+                  onClick={() => setShowPwd(v => !v)}
+                  aria-label={showPwd ? 'Masquer' : 'Afficher'}>
+                  {showPwd ? <IconEyeOff /> : <IconEye />}
+                </button>
+              }
+            />
+            {/* Barres de force */}
+            {values.password && (
+              <div style={{ marginTop: '6px' }}>
+                <div className="pwd-strength">
+                  {[1,2,3].map(i => (
+                    <div key={i}
+                      className={`pwd-strength__bar ${strength >= i ? `pwd-strength__bar--${STRENGTH_MODS[strength]}` : ''}`}
+                    />
+                  ))}
+                </div>
+                <p className="pwd-strength__label">
+                  Force : {' '}
+                  <strong style={{ color: STRENGTH_COLORS[strength] }}>
+                    {STRENGTH_LABELS[strength]}
+                  </strong>
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Confirmation mot de passe */}
+          <Input id="confirmPassword" name="confirmPassword"
+            type={showConfirm ? 'text' : 'password'}
+            label="Confirmer le mot de passe" placeholder="••••••••"
+            value={values.confirmPassword} onChange={handleChange}
+            error={errors.confirmPassword} icon={<IconLock />}
+            autoComplete="new-password" disabled={isLoading}
+            rightElement={
+              <button type="button" className="pwd-toggle"
+                onClick={() => setShowConfirm(v => !v)}
+                aria-label={showConfirm ? 'Masquer' : 'Afficher'}>
+                {showConfirm ? <IconEyeOff /> : <IconEye />}
+              </button>
+            }
+          />
+
+          {/* Bouton inscription */}
+          <Button type="submit" variant="secondary" isLoading={isLoading} fullWidth>
+            Créer mon compte
+          </Button>
+
+        </div>
+      </form>
+
+      <p className="auth-switch">
+        Déjà inscrit ?{' '}
+        <Link href={APP_ROUTES.LOGIN}>Se connecter</Link>
+      </p>
+    </AuthLayout>
+  );
+}
+
+// END OF FILE: src/app/register/page.tsx
+
+
+// FILE: src/app/two-factor/page.tsx
+-----------------------------------------------
+'use client';
+
+// ============================================================
+// FICHIER  : src/app/two-factor/page.tsx
+// RÔLE     : Page de vérification 2FA.
+//            Saisie case par case d'un code OTP à 6 chiffres.
+//            Fonctionnalités : auto-focus, collage, minuterie,
+//                              renvoi de code, animation erreur.
+// ============================================================
+
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import Link        from 'next/link';
+import { useRouter } from 'next/navigation';
+import AuthLayout  from '@/components/auth/AuthLayout';
+import Button      from '@/components/ui/Button';
+import { verifyTwoFactor, resendTwoFactorCode } from '@/lib/authService';
+import {
+  APP_ROUTES,
+  TWO_FACTOR_CODE_LENGTH,
+  TWO_FACTOR_CODE_EXPIRY_SECONDS,
+} from '@/constants/auth';
+
+// ── Formatage du minuteur en MM:SS ──
+const formatTime = (s: number) =>
+  `${String(Math.floor(s / 60)).padStart(2,'0')}:${String(s % 60).padStart(2,'0')}`;
+
+// ── Icônes ──────────────────────────────────────────────────
+const IconAlert = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2" className="alert__icon">
+    <circle cx="12" cy="12" r="10"/>
+    <line x1="12" y1="8"  x2="12" y2="12"/>
+    <line x1="12" y1="16" x2="12.01" y2="16"/>
+  </svg>
+);
+const IconCheck = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2" className="alert__icon">
+    <polyline points="20,6 9,17 4,12"/>
+  </svg>
+);
+const IconArrowLeft = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2">
+    <line x1="19" y1="12" x2="5" y2="12"/>
+    <polyline points="12,19 5,12 12,5"/>
+  </svg>
+);
+
+// ─────────────────────────────────────────────────────────────
+// COMPOSANT PAGE
+// ─────────────────────────────────────────────────────────────
+export default function TwoFactorPage() {
+  const router = useRouter();
+
+  // Tableau d'une chaîne par case OTP
+  const [otp,          setOtp]          = useState<string[]>(
+    Array(TWO_FACTOR_CODE_LENGTH).fill('')
+  );
+  const [hasError,     setHasError]     = useState(false);
+  const [errorMsg,     setErrorMsg]     = useState('');
+  const [resendMsg,    setResendMsg]    = useState('');
+  const [isLoading,    setIsLoading]    = useState(false);
+  const [isResending,  setIsResending]  = useState(false);
+  const [timeLeft,     setTimeLeft]     = useState(TWO_FACTOR_CODE_EXPIRY_SECONDS);
+
+  // Références sur chaque input pour le focus automatique
+  const refs = useRef<Array<HTMLInputElement | null>>(
+    Array(TWO_FACTOR_CODE_LENGTH).fill(null)
+  );
+
+  // ── Minuterie ──
+  useEffect(() => {
+    if (timeLeft <= 0) return;
+    const t = setInterval(() => setTimeLeft(n => n - 1), 1000);
+    return () => clearInterval(t);
+  }, [timeLeft]);
+
+  const isExpired   = timeLeft <= 0;
+  const codeIsFull  = otp.every(c => c !== '');
+  const otpValue    = otp.join('');
+
+  // Récupérer le token de session stocké après le login
+  const getSessionToken = () => sessionStorage.getItem('gbe_session_token') ?? '';
+
+  // ── Gestion de la saisie dans une case ──
+  const handleInput = useCallback((index: number, raw: string) => {
+    // N'accepter que les chiffres
+    if (!/^\d*$/.test(raw)) return;
+    setHasError(false);
+    setErrorMsg('');
+
+    const next = [...otp];
+
+    if (raw.length > 1) {
+      // Cas collage : distribuer les chiffres sur les cases
+      const digits = raw.replace(/\D/g,'').slice(0, TWO_FACTOR_CODE_LENGTH);
+      for (let i = 0; i < TWO_FACTOR_CODE_LENGTH; i++) {
+        next[i] = digits[i] ?? '';
+      }
+      setOtp(next);
+      refs.current[Math.min(digits.length, TWO_FACTOR_CODE_LENGTH - 1)]?.focus();
+      return;
+    }
+
+    next[index] = raw;
+    setOtp(next);
+    // Auto-focus case suivante
+    if (raw && index < TWO_FACTOR_CODE_LENGTH - 1) {
+      refs.current[index + 1]?.focus();
+    }
+  }, [otp]);
+
+  // ── Touches spéciales : Backspace, flèches ──
+  const handleKeyDown = useCallback((index: number, e: React.KeyboardEvent) => {
+    if (e.key === 'Backspace') {
+      if (otp[index]) {
+        const next = [...otp]; next[index] = ''; setOtp(next);
+      } else if (index > 0) {
+        refs.current[index - 1]?.focus();
+      }
+    } else if (e.key === 'ArrowLeft'  && index > 0) {
+      refs.current[index - 1]?.focus();
+    } else if (e.key === 'ArrowRight' && index < TWO_FACTOR_CODE_LENGTH - 1) {
+      refs.current[index + 1]?.focus();
+    }
+  }, [otp]);
+
+  // ── Vérification du code ──
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!codeIsFull || isExpired) return;
+
+    setIsLoading(true);
+    setHasError(false);
+    setErrorMsg('');
+    try {
+      const res = await verifyTwoFactor({
+        code:         otpValue,
+        sessionToken: getSessionToken(),
+      });
+
+      if (res.success) {
+        sessionStorage.removeItem('gbe_session_token');
+        router.push(APP_ROUTES.DASHBOARD);
+      } else {
+        setHasError(true);
+        setErrorMsg(res.message || 'Code incorrect. Veuillez réessayer.');
+      }
+    } catch (err) {
+      setHasError(true);
+      setErrorMsg(err instanceof Error ? err.message : 'Code invalide ou expiré.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // ── Renvoi d'un nouveau code ──
+  const handleResend = async () => {
+    if (isResending) return;
+    setIsResending(true);
+    setResendMsg('');
+    setErrorMsg('');
+    setHasError(false);
+    try {
+      await resendTwoFactorCode(getSessionToken());
+      setOtp(Array(TWO_FACTOR_CODE_LENGTH).fill(''));
+      setTimeLeft(TWO_FACTOR_CODE_EXPIRY_SECONDS);
+      setResendMsg('Un nouveau code vous a été envoyé.');
+      refs.current[0]?.focus();
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : 'Impossible de renvoyer le code.');
+    } finally {
+      setIsResending(false);
+    }
+  };
+
+  return (
+    <AuthLayout
+      title="Vérification en deux étapes"
+      subtitle="Saisissez le code à 6 chiffres envoyé à votre email ou téléphone"
+    >
+      {/* Erreur */}
+      {errorMsg && (
+        <div className="alert alert--error" role="alert">
+          <IconAlert /> {errorMsg}
+        </div>
+      )}
+
+      {/* Succès renvoi */}
+      {resendMsg && (
+        <div className="alert alert--success" role="status">
+          <IconCheck /> {resendMsg}
+        </div>
+      )}
+
+      {/* Code expiré */}
+      {isExpired && !errorMsg && (
+        <div className="alert alert--error" role="alert">
+          <IconAlert /> Le code a expiré. Veuillez en demander un nouveau.
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} noValidate>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
+          {/* Cases OTP */}
+          <div>
+            <p style={{
+              fontSize: '.8125rem', fontWeight: 600,
+              color: 'var(--clr-gray-600)', marginBottom: '12px',
+            }}>
+              Code à {TWO_FACTOR_CODE_LENGTH} chiffres
+            </p>
+
+            <div className="otp-container"
+              role="group"
+              aria-label={`Code de vérification à ${TWO_FACTOR_CODE_LENGTH} chiffres`}>
+              {otp.map((digit, i) => (
+                <input
+                  key={i}
+                  ref={el => { refs.current[i] = el; }}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="\d*"
+                  maxLength={TWO_FACTOR_CODE_LENGTH}
+                  value={digit}
+                  onChange={e => handleInput(i, e.target.value)}
+                  onKeyDown={e => handleKeyDown(i, e)}
+                  onFocus={e => e.target.select()}
+                  autoFocus={i === 0}
+                  autoComplete={i === 0 ? 'one-time-code' : 'off'}
+                  disabled={isLoading || isExpired}
+                  aria-label={`Chiffre ${i + 1}`}
+                  className={[
+                    'otp-input',
+                    digit              ? 'otp-input--filled' : '',
+                    hasError           ? 'otp-input--error'  : '',
+                  ].join(' ')}
+                />
+              ))}
+            </div>
+
+            {/* Minuterie */}
+            <p className={`otp-timer ${isExpired ? 'otp-timer--expired' : ''}`}>
+              {isExpired
+                ? <>Code <strong>expiré</strong></>
+                : <>Expire dans <strong>{formatTime(timeLeft)}</strong></>
+              }
+            </p>
+          </div>
+
+          {/* Bouton vérifier */}
+          <Button
+            type="submit"
+            isLoading={isLoading}
+            fullWidth
+            disabled={!codeIsFull || isExpired || isLoading}
+          >
+            Vérifier le code
+          </Button>
+
+          {/* Renvoi code */}
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ fontSize: '.82rem', color: 'var(--clr-gray-400)', marginBottom: '6px' }}>
+              Vous n&apos;avez pas reçu de code ?
+            </p>
+            <button
+              type="button"
+              className="resend-btn"
+              onClick={handleResend}
+              disabled={isResending || isLoading}
+            >
+              {isResending ? 'Envoi en cours…' : 'Renvoyer le code'}
+            </button>
+          </div>
+
+          {/* Retour connexion */}
+          <div style={{
+            textAlign: 'center',
+            borderTop: '1px solid var(--clr-gray-100)',
+            paddingTop: '14px',
+          }}>
+            <Link href={APP_ROUTES.LOGIN} style={{
+              fontSize: '.8rem',
+              color: 'var(--clr-gray-400)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+            }}>
+              <IconArrowLeft /> Retour à la connexion
+            </Link>
+          </div>
+
+        </div>
+      </form>
+    </AuthLayout>
+  );
+}
+
+// END OF FILE: src/app/two-factor/page.tsx
+
+
+// FILE: src/app/layout.tsx
+-----------------------------------------------
+// ============================================================
+// FICHIER  : src/app/layout.tsx
+// RÔLE     : Layout racine Next.js (App Router).
+//            Charge la feuille de style globale et définit
+//            les métadonnées HTML de l'application.
+// ============================================================
+
+import type { Metadata } from 'next';
+import './globals.css';
+
+export const metadata: Metadata = {
+  title:       "GBE – Gestion du Budget de l'État | MINFI Cameroun",
+  description: "Plateforme officielle de gestion du budget de l'État du Cameroun. "
+             + "Ministère des Finances (MINFI). Accès réservé aux agents autorisés.",
+  keywords:    ['MINFI', 'budget', 'Cameroun', 'GBE', 'finances publiques'],
+  icons: { icon: '/images/minfi-logo.svg' },
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="fr">
+      <body>{children}</body>
+    </html>
+  );
+}
+
+// END OF FILE: src/app/layout.tsx
+
+
+// FILE: src/app/page.tsx
+-----------------------------------------------
+// ============================================================
+// FICHIER  : src/app/page.tsx
+// RÔLE     : Redirection automatique de la racine "/" vers
+//            la page de connexion "/login".
+// ============================================================
+
+import { redirect } from 'next/navigation';
+
+export default function HomePage() {
+  redirect('/login');
+}
+
+// END OF FILE: src/app/page.tsx
+
+
+// FILE: src/components/auth/AuthHeader.tsx
+-----------------------------------------------
+// ============================================================
+// FICHIER  : src/components/auth/AuthHeader.tsx
+// RÔLE     : En-tête institutionnel affiché EN HAUT de toutes
+//            les pages d'authentification, au-dessus du formulaire.
+//            Contient :
+//            - Logo MINFI (gauche)
+//            - Textes officiels (centre)
+//            - Drapeau camerounais (droite)
+//            - Bandes tricolores en bas avec étoile sur le jaune
+// ============================================================
+
+import React from 'react';
+import Image from 'next/image';
+
+/**
+ * En-tête de marque GBE-MINFI.
+ * Partagé par toutes les pages d'authentification via AuthLayout.
+ */
+const AuthHeader: React.FC = () => {
+  return (
+    <header className="auth-header">
+
+      {/* ── Motifs lumineux en arrière-plan (dégradés radiaux) ── */}
+      <div className="auth-header__bg" aria-hidden="true" />
+
+      {/* ── Bandes tricolores camerounaises en bas du header ── */}
+      <div className="auth-header__stripes" aria-hidden="true">
+
+        {/* Bande verte */}
+        <div className="stripe stripe--green" />
+
+        {/* Bande rouge */}
+        <div className="stripe stripe--red" />
+
+        {/* Bande jaune avec étoile à 5 branches centrée */}
+        <div className="stripe stripe--yellow">
+          <span className="stripe__star">
+            {/*
+              Étoile à 5 branches — coordonnées calculées pour
+              s'inscrire dans la hauteur de la bande (10px).
+              viewBox large → scale automatique via height="100%".
+            */}
+            <svg
+              viewBox="0 0 24 24"
+              height="8"
+              width="8"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              {/* Étoile pleine, couleur blanc pour contraste sur jaune */}
+              <polygon
+                fill="#0D2B55"
+                points="
+                  12,2
+                  15.09,8.26
+                  22,9.27
+                  17,14.14
+                  18.18,21.02
+                  12,17.77
+                  5.82,21.02
+                  7,14.14
+                  2,9.27
+                  8.91,8.26
+                "
+              />
+            </svg>
+          </span>
+        </div>
+
+      </div>
+
+      {/* ── Contenu principal : logo | textes | drapeau ── */}
+      <div className="auth-header__content">
+
+        {/* Logo MINFI — remplacer .svg par .png officiel si disponible */}
+        <div className="auth-header__logo-wrap">
+          <Image
+            src="/images/logo-minfi.png"
+            alt="Logo du Ministère des Finances du Cameroun – MINFI"
+            width={80}
+            height={80}
+            priority
+            className="auth-header__logo"
+          />
+        </div>
+
+        {/* Bloc de textes institutionnels centré */}
+        <div className="auth-header__texts">
+
+          {/* République */}
+          <p className="auth-header__republic">République du Cameroun</p>
+
+          {/* Devise nationale */}
+          <p className="auth-header__motto">Paix – Travail – Patrie</p>
+
+          {/* Séparateur tricolore décoratif */}
+          <div className="auth-header__divider" aria-hidden="true" />
+
+          {/* Nom du ministère */}
+          <h1 className="auth-header__ministry">Ministère des Finances</h1>
+
+          {/* Nom de l'application */}
+          <p className="auth-header__app">Gestion du Budget de l&apos;État</p>
+
+        </div>
+
+        {/* Drapeau camerounais — remplacer .svg par .png officiel si disponible */}
+        <div className="auth-header__flag-wrap">
+          <Image
+            src="/images/cameroon_flag.jpg"
+            alt="Drapeau de la République du Cameroun"
+            width={72}
+            height={48}
+            className="auth-header__flag"
+          />
+        </div>
+
+      </div>
+    </header>
+  );
+};
+
+export default AuthHeader;
+
+// END OF FILE: src/components/auth/AuthHeader.tsx
+
+
+// FILE: src/components/auth/AuthLayout.tsx
+-----------------------------------------------
+// ============================================================
+// FICHIER  : src/components/auth/AuthLayout.tsx
+// RÔLE     : Layout partagé par toutes les pages d'auth.
+//            Structure (colonne unique centrée) :
+//            ┌─────────────────────────────────┐
+//            │  AuthHeader (logo + textes)     │  ← bleu marine
+//            ├─────────────────────────────────┤
+//            │  Titre du formulaire            │
+//            │  Sous-titre                     │
+//            │  {children} (formulaire)        │
+//            │  Footer                         │
+//            └─────────────────────────────────┘
+// ============================================================
+
+import React from 'react';
+import Link  from 'next/link';
+import AuthHeader from './AuthHeader';
+
+// ── Props du composant ──
+interface AuthLayoutProps {
+  /** Titre principal du formulaire (ex : "Connexion") */
+  title: string;
+  /** Description courte sous le titre */
+  subtitle: string;
+  /** Contenu du formulaire injecté par chaque page */
+  children: React.ReactNode;
+}
+
+/**
+ * Enveloppe de mise en page pour toutes les pages d'authentification.
+ *
+ * Usage :
+ * ```tsx
+ * <AuthLayout title="Connexion" subtitle="Accédez à votre espace">
+ *   <LoginForm />
+ * </AuthLayout>
+ * ```
+ */
+const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, children }) => {
+  return (
+    // Arrière-plan de la page entière
+    <div className="auth-page">
+
+      {/* ── En-tête institutionnel (logo MINFI + drapeau + textes) ── */}
+      <AuthHeader />
+
+      {/* ── Zone du formulaire ── */}
+      <main className="auth-main">
+
+        {/* Carte blanche qui contient le formulaire */}
+        <div className="auth-card">
+
+          {/* En-tête de la carte : titre + sous-titre */}
+          <div className="auth-card__header">
+            <h2 className="auth-card__title">{title}</h2>
+            <p  className="auth-card__subtitle">{subtitle}</p>
+          </div>
+
+          {/* Corps : formulaire injecté par la page parente */}
+          <div className="auth-card__body">
+            {children}
+          </div>
+
+        </div>
+
+        {/* ── Pied de page ── */}
+        <footer className="auth-footer">
+          <p>© {new Date().getFullYear()} MINFI – République du Cameroun</p>
+          <p>
+            <Link href="/aide"    className="auth-footer__link">Aide</Link>
+            {' · '}
+            <Link href="/contact" className="auth-footer__link">Contact</Link>
+          </p>
+        </footer>
+
+      </main>
+    </div>
+  );
+};
+
+export default AuthLayout;
+
+// END OF FILE: src/components/auth/AuthLayout.tsx
+
+
+// FILE: src/components/ui/Button.tsx
+-----------------------------------------------
+// ============================================================
+// FICHIER  : src/components/ui/Button.tsx
+// RÔLE     : Bouton réutilisable avec 3 variantes visuelles,
+//            état de chargement (spinner) et support disabled.
+// ============================================================
+
+import React, { ButtonHTMLAttributes } from 'react';
+
+// ── Props du composant ──
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  /**
+   * Variante visuelle :
+   * - primary   → bleu marine (action principale)
+   * - secondary → vert MINFI (action secondaire / inscription)
+   * - ghost     → transparent avec bordure (action tertiaire)
+   */
+  variant?: 'primary' | 'secondary' | 'ghost';
+  /** Affiche un spinner et désactive le bouton pendant un chargement */
+  isLoading?: boolean;
+  /** Prend toute la largeur du conteneur parent */
+  fullWidth?: boolean;
+}
+
+/**
+ * Bouton du design system GBE-MINFI.
+ *
+ * Usage :
+ * ```tsx
+ * <Button variant="primary" isLoading={isSubmitting} fullWidth>
+ *   Se connecter
+ * </Button>
+ * ```
+ */
+const Button: React.FC<ButtonProps> = ({
+  children,
+  variant   = 'primary',
+  isLoading = false,
+  fullWidth = false,
+  disabled,
+  className = '',
+  ...rest
+}) => {
+  const isDisabled = disabled || isLoading;
+
+  return (
+    <button
+      className={[
+        'btn',
+        `btn--${variant}`,
+        fullWidth ? 'btn--full' : '',
+        className,
+      ].join(' ')}
+      disabled={isDisabled}
+      aria-busy={isLoading}
+      {...rest}
+    >
+      {isLoading ? (
+        /* ── État chargement : spinner + texte ── */
+        <span className="btn__loader">
+          <span className="btn__spinner" aria-hidden="true" />
+          <span>Chargement...</span>
+        </span>
+      ) : (
+        /* ── État normal ── */
+        children
+      )}
+    </button>
+  );
+};
+
+export default Button;
+
+// END OF FILE: src/components/ui/Button.tsx
+
+
+// FILE: src/components/ui/Input.tsx
+-----------------------------------------------
+// ============================================================
+// FICHIER  : src/components/ui/Input.tsx
+// RÔLE     : Champ de saisie réutilisable avec label, icône
+//            gauche, élément droit (ex : toggle mot de passe)
+//            et affichage des erreurs de validation.
+//            Compatible react-hook-form grâce à forwardRef.
+// ============================================================
+
+import React, { InputHTMLAttributes, forwardRef } from 'react';
+
+// ── Props du composant ──────────────────────────────────────
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+  /** Label affiché au-dessus du champ */
+  label: string;
+  /** Message d'erreur de validation (optionnel) */
+  error?: string;
+  /** Icône SVG affichée à gauche dans le champ */
+  icon?: React.ReactNode;
+  /** Élément affiché à droite (ex : bouton afficher/masquer mdp) */
+  rightElement?: React.ReactNode;
+}
+
+/**
+ * Champ de saisie universel du design system GBE-MINFI.
+ *
+ * Usage :
+ * ```tsx
+ * <Input
+ *   name="email"
+ *   label="Adresse email"
+ *   type="email"
+ *   placeholder="vous@exemple.cm"
+ *   icon={<MailIcon />}
+ *   error={errors.email}
+ * />
+ * ```
+ */
+const Input = forwardRef<HTMLInputElement, InputProps>(
+  ({ label, error, icon, rightElement, className = '', id, name, ...rest }, ref) => {
+
+    // Utiliser `id` s'il est fourni, sinon `name` pour le lien label ↔ input
+    const fieldId = id ?? name;
+
+    return (
+      <div className="inp-group">
+
+        {/* ── Label ── */}
+        <label className="inp-label" htmlFor={fieldId}>
+          {label}
+        </label>
+
+        {/* ── Wrapper relatif pour positionner les icônes ── */}
+        <div className="inp-wrapper">
+
+          {/* Icône gauche (optionnelle) */}
+          {icon && (
+            <span className="inp-icon-left" aria-hidden="true">
+              {icon}
+            </span>
+          )}
+
+          {/* Champ de saisie */}
+          <input
+            ref={ref}
+            id={fieldId}
+            name={name}
+            className={[
+              'inp-field',
+              icon         ? 'inp-field--with-icon'  : '',
+              rightElement ? 'inp-field--with-right'  : '',
+              error        ? 'inp-field--error'        : '',
+              className,
+            ].filter(Boolean).join(' ')}
+            aria-describedby={error ? `${fieldId}-error` : undefined}
+            aria-invalid={error ? true : undefined}
+            {...rest}
+          />
+
+          {/* Élément droit (ex : toggle visibilité mot de passe) */}
+          {rightElement && (
+            <span className="inp-icon-right">
+              {rightElement}
+            </span>
+          )}
+
+        </div>
+
+        {/* ── Message d'erreur ── */}
+        {error && (
+          <p
+            id={`${fieldId}-error`}
+            className="inp-error-msg"
+            role="alert"
+          >
+            {/* Icône d'avertissement inline */}
+            <svg
+              width="12" height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8"  x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            {error}
+          </p>
+        )}
+
+      </div>
+    );
+  }
+);
+
+Input.displayName = 'Input';
+
+// ✅ Export par défaut — s'importe SANS accolades :
+// import Input from '@/components/ui/Input'
+export default Input;
+
+// END OF FILE: src/components/ui/Input.tsx
+
+
+// FILE: src/constants/auth.ts
+-----------------------------------------------
+// ============================================================
+// FICHIER  : src/constants/auth.ts
+// RÔLE     : Centralisation de toutes les constantes liées
+//            à l'authentification : URLs API et routes internes.
+//            Pour changer de back-end, modifier uniquement
+//            la variable NEXT_PUBLIC_API_URL dans .env.local.
+// ============================================================
+
+/**
+ * URL de base de l'API.
+ * Définie via la variable d'environnement NEXT_PUBLIC_API_URL.
+ * Valeur par défaut : serveur local sur le port 8080.
+ */
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080/api/v1';
+
+/**
+ * Endpoints de l'API d'authentification.
+ * Préfixés par API_BASE_URL pour construire l'URL complète.
+ */
+export const AUTH_ENDPOINTS = {
+  LOGIN:             `${API_BASE_URL}/auth/login`,
+  REGISTER:          `${API_BASE_URL}/auth/register`,
+  TWO_FACTOR_VERIFY: `${API_BASE_URL}/auth/2fa/verify`,
+  TWO_FACTOR_RESEND: `${API_BASE_URL}/auth/2fa/resend`,
+  FORGOT_PASSWORD:   `${API_BASE_URL}/auth/forgot-password`,
+  RESET_PASSWORD:    `${API_BASE_URL}/auth/reset-password`,
+  LOGOUT:            `${API_BASE_URL}/auth/logout`,
+  REFRESH_TOKEN:     `${API_BASE_URL}/auth/refresh`,
+} as const;
+
+/**
+ * Routes de navigation de l'application Next.js.
+ * Utiliser ces constantes dans router.push() pour éviter
+ * les chaînes de caractères codées en dur.
+ */
+export const APP_ROUTES = {
+  LOGIN:           '/login',
+  REGISTER:        '/register',
+  TWO_FACTOR:      '/two-factor',
+  FORGOT_PASSWORD: '/forgot-password',
+  DASHBOARD:       '/dashboard',
+} as const;
+
+/**
+ * Durée de validité du code 2FA en secondes (5 minutes).
+ */
+export const TWO_FACTOR_CODE_EXPIRY_SECONDS = 300;
+
+/**
+ * Nombre de chiffres du code OTP.
+ */
+export const TWO_FACTOR_CODE_LENGTH = 6;
+
+// END OF FILE: src/constants/auth.ts
+
+
+// FILE: src/lib/authService.ts
+-----------------------------------------------
+// ============================================================
+// FICHIER  : src/lib/authService.ts
+// RÔLE     : Couche d'abstraction pour tous les appels API
+//            d'authentification. Les composants ne font jamais
+//            de fetch directement — ils passent par ce service.
+//            Pour brancher un vrai back-end : modifier uniquement
+//            les endpoints dans src/constants/auth.ts.
+// ============================================================
+
+import {
+  LoginPayload,
+  RegisterPayload,
+  TwoFactorPayload,
+  ForgotPasswordPayload,
+  AuthApiResponse,
+} from '@/types/auth';
+import { AUTH_ENDPOINTS } from '@/constants/auth';
+
+// ── Headers par défaut pour toutes les requêtes ──
+const DEFAULT_HEADERS: HeadersInit = {
+  'Content-Type': 'application/json',
+  'Accept':       'application/json',
+};
+
+/**
+ * Utilitaire interne : exécute un POST et lève une exception
+ * si la réponse HTTP n'est pas dans la plage 2xx.
+ *
+ * @param url     - URL de l'endpoint
+ * @param payload - Corps de la requête (sera sérialisé en JSON)
+ * @returns Réponse JSON typée AuthApiResponse
+ */
+async function postJson<T>(url: string, payload: T): Promise<AuthApiResponse> {
+  const response = await fetch(url, {
+    method:  'POST',
+    headers: DEFAULT_HEADERS,
+    body:    JSON.stringify(payload),
+  });
+
+  // Lire le corps même en cas d'erreur pour récupérer le message du serveur
+  const data: AuthApiResponse = await response.json().catch(() => ({
+    success: false,
+    message: 'Erreur réseau ou réponse invalide du serveur.',
+  }));
+
+  if (!response.ok) {
+    // Lever une erreur avec le message renvoyé par l'API
+    throw new Error(data.message || `Erreur HTTP ${response.status}`);
+  }
+
+  return data;
+}
+
+// ─────────────────────────────────────────────────────────────
+// FONCTIONS PUBLIQUES
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Connecte un utilisateur avec email, matricule et mot de passe.
+ * Si le 2FA est activé, la réponse contient un `sessionToken`
+ * et non un `accessToken`.
+ */
+export async function loginUser(
+  payload: LoginPayload
+): Promise<AuthApiResponse> {
+  return postJson(AUTH_ENDPOINTS.LOGIN, payload);
+}
+
+/**
+ * Inscrit un nouvel utilisateur.
+ * Le back-end doit valider l'unicité de l'email et du matricule.
+ */
+export async function registerUser(
+  payload: RegisterPayload
+): Promise<AuthApiResponse> {
+  return postJson(AUTH_ENDPOINTS.REGISTER, payload);
+}
+
+/**
+ * Vérifie le code OTP reçu par email ou SMS.
+ * Retourne un `accessToken` si le code est correct.
+ */
+export async function verifyTwoFactor(
+  payload: TwoFactorPayload
+): Promise<AuthApiResponse> {
+  return postJson(AUTH_ENDPOINTS.TWO_FACTOR_VERIFY, payload);
+}
+
+/**
+ * Demande le renvoi d'un nouveau code OTP.
+ * Nécessite le `sessionToken` de la session en cours.
+ */
+export async function resendTwoFactorCode(
+  sessionToken: string
+): Promise<AuthApiResponse> {
+  return postJson(AUTH_ENDPOINTS.TWO_FACTOR_RESEND, { sessionToken });
+}
+
+/**
+ * Envoie un email de réinitialisation de mot de passe.
+ * Toujours retourner un succès côté UI (sécurité : ne pas
+ * révéler si l'email existe dans la base).
+ */
+export async function forgotPassword(
+  payload: ForgotPasswordPayload
+): Promise<AuthApiResponse> {
+  return postJson(AUTH_ENDPOINTS.FORGOT_PASSWORD, payload);
+}
+
+// END OF FILE: src/lib/authService.ts
+
+
+// FILE: src/types/auth.ts
+-----------------------------------------------
+// ============================================================
+// FICHIER  : src/types/auth.ts
+// RÔLE     : Définition de toutes les interfaces TypeScript
+//            utilisées dans les pages d'authentification.
+//            Centraliser ici facilite la maintenance et
+//            garantit la cohérence avec le back-end.
+// ============================================================
+
+/**
+ * Payload envoyé au back-end lors de la connexion.
+ * Route : POST /auth/login
+ */
+export interface LoginPayload {
+  email:     string; // Adresse email de l'utilisateur
+  matricule: string; // Identifiant administratif unique
+  password:  string; // Mot de passe en clair (HTTPS obligatoire)
+}
+
+/**
+ * Payload envoyé au back-end lors de l'inscription.
+ * Route : POST /auth/register
+ */
+export interface RegisterPayload {
+  firstName:       string; // Prénom
+  lastName:        string; // Nom de famille
+  email:           string; // Adresse email
+  password:        string; // Mot de passe choisi
+  confirmPassword: string; // Confirmation (validé côté client seulement)
+  phoneNumber:     string; // Ex : +237655555555
+  dateOfBirth:     string; // Format ISO : "1990-01-25"
+  matricule:       string; // Matricule administratif
+}
+
+/**
+ * Payload envoyé pour vérifier le code OTP 2FA.
+ * Route : POST /auth/2fa/verify
+ */
+export interface TwoFactorPayload {
+  code:         string; // Code à 6 chiffres reçu par email/SMS
+  sessionToken: string; // Token temporaire retourné après login réussi
+}
+
+/**
+ * Payload pour demander la réinitialisation du mot de passe.
+ * Route : POST /auth/forgot-password
+ */
+export interface ForgotPasswordPayload {
+  email: string;
+}
+
+/**
+ * Structure de réponse standard de l'API d'authentification.
+ * Toutes les routes auth renvoient ce format.
+ */
+export interface AuthApiResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    accessToken?:  string; // JWT d'accès (connexion complète)
+    refreshToken?: string; // JWT de rafraîchissement
+    sessionToken?: string; // Token temporaire pour le flux 2FA
+    user?: {
+      id:        string;
+      firstName: string;
+      lastName:  string;
+      email:     string;
+      matricule: string;
+      role:      string;
+    };
+  };
+}
+
+/**
+ * Dictionnaire d'erreurs de validation par champ.
+ * Clé = nom du champ, valeur = message d'erreur ou undefined.
+ */
+export type FormErrors = Record<string, string | undefined>;
+
+// END OF FILE: src/types/auth.ts
+
+
+// FILE: .gitignore
+-----------------------------------------------
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+
+// END OF FILE: .gitignore
+
+
+// FILE: eslint.config.mjs
+-----------------------------------------------
+import { defineConfig, globalIgnores } from "eslint/config";
+import nextVitals from "eslint-config-next/core-web-vitals";
+import nextTs from "eslint-config-next/typescript";
+
+const eslintConfig = defineConfig([
+  ...nextVitals,
+  ...nextTs,
+  // Override default ignores of eslint-config-next.
+  globalIgnores([
+    // Default ignores of eslint-config-next:
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+  ]),
+]);
+
+export default eslintConfig;
+
+
+// END OF FILE: eslint.config.mjs
+
+
+// FILE: extract_context.ps1
+-----------------------------------------------
+<#
+.SYNOPSIS
+Extrait le code source d'un projet Next.js pour l'utiliser comme contexte IA.
+#>
+
+param (
+    [string]$ProjectPath = "."
+)
+
+$OutputFilename = "project_context_frontend.txt"
+
+# Résolution du chemin absolu
+try {
+    $ResolvedPath = (Resolve-Path $ProjectPath -ErrorAction Stop).Path
+} catch {
+    Write-Error "Erreur: Répertoire invalide ($ProjectPath)."
+    exit 1
+}
+
+$OutputFile = Join-Path $ResolvedPath $OutputFilename
+
+# Suppression de l'ancien fichier s'il existe
+if (Test-Path $OutputFile) {
+    Remove-Item $OutputFile -Force
+}
+
+# Dossiers à ignorer (optimisation : on n'y entre même pas)
+$ExcludeDirs = @(
+    ".git", ".vscode", ".idea", "node_modules", ".next", 
+    "out", "build", "coverage", "public", "dist", ".vercel"
+)
+
+# Fichiers à ignorer (accepte les wildcards *)
+$ExcludeFiles = @(
+    "*.log", "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "bun.lockb",
+    ".env*", "*.ico", "*.png", "*.jpg", "*.jpeg", "*.svg", "*.webp", 
+    "*.pdf", "*.map", "*.ttf", "*.woff", "*.woff2", "*.eot", "*.mp4",
+    $OutputFilename
+)
+
+# Fonction pour vérifier si un fichier est binaire (contient des octets nuls)
+function Test-IsBinary {
+    param ([string]$FilePath)
+    try {
+        $bytes = [System.IO.File]::ReadAllBytes($FilePath)
+        $checkLength = [math]::Min(1024, $bytes.Length)
+        for ($i = 0; $i -lt $checkLength; $i++) {
+            if ($bytes[$i] -eq 0) { return $true }
+        }
+        return $false
+    } catch {
+        return $true # En cas d'erreur de lecture, on ignore par sécurité
+    }
+}
+
+$foundFiles = [System.Collections.Generic.List[string]]::new()
+
+# Fonction récursive pour lister les fichiers valides
+function Get-ValidFiles {
+    param ([string]$CurrentDir)
+    
+    $items = Get-ChildItem -Path $CurrentDir -Force -ErrorAction SilentlyContinue
+    
+    foreach ($item in $items) {
+        if ($item.PSIsContainer) {
+            # Si c'est un dossier et qu'il n'est pas dans la liste d'exclusion
+            if ($ExcludeDirs -notcontains $item.Name) {
+                Get-ValidFiles -CurrentDir $item.FullName
+            }
+        } else {
+            # Si c'est un fichier, on vérifie son extension/nom
+            $skip = $false
+            foreach ($pattern in $ExcludeFiles) {
+                if ($item.Name -like $pattern) {
+                    $skip = $true
+                    break
+                }
+            }
+            if (-not $skip) {
+                $foundFiles.Add($item.FullName)
+            }
+        }
+    }
+}
+
+Write-Host "Recherche des fichiers en cours..." -ForegroundColor Cyan
+Get-ValidFiles -CurrentDir $ResolvedPath
+
+# Écriture de l'en-tête
+$dateStr = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+$header = @"
+Next.js Project Context
+Generated On: $dateStr
+Root: $ResolvedPath
+===============================================
+"@
+
+Set-Content -Path $OutputFile -Value $header -Encoding UTF8
+
+Write-Host "Génération du fichier de contexte en cours..." -ForegroundColor Cyan
+
+foreach ($file in $foundFiles) {
+    # Calcul du chemin relatif
+    $relativePath = $file.Substring($ResolvedPath.Length).TrimStart('\')
+    $relativePath = $relativePath -replace '\\', '/' # Formatage type UNIX pour l'IA
+    
+    $fileHeader = "`n// FILE: $relativePath`n-----------------------------------------------"
+    Add-Content -Path $OutputFile -Value $fileHeader -Encoding UTF8
+    
+    if (Test-IsBinary -FilePath $file) {
+        Add-Content -Path $OutputFile -Value "[Fichier binaire ou asset omis]" -Encoding UTF8
+    } else {
+        try {
+            # Lecture du contenu brut
+            $content = Get-Content -Path $file -Raw -Encoding UTF8 -ErrorAction Stop
+            if ($null -ne $content) {
+                Add-Content -Path $OutputFile -Value $content -Encoding UTF8
+            }
+        } catch {
+            Add-Content -Path $OutputFile -Value "[Erreur lors de la lecture du fichier]" -Encoding UTF8
+        }
+    }
+    
+    Add-Content -Path $OutputFile -Value "`n// END OF FILE: $relativePath`n" -Encoding UTF8
+}
+
+Write-Host "Succès ! Ton contexte Next.js est prêt dans : $OutputFile" -ForegroundColor Green
+
+// END OF FILE: extract_context.ps1
+
+
+// FILE: extract_context.sh
+-----------------------------------------------
+#!/bin/bash
+
+# --- Configuration ---
+
+# Chemin par défaut ou premier argument
+PROJECT_PATH="${1:-.}"
+OUTPUT_FILENAME="project_context_frontend.txt"
+
+# Résolution du chemin absolu
+PROJECT_PATH=$(realpath "$PROJECT_PATH" 2>/dev/null)
+
+if [ ! -d "$PROJECT_PATH" ]; then
+    echo "Erreur: Répertoire invalide ($PROJECT_PATH)." >&2
+    exit 1
+fi
+
+OUTPUT_FILE="$PROJECT_PATH/$OUTPUT_FILENAME"
+
+# Dossiers à ignorer totalement (prune)
+EXCLUDE_DIRS=(
+    ".git" ".vscode" ".idea" "node_modules" ".next" 
+    "out" "build" "coverage" "public" "dist" ".vercel"
+)
+
+# Fichiers à ignorer (patterns)
+EXCLUDE_FILES=(
+    "*.log" "package-lock.json" "yarn.lock" "pnpm-lock.yaml" "bun.lockb"
+    ".env*" "*.ico" "*.png" "*.jpg" "*.jpeg" "*.svg" "*.webp" 
+    "*.pdf" "*.map" "*.ttf" "*.woff" "*.woff2" "*.eot" "*.mp4"
+    "$OUTPUT_FILENAME"
+)
+
+# --- Préparation de la commande find ---
+
+# Construction des arguments d'exclusion de dossiers
+PRUNE_ARGS=()
+for dir in "${EXCLUDE_DIRS[@]}"; do
+    if [ ${#PRUNE_ARGS[@]} -gt 0 ]; then PRUNE_ARGS+=("-o"); fi
+    PRUNE_ARGS+=("-name" "$dir")
+done
+
+# Construction des arguments d'exclusion de fichiers
+FILE_ARGS=()
+for file in "${EXCLUDE_FILES[@]}"; do
+    FILE_ARGS+=("!" "-name" "$file")
+done
+
+# --- Exécution ---
+
+echo "Recherche des fichiers dans : $PROJECT_PATH..."
+
+# Entête du fichier
+{
+    echo "Next.js Project Context"
+    echo "Generated On: $(date '+%Y-%m-%d %H:%M:%S')"
+    echo "Root: $PROJECT_PATH"
+    echo "==============================================="
+} > "$OUTPUT_FILE"
+
+# Recherche et traitement des fichiers
+# 1. On ignore les dossiers listés
+# 2. On prend uniquement les fichiers (-type f)
+# 3. On applique les exclusions de noms de fichiers
+find "$PROJECT_PATH" \( "${PRUNE_ARGS[@]}" \) -prune -o -type f "${FILE_ARGS[@]}" -print | sort | while read -r FILE; do
+    
+    # Calcul du chemin relatif
+    RELATIVE_PATH="${FILE#"$PROJECT_PATH"/}"
+    
+    echo "Traitement de : $RELATIVE_PATH"
+
+    {
+        echo -e "\n// FILE: $RELATIVE_PATH"
+        echo "-----------------------------------------------"
+    } >> "$OUTPUT_FILE"
+
+    # Vérification si le fichier est binaire
+    # Sur Linux, 'grep -I' est le moyen le plus rapide de détecter un binaire
+    if grep -qI . "$FILE"; then
+        cat "$FILE" >> "$OUTPUT_FILE"
+    else
+        echo "[Fichier binaire ou asset omis]" >> "$OUTPUT_FILE"
+    fi
+
+    echo -e "\n// END OF FILE: $RELATIVE_PATH" >> "$OUTPUT_FILE"
+done
+
+echo "-----------------------------------------------"
+echo "Succès ! Le contexte est prêt : $OUTPUT_FILE"
+
+
+// END OF FILE: extract_context.sh
+
+
+// FILE: MIGRATION.md
+-----------------------------------------------
+## ✅ Restructuration Complétée
+
+La structure de votre projet a été réorganisée avec succès selon vos spécifications.
+
+### Changements apportés
+
+#### 1. **Dossier src/** créé avec l'architecture complète
+- ✅ `src/app/` - Dossier principal Next.js App Router
+  - `layout.tsx` - Root layout avec métadonnées
+  - `globals.css` - Design system et variables CSS
+  - `page.tsx` - Redirection "/" → "/login"
+  - Pages d'authentification :
+    - `login/page.tsx`
+    - `register/page.tsx`
+    - `two-factor/page.tsx`
+    - `forgot-password/page.tsx`
+
+- ✅ `src/components/` - Composants réutilisables
+  - `auth/AuthHeader.tsx` - En-tête avec logo MINFI + drapeau
+  - `auth/AuthLayout.tsx` - Layout partagé pour toutes les pages d'auth
+  - `ui/Input.tsx` - Composant Input avec gestion d'erreurs
+  - `ui/Button.tsx` - Composant Button avec 3 variantes (primary, secondary, danger)
+
+- ✅ `src/constants/auth.ts` - Constantes centralisées
+  - URLs API
+  - Routes internes de l'application
+
+- ✅ `src/lib/authService.ts` - Service d'API d'authentification
+  - Appels API pour login, register, OTP, password reset, etc.
+  - Gestion des erreurs
+
+- ✅ `src/types/auth.ts` - Interfaces TypeScript
+  - LoginPayload, RegisterPayload, AuthResponse
+  - OtpVerificationPayload, PasswordResetPayload
+
+#### 2. **Dossier public/images/** créé
+- ✅ `public/images/minfi-logo.svg` - Placeholder logo MINFI
+- ✅ `public/images/cameroon-flag.svg` - Drapeau camerounais
+
+#### 3. **Fichiers de configuration**
+- ✅ `tsconfig.json` - Alias '@/*' mis à jour pour pointer sur './src/*'
+- ✅ `.env.example` - Modèle de variables d'environnement
+- ✅ `PROJECT_STRUCTURE.md` - Documentation complète
+- ✅ `MIGRATION.md` - Ce fichier
+
+#### 4. **Ancien dossier app/** supprimé
+- ✅ Ancien `/app` à la racine supprimé
+- ✅ Cache Next.js nettoyé
+
+### Vérification de la compilation
+
+```
+✅ Build Next.js réussit
+✅ TypeScript valide
+✅ Toutes les routes compilées :
+   - / (redirect to /login)
+   - /login
+   - /register
+   - /two-factor
+   - /forgot-password
+   - /_not-found
+```
+
+### Prochain pas
+
+1. **Configurer .env.local**
+   ```bash
+   cp .env.example .env.local
+   ```
+
+2. **Installer les dépendances** (si nécessaire)
+   ```bash
+   npm install
+   ```
+
+3. **Démarrer le serveur de développement**
+   ```bash
+   npm run dev
+   ```
+
+4. **Implémenter les formulaires d'authentification**
+   - Créer des fichiers pour chaque page (login, register, etc.)
+   - Intégrer les composants Input et Button
+   - Utiliser authService pour les appels API
+
+5. **Intégrer le backend**
+   - Configurer l'URL de l'API dans `.env.local`
+   - Adapter authService.ts aux endpoints réels
+
+### Structure finale prête pour développement
+
+Le projet est maintenant structuré profesionnellement et prêt pour :
+- ✅ Développement local
+- ✅ Tests unitaires et e2e
+- ✅ Déploiement en production
+- ✅ Scalabilité future
+
+Tous les fichiers sont en TypeScript avec une excellente expérience de développement (types, autocomplete, vérification de sécurité).
+
+
+// END OF FILE: MIGRATION.md
+
+
+// FILE: next-env.d.ts
+-----------------------------------------------
+/// <reference types="next" />
+/// <reference types="next/image-types/global" />
+import "./.next/dev/types/routes.d.ts";
+
+// NOTE: This file should not be edited
+// see https://nextjs.org/docs/app/api-reference/config/typescript for more information.
+
+
+// END OF FILE: next-env.d.ts
+
+
+// FILE: next.config.ts
+-----------------------------------------------
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  /* config options here */
+};
+
+export default nextConfig;
+
+
+// END OF FILE: next.config.ts
+
+
+// FILE: package.json
+-----------------------------------------------
+{
+  "name": "front-gbe",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "@shadcn/ui": "^0.0.4",
+    "date-fns": "^4.1.0",
+    "lucide-react": "^0.577.0",
+    "next": "16.1.6",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-hook-form": "^7.71.2",
+    "recharts": "^3.8.0",
+    "zod": "^4.3.6",
+    "zustand": "^5.0.11"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
+
+
+// END OF FILE: package.json
+
+
+// FILE: postcss.config.mjs
+-----------------------------------------------
+const config = {
+  plugins: {
+    "@tailwindcss/postcss": {},
+  },
+};
+
+export default config;
+
+
+// END OF FILE: postcss.config.mjs
+
+
+// FILE: PROJECT_STRUCTURE.md
+-----------------------------------------------
+# MINFI - Front-end GBE
+
+Plateforme d'authentification Frontend pour le MINFI (Ministère des Finances du Cameroun).
+
+## Structure du Projet
+
+```
+front-gbe/
+├── public/
+│   └── images/
+│       ├── minfi-logo.svg        ← Logo du MINFI
+│       └── cameroon-flag.svg     ← Drapeau camerounais
+│
+├── src/
+│   ├── app/
+│   │   ├── globals.css           ← Design system (variables, composants)
+│   │   ├── layout.tsx            ← Root layout Next.js
+│   │   ├── page.tsx              ← Redirection "/" → "/login"
+│   │   ├── login/
+│   │   │   └── page.tsx          ← Page de connexion
+│   │   ├── register/
+│   │   │   └── page.tsx          ← Page d'inscription
+│   │   ├── two-factor/
+│   │   │   └── page.tsx          ← Page 2FA (code OTP)
+│   │   └── forgot-password/
+│   │       └── page.tsx          ← Page mot de passe oublié
+│   │
+│   ├── components/
+│   │   ├── auth/
+│   │   │   ├── AuthHeader.tsx    ← En-tête institutionnel
+│   │   │   └── AuthLayout.tsx    ← Layout partagé
+│   │   └── ui/
+│   │       ├── Input.tsx         ← Champ de saisie
+│   │       └── Button.tsx        ← Bouton (3 variantes)
+│   │
+│   ├── constants/
+│   │   └── auth.ts               ← URLs API et routes
+│   │
+│   ├── lib/
+│   │   └── authService.ts        ← Appels API
+│   │
+│   └── types/
+│       └── auth.ts               ← Interfaces TypeScript
+│
+├── .env.example                  ← Variables d'environnement
+├── .eslintrc.json
+├── .gitignore
+├── eslint.config.mjs
+├── next.config.ts
+├── package.json
+├── postcss.config.mjs
+├── tsconfig.json
+└── README.md
+
+```
+
+## Installation
+
+### Prérequis
+- Node.js >= 18
+- npm ou yarn
+
+### Étapes
+```bash
+# Installations des dépendances
+npm install
+
+# Copier le fichier d'environnement
+cp .env.example .env.local
+
+# Éditer .env.local avec vos configurations
+nano .env.local
+
+# Démarrer le serveur de développement
+npm run dev
+```
+
+L'application sera disponible à `http://localhost:3000`
+
+## Scripts disponibles
+
+```bash
+# Développement
+npm run dev
+
+# Build de production
+npm run build
+
+# Démarrage de la version production
+npm start
+
+# Lint (ESLint)
+npm run lint
+
+# Lint et correction automatique
+npm run lint:fix
+```
+
+## Architecture
+
+### Pages d'authentification
+- **Login** (`/login`) - Connexion utilisateur
+- **Register** (`/register`) - Inscription utilisateur
+- **2FA** (`/two-factor`) - Vérification code OTP
+- **Forgot Password** (`/forgot-password`) - Récupération du mot de passe
+
+### Composants réutilisables
+- **AuthHeader** - En-tête avec logo MINFI et drapeau Cameroun
+- **AuthLayout** - Conteneur partagé pour les pages d'auth
+- **Button** - Bouton avec 3 variantes (primary, secondary, danger)
+- **Input** - Champ de saisie avec gestion d'erreurs
+
+### Services API
+- `authService.ts` - Centralise tous les appels API d'authentification
+
+### Types TypeScript
+- `auth.ts` - Définit les interfaces pour les payloads et réponses API
+
+### Constantes
+- Endpoints API centralisés
+- Routes internes de l'application
+
+## Variables d'environnement
+
+Copier `.env.example` en `.env.local` et configurer :
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3000/api
+NEXT_PUBLIC_AUTH_ENABLED=true
+NEXT_PUBLIC_SESSION_TIMEOUT=3600
+NODE_ENV=development
+```
+
+## Technologies utilisées
+
+- **Framework** - Next.js 15+ (React 19)
+- **Langage** - TypeScript
+- **Styling** - Tailwind CSS
+- **Linter** - ESLint
+- **Formatage** - Prettier (configuration par ESLint)
+
+## Prochaines étapes
+
+1. [ ] Implémenter les formulaires de connexion/inscription
+2. [ ] Intégrer le backend API
+3. [ ] Ajouter la gestion des erreurs globale
+4. [ ] Mettre en place l'authentification avec tokens JWT
+5. [ ] Ajouter les redirections post-authentification
+6. [ ] Tester sur mobile
+7. [ ] Déployer en production
+
+## Support
+
+Pour toute question ou problème, contactez l'équipe de développement.
+
+
+// END OF FILE: PROJECT_STRUCTURE.md
+
+
+// FILE: README.md
+-----------------------------------------------
+# GBE – Gestion du Budget de l'État
+## Ministère des Finances du Cameroun (MINFI)
+
+Application **Next.js 14 + TypeScript** pour la gestion du budget de l'État
+selon la **Loi N° 2018/012 du 11 Juillet 2018**.
+
+---
+
+## 🚀 Démarrage rapide
+
+```bash
+# 1. Entrer dans le dossier
+cd front-gbe
+
+# 2. Installer les dépendances
+npm install
+
+# 3. Configurer les variables d'environnement
+cp .env.example .env.local
+# → Modifier NEXT_PUBLIC_API_URL avec votre URL back-end
+
+# 4. Lancer le serveur de développement
+npm run dev
+# → http://localhost:3000  (redirige vers /login)
+```
+
+---
+
+## 📁 Structure du projet
+
+```
+front-gbe/
+├── public/
+│   └── images/
+│       ├── minfi-logo.svg        ← Placeholder (remplacer par le PNG officiel)
+│       └── cameroon-flag.svg     ← Drapeau SVG (remplacer par PNG si besoin)
+│
+├── src/
+│   ├── app/
+│   │   ├── globals.css           ← Design system complet (variables, composants)
+│   │   ├── layout.tsx            ← Root layout Next.js (métadonnées, CSS global)
+│   │   ├── page.tsx              ← Redirection "/" → "/login"
+│   │   ├── login/
+│   │   │   └── page.tsx          ← Page de connexion
+│   │   ├── register/
+│   │   │   └── page.tsx          ← Page d'inscription
+│   │   ├── two-factor/
+│   │   │   └── page.tsx          ← Page 2FA (code OTP)
+│   │   └── forgot-password/
+│   │       └── page.tsx          ← Page mot de passe oublié
+│   │
+│   ├── components/
+│   │   ├── auth/
+│   │   │   ├── AuthHeader.tsx    ← En-tête institutionnel (logo + drapeau + textes)
+│   │   │   └── AuthLayout.tsx    ← Layout partagé : header + carte + footer
+│   │   └── ui/
+│   │       ├── Input.tsx         ← Champ de saisie réutilisable
+│   │       └── Button.tsx        ← Bouton réutilisable (3 variantes)
+│   │
+│   ├── constants/
+│   │   └── auth.ts               ← URLs API et routes app centralisées
+│   │
+│   ├── lib/
+│   │   └── authService.ts        ← Appels API d'authentification
+│   │
+│   └── types/
+│       └── auth.ts               ← Interfaces TypeScript (payloads, réponses)
+│
+├── .env.example                  ← Modèle de variables d'environnement
+├── .eslintrc.json
+├── .gitignore
+├── next.config.js
+├── package.json
+├── postcss.config.js
+└── tsconfig.json
+```
+
+---
+
+## 🖼️ Images à remplacer
+
+| Fichier                        | Description              | Dimensions conseillées |
+|--------------------------------|--------------------------|------------------------|
+| `public/images/minfi-logo.png` | Logo officiel MINFI      | 200 × 200 px (carré)   |
+| `public/images/cameroon-flag.png` | Drapeau PNG officiel  | 300 × 200 px           |
+
+Après remplacement, mettre à jour `src/components/auth/AuthHeader.tsx` :
+```tsx
+// Ligne logo
+src="/images/minfi-logo.png"
+
+// Ligne drapeau
+src="/images/cameroon-flag.png"
+```
+
+---
+
+## 🔌 Intégration back-end
+
+Modifier uniquement `src/constants/auth.ts` ou la variable `.env.local` :
+
+```env
+NEXT_PUBLIC_API_URL=https://api.gbe.minfi.cm/api/v1
+```
+
+### Endpoints attendus
+
+| Méthode | Route                   | Usage                         |
+|---------|-------------------------|-------------------------------|
+| POST    | `/auth/login`           | Connexion                     |
+| POST    | `/auth/register`        | Inscription                   |
+| POST    | `/auth/2fa/verify`      | Vérification OTP              |
+| POST    | `/auth/2fa/resend`      | Renvoi OTP                    |
+| POST    | `/auth/forgot-password` | Demande réinitialisation mdp  |
+| POST    | `/auth/reset-password`  | Nouveau mot de passe          |
+| POST    | `/auth/logout`          | Déconnexion                   |
+| POST    | `/auth/refresh`         | Rafraîchissement du token     |
+
+---
+
+## 🎨 Design
+
+| Élément       | Valeur                                 |
+|---------------|----------------------------------------|
+| Police titres | Playfair Display (serif élégant)       |
+| Police corps  | DM Sans (sans-serif moderne)           |
+| Bleu marine   | `#0D2B55` (couleur principale MINFI)   |
+| Vert drapeau  | `#007A3D`                              |
+| Rouge drapeau | `#CE1126`                              |
+| Jaune drapeau | `#FCD116`                              |
+| Or MINFI      | `#C9A227`                              |
+
+---
+
+## 📋 Scripts disponibles
+
+```bash
+npm run dev        # Serveur de développement (hot reload)
+npm run build      # Build de production
+npm run start      # Démarrer le build de production
+npm run lint       # Vérification ESLint
+npm run type-check # Vérification TypeScript sans compilation
+```
+
+// END OF FILE: README.md
+
+
+// FILE: tsconfig.json
+-----------------------------------------------
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "**/*.mts"
+  ],
+  "exclude": ["node_modules"]
+}
+
+
+// END OF FILE: tsconfig.json
+
