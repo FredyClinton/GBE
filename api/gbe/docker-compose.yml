@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:17.9
+    container_name: gbe
+    environment:
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+      PGDATA: /data/postgres
+      POSTGRES_DB: gbe_db
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5433:5432"
+    restart: unless-stopped
+
+volumes:
+  postgres:
