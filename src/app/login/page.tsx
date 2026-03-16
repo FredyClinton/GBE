@@ -6,14 +6,10 @@
 //
 // FLUX :
 //   1. Utilisateur saisit email + mot de passe
-//   2. Appel POST /api/v1/auth/login
+//   2. POST /api/v1/auth/login { email, password }
 //   3. Back-end répond :
-//      a) mfaRequired=true  → stocker l'email → rediriger vers /two-factor
-//      b) accessToken direct → stocker le token → rediriger vers /dashboard
-//
-// NOTE : Le champ "Matricule" a été retiré car l'API n'en a pas
-//        besoin pour le login. Il reste disponible dans le formulaire
-//        d'inscription (register).
+//      → { "mfaEnabled": true }  = 2FA requis → /two-factor
+//      → { "accessToken": "..." } = connexion directe → /dashboard
 // ============================================================
 
 import React, { useState } from 'react';
@@ -22,11 +18,11 @@ import { useRouter } from 'next/navigation';
 import AuthLayout    from '@/components/auth/AuthLayout';
 import Input         from '@/components/ui/Input';
 import Button        from '@/components/ui/Button';
-import { loginUser, saveAccessToken } from '@/lib/authService';
-import { LoginPayload, FormErrors }   from '@/types/auth';
-import { APP_ROUTES }                 from '@/constants/auth';
+import { saveAccessToken } from '@/lib/authService';
+import { FormErrors }      from '@/types/auth';
+import { APP_ROUTES }      from '@/constants/auth';
 
-// ── Icônes SVG inline (pas de dépendance externe) ──────────
+// ── Icônes SVG inline ───────────────────────────────────────
 const IconMail = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <rect x="2" y="4" width="20" height="16" rx="2"/>
@@ -66,24 +62,19 @@ const IconAlert = () => (
 );
 
 // ─────────────────────────────────────────────────────────────
-// Validation locale (avant d'appeler l'API)
-// Permet d'éviter des appels réseau inutiles pour des saisies
-// manifestement incorrectes.
+// Validation locale avant appel API
 // ─────────────────────────────────────────────────────────────
-function validate(values: LoginPayload): FormErrors {
-  const errors: FormErrors = {};
-
-  if (!values.email.trim()) {
-    errors.email = "L'adresse email est requise";
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
-    errors.email = 'Adresse email invalide';
+function validate(email: string, password: string): FormErrors {
+  const e: FormErrors = {};
+  if (!email.trim()) {
+    e.email = "L'adresse email est requise";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    e.email = 'Adresse email invalide';
   }
-
-  if (!values.password) {
-    errors.password = 'Le mot de passe est requis';
+  if (!password) {
+    e.password = 'Le mot de passe est requis';
   }
-
-  return errors;
+  return e;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -92,100 +83,99 @@ function validate(values: LoginPayload): FormErrors {
 export default function LoginPage() {
   const router = useRouter();
 
-  // ── État local du formulaire ──
-  const [values, setValues] = useState<LoginPayload>({
-    email:    '',
-    password: '',
-  });
+  const [email,       setEmail]       = useState('');
+  const [password,    setPassword]    = useState('');
   const [fieldErrors, setFieldErrors] = useState<FormErrors>({});
   const [apiError,    setApiError]    = useState('');
   const [isLoading,   setIsLoading]   = useState(false);
   const [showPwd,     setShowPwd]     = useState(false);
 
-  // ── Mise à jour d'un champ : efface l'erreur du champ modifié ──
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setValues(prev => ({ ...prev, [name]: value }));
-    // Effacer l'erreur de ce champ dès que l'utilisateur retape
-    if (fieldErrors[name]) {
-      setFieldErrors(prev => ({ ...prev, [name]: undefined }));
-    }
+    if (name === 'email')    setEmail(value);
+    if (name === 'password') setPassword(value);
+    // Effacer l'erreur du champ modifié
+    if (fieldErrors[name]) setFieldErrors(prev => ({ ...prev, [name]: undefined }));
     setApiError('');
   };
 
-  // ── Soumission du formulaire ──
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Étape 1 : Validation locale
-    const errors = validate(values);
-    if (Object.keys(errors).length > 0) {
-      setFieldErrors(errors);
-      return; // Arrêter ici — pas besoin d'appeler le back-end
-    }
+    // Validation locale
+    const errors = validate(email, password);
+    if (Object.keys(errors).length > 0) { setFieldErrors(errors); return; }
 
-    // Étape 2 : Appel API
     setIsLoading(true);
     setApiError('');
 
     try {
-      const response = await loginUser(values);
+      // Appel POST /api/v1/auth/login
+      const res = await fetch('https://gbe-8clf.onrender.com/api/v1/auth/login', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body:    JSON.stringify({ email, password }),
+      });
 
-      if (response.mfaRequired) {
-        // ✅ Cas A : Le compte a le 2FA activé
-        // → Stocker l'email en sessionStorage pour la page de vérification
-        //   (sessionStorage est effacé à la fermeture de l'onglet)
-        sessionStorage.setItem('gbe_email_2fa', values.email);
-        router.push(APP_ROUTES.TWO_FACTOR);
+      const data = await res.json();
 
-      } else if (response.accessToken) {
-        // ✅ Cas B : Connexion directe sans 2FA
-        // → Stocker le JWT dans localStorage pour les futures requêtes
-        saveAccessToken(response.accessToken);
-        router.push(APP_ROUTES.DASHBOARD);
-
-      } else {
-        // ⚠️ Cas inattendu : ni token ni 2FA requis
-        setApiError(response.message || 'Réponse inattendue du serveur.');
+      // Erreur HTTP (401 mauvais identifiants, 404 compte inexistant…)
+      if (!res.ok) {
+        throw new Error(data.message || 'Identifiants incorrects. Veuillez réessayer.');
       }
 
-    } catch (err) {
-      // Erreur réseau ou erreur HTTP retournée par le back-end
+      // ✅ Cas 1 : Le back-end retourne { "mfaEnabled": true }
+      // → Stocker l'email → rediriger vers la page de saisie du code 2FA
+      if (data.mfaEnabled === true) {
+        sessionStorage.setItem('gbe_email_2fa', email);
+        router.push(APP_ROUTES.TWO_FACTOR);
+        return;
+      }
+
+      // ✅ Cas 2 : Connexion directe sans 2FA
+      // → accessToken présent directement
+      if (data.accessToken) {
+        saveAccessToken(data.accessToken);
+        router.push(APP_ROUTES.DASHBOARD);
+        return;
+      }
+
+      // ⚠️ Cas inattendu : réponse 200 mais structure inconnue
+      // Afficher les champs reçus pour debug
       setApiError(
-        err instanceof Error
-          ? err.message
-          : 'Une erreur est survenue. Veuillez réessayer.'
+        `Réponse inattendue du serveur. Champs reçus : ${Object.keys(data).join(', ')}`
+      );
+
+    } catch (err) {
+      setApiError(
+        err instanceof Error ? err.message : 'Une erreur est survenue. Veuillez réessayer.'
       );
     } finally {
       setIsLoading(false);
     }
   };
 
-  // ── Rendu ──
   return (
     <AuthLayout
       title="Connexion"
       subtitle="Accédez à votre espace de gestion budgétaire"
     >
-      {/* Alerte d'erreur globale (retournée par l'API) */}
+      {/* Erreur API */}
       {apiError && (
         <div className="alert alert--error" role="alert">
-          <IconAlert />
-          {apiError}
+          <IconAlert /> {apiError}
         </div>
       )}
 
       <form onSubmit={handleSubmit} noValidate>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
-          {/* ── Email ── */}
+          {/* Email */}
           <Input
-            id="email"
-            name="email"
-            type="email"
+            id="email" name="email" type="email"
             label="Adresse email"
             placeholder="vous@exemple.cm"
-            value={values.email}
+            value={email}
             onChange={handleChange}
             error={fieldErrors.email}
             icon={<IconMail />}
@@ -194,15 +184,14 @@ export default function LoginPage() {
             disabled={isLoading}
           />
 
-          {/* ── Mot de passe + lien oublié ── */}
+          {/* Mot de passe */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <Input
-              id="password"
-              name="password"
+              id="password" name="password"
               type={showPwd ? 'text' : 'password'}
               label="Mot de passe"
               placeholder="••••••••"
-              value={values.password}
+              value={password}
               onChange={handleChange}
               error={fieldErrors.password}
               icon={<IconLock />}
@@ -219,13 +208,12 @@ export default function LoginPage() {
                 </button>
               }
             />
-            {/* Lien mot de passe oublié */}
             <Link href={APP_ROUTES.FORGOT_PASSWORD} className="forgot-link">
               Mot de passe oublié ?
             </Link>
           </div>
 
-          {/* ── Bouton de connexion ── */}
+          {/* Bouton connexion */}
           <Button type="submit" isLoading={isLoading} fullWidth>
             Se connecter
           </Button>
@@ -239,7 +227,6 @@ export default function LoginPage() {
         </div>
       </form>
 
-      {/* Lien vers l'inscription */}
       <p className="auth-switch">
         Pas encore de compte ?{' '}
         <Link href={APP_ROUTES.REGISTER}>Créer un compte</Link>

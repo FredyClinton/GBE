@@ -1,7 +1,390 @@
 ﻿Next.js Project Context
-Generated On: 2026-03-16 10:01:33
+Generated On: 2026-03-16 14:12:21
 Root: C:\Users\steve\Documents\Front-end_GBE\MINFI-Application-de-Genstion-du-Budget
 ===============================================
+
+// FILE: src/app/dashboard/page.tsx
+-----------------------------------------------
+'use client';
+
+// ============================================================
+// FICHIER  : src/app/dashboard/page.tsx
+// RÔLE     : Page d'accueil après connexion réussie.
+//            Page simulée — sera remplacée par le vrai dashboard
+//            GBE lors du développement de la suite de l'application.
+//
+// SÉCURITÉ (côté client) :
+//   - Vérifie la présence du JWT dans localStorage
+//   - Si absent → redirection vers /login
+//   - Le JWT doit être validé côté back-end pour les vraies routes
+// ============================================================
+
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Image         from 'next/image';
+import { getAccessToken, clearTokens } from '@/lib/authService';
+import { APP_ROUTES }                  from '@/constants/auth';
+
+// Modules budgétaires disponibles dans l'application GBE
+// (à remplacer par les vrais modules lors du développement)
+const MODULES = [
+  {
+    icon: '📊',
+    title: 'Budget de l\'État',
+    description: 'Consultation et suivi du budget général',
+    color: 'var(--clr-navy)',
+    bg: 'rgba(13,43,85,.06)',
+  },
+  {
+    icon: '💰',
+    title: 'Recettes',
+    description: 'Suivi des recettes budgétaires',
+    color: 'var(--clr-green)',
+    bg: 'rgba(0,122,61,.06)',
+  },
+  {
+    icon: '📋',
+    title: 'Dépenses',
+    description: 'Gestion des dépenses publiques',
+    color: 'var(--clr-red)',
+    bg: 'rgba(206,17,38,.06)',
+  },
+  {
+    icon: '📈',
+    title: 'Rapports',
+    description: 'Génération de rapports financiers',
+    color: 'var(--clr-yellow-dark)',
+    bg: 'rgba(212,168,0,.06)',
+  },
+  {
+    icon: '🏛️',
+    title: 'Programmes',
+    description: 'Suivi des programmes budgétaires',
+    color: 'var(--clr-navy-mid)',
+    bg: 'rgba(26,58,107,.06)',
+  },
+  {
+    icon: '⚙️',
+    title: 'Administration',
+    description: 'Paramètres et configuration',
+    color: 'var(--clr-gray-600)',
+    bg: 'rgba(74,85,104,.06)',
+  },
+];
+
+export default function DashboardPage() {
+  const router = useRouter();
+
+  const [isReady, setIsReady] = useState(false);
+
+  // ── Vérification de l'authentification côté client ──
+  useEffect(() => {
+    const token = getAccessToken();
+    if (!token) {
+      // Pas de token → l'utilisateur n'est pas connecté → rediriger
+      router.replace(APP_ROUTES.LOGIN);
+      return;
+    }
+    setIsReady(true);
+  }, [router]);
+
+  // ── Déconnexion ──
+  const handleLogout = () => {
+    clearTokens(); // Supprime JWT de localStorage + sessionStorage
+    router.push(APP_ROUTES.LOGIN);
+  };
+
+  // Affichage pendant la vérification du token
+  if (!isReady) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'var(--clr-off-white)',
+        fontFamily: 'var(--font-body)',
+      }}>
+        <div style={{ textAlign: 'center', color: 'var(--clr-gray-400)' }}>
+          <div style={{
+            width: 40, height: 40,
+            border: '3px solid var(--clr-gray-200)',
+            borderTopColor: 'var(--clr-navy)',
+            borderRadius: '50%',
+            animation: 'spin .7s linear infinite',
+            margin: '0 auto 16px',
+          }} />
+          Chargement de votre espace…
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      background: 'var(--clr-off-white)',
+      fontFamily: 'var(--font-body)',
+      color: 'var(--clr-gray-800)',
+    }}>
+
+      {/* ══════════════════════════════════════
+          BARRE DE NAVIGATION
+          ══════════════════════════════════════ */}
+      <nav style={{
+        background: 'linear-gradient(135deg, var(--clr-navy) 0%, var(--clr-navy-mid) 100%)',
+        padding: '0 32px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        height: 64,
+        boxShadow: '0 2px 16px rgba(13,43,85,.30)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
+      }}>
+        {/* Logo + nom */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <Image src="/images/logo-minfi.png" alt="MINFI" width={36} height={36}
+            style={{ borderRadius: '50%', border: '1.5px solid rgba(255,255,255,.3)' }} />
+          <div>
+            <p style={{ fontFamily: 'var(--font-display)', fontSize: '.9rem', fontWeight: 700, color: '#fff', lineHeight: 1 }}>
+              GBE – MINFI
+            </p>
+            <p style={{ fontSize: '.65rem', color: 'rgba(255,255,255,.55)', letterSpacing: '.05em' }}>
+              Gestion du Budget de l&apos;État
+            </p>
+          </div>
+        </div>
+
+        {/* Barre de navigation centrale (placeholder) */}
+        <div style={{ display: 'flex', gap: 8 }}>
+          {['Accueil', 'Budget', 'Rapports'].map(item => (
+            <button key={item} style={{
+              background: item === 'Accueil' ? 'rgba(255,255,255,.12)' : 'transparent',
+              border: 'none',
+              color: '#fff',
+              fontSize: '.82rem',
+              fontWeight: 500,
+              padding: '6px 14px',
+              borderRadius: 6,
+              cursor: 'pointer',
+              fontFamily: 'var(--font-body)',
+            }}>
+              {item}
+            </button>
+          ))}
+        </div>
+
+        {/* Bouton déconnexion */}
+        <button
+          onClick={handleLogout}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            background: 'rgba(255,255,255,.1)',
+            border: '1px solid rgba(255,255,255,.2)',
+            color: '#fff',
+            fontSize: '.82rem',
+            fontWeight: 500,
+            padding: '7px 14px',
+            borderRadius: 8,
+            cursor: 'pointer',
+            fontFamily: 'var(--font-body)',
+            transition: 'background .15s',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,.18)')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,.10)')}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16,17 21,12 16,7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Déconnexion
+        </button>
+      </nav>
+
+      {/* ══════════════════════════════════════
+          CONTENU PRINCIPAL
+          ══════════════════════════════════════ */}
+      <main style={{ maxWidth: 1100, margin: '0 auto', padding: '40px 24px' }}>
+
+        {/* Bannière de bienvenue */}
+        <div style={{
+          background: 'linear-gradient(135deg, var(--clr-navy) 0%, var(--clr-navy-mid) 100%)',
+          borderRadius: 'var(--radius-xl)',
+          padding: '32px 40px',
+          marginBottom: 40,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          boxShadow: '0 8px 32px rgba(13,43,85,.20)',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          {/* Motif décoratif */}
+          <div style={{
+            position: 'absolute', right: -40, top: -40,
+            width: 200, height: 200,
+            borderRadius: '50%',
+            background: 'rgba(255,255,255,.04)',
+            pointerEvents: 'none',
+          }} />
+          <div style={{
+            position: 'absolute', right: 60, bottom: -60,
+            width: 160, height: 160,
+            borderRadius: '50%',
+            background: 'rgba(252,209,22,.06)',
+            pointerEvents: 'none',
+          }} />
+          {/* Bandes tricolores en bas */}
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 4, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr' }}>
+            <div style={{ background: 'var(--clr-green)' }} />
+            <div style={{ background: 'var(--clr-red)' }} />
+            <div style={{ background: 'var(--clr-yellow)' }} />
+          </div>
+
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <p style={{ color: 'var(--clr-yellow)', fontSize: '.75rem', fontWeight: 500, letterSpacing: '.15em', textTransform: 'uppercase', marginBottom: 8 }}>
+              Bienvenue sur la plateforme
+            </p>
+            <h1 style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: '1.8rem',
+              fontWeight: 700,
+              color: '#fff',
+              marginBottom: 8,
+            }}>
+              Gestion du Budget de l&apos;État
+            </h1>
+            <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.875rem' }}>
+              Ministère des Finances du Cameroun • Exercice budgétaire {new Date().getFullYear()}
+            </p>
+          </div>
+
+          <Image src="/images/logo-minfi.png" alt="MINFI" width={80} height={80}
+            style={{
+              borderRadius: '50%',
+              border: '2px solid rgba(255,255,255,.2)',
+              position: 'relative',
+              zIndex: 1,
+              opacity: .9,
+            }} />
+        </div>
+
+        {/* Indicateur page en développement */}
+        <div style={{
+          background: '#FFF7ED',
+          border: '1px solid #FED7AA',
+          borderRadius: 'var(--radius-md)',
+          padding: '12px 16px',
+          marginBottom: 32,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          fontSize: '.82rem',
+          color: '#9A3412',
+        }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}>
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <span>
+            <strong>Tableau de bord en développement</strong> — Vous êtes connecté avec succès.
+            Les modules ci-dessous seront disponibles dans les prochaines versions.
+          </span>
+        </div>
+
+        {/* Grille des modules */}
+        <h2 style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: '1.2rem',
+          fontWeight: 700,
+          color: 'var(--clr-navy)',
+          marginBottom: 20,
+        }}>
+          Modules disponibles
+        </h2>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+          gap: 20,
+        }}>
+          {MODULES.map((mod, i) => (
+            <div key={i} style={{
+              background: '#fff',
+              borderRadius: 'var(--radius-lg)',
+              padding: '24px',
+              boxShadow: 'var(--shadow-sm)',
+              border: '1px solid var(--clr-gray-100)',
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: 16,
+              cursor: 'default',
+              transition: 'transform .2s, box-shadow .2s',
+              animation: `cardReveal .4s ${i * .06}s cubic-bezier(.22,.68,0,1.2) both`,
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.transform = 'translateY(-3px)';
+              e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+            }}
+            >
+              {/* Icône du module */}
+              <div style={{
+                width: 48, height: 48,
+                background: mod.bg,
+                borderRadius: 12,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.4rem',
+                flexShrink: 0,
+              }}>
+                {mod.icon}
+              </div>
+              <div>
+                <h3 style={{ fontSize: '.9rem', fontWeight: 600, color: mod.color, marginBottom: 4 }}>
+                  {mod.title}
+                </h3>
+                <p style={{ fontSize: '.8rem', color: 'var(--clr-gray-400)', lineHeight: 1.5 }}>
+                  {mod.description}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Loi de référence */}
+        <div style={{
+          marginTop: 40,
+          padding: '16px 20px',
+          background: 'rgba(13,43,85,.04)',
+          borderRadius: 'var(--radius-md)',
+          border: '1px solid rgba(13,43,85,.08)',
+          fontSize: '.75rem',
+          color: 'var(--clr-gray-400)',
+          textAlign: 'center',
+          fontStyle: 'italic',
+        }}>
+          Application développée conformément à la Loi N° 2018/012 du 11 Juillet 2018
+          portant régime financier de l&apos;État et des autres entités publiques
+          – République du Cameroun
+        </div>
+
+      </main>
+    </div>
+  );
+}
+
+// END OF FILE: src/app/dashboard/page.tsx
+
 
 // FILE: src/app/forgot-password/page.tsx
 -----------------------------------------------
@@ -9,9 +392,6 @@ Root: C:\Users\steve\Documents\Front-end_GBE\MINFI-Application-de-Genstion-du-Bu
 
 // ============================================================
 // FICHIER  : src/app/forgot-password/page.tsx
-// RÔLE     : Page "Mot de passe oublié".
-//            Saisie de l'email → envoi d'un lien de réinit.
-//            Affiche un écran de confirmation après envoi.
 // ============================================================
 
 import React, { useState } from 'react';
@@ -19,168 +399,76 @@ import Link      from 'next/link';
 import AuthLayout from '@/components/auth/AuthLayout';
 import Input      from '@/components/ui/Input';
 import Button     from '@/components/ui/Button';
-import { forgotPassword } from '@/lib/authService';
 import { APP_ROUTES } from '@/constants/auth';
 
-// ── Icônes ──────────────────────────────────────────────────
 const IconMail = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <rect x="2" y="4" width="20" height="16" rx="2"/>
     <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
   </svg>
 );
-const IconAlert = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="2" className="alert__icon">
-    <circle cx="12" cy="12" r="10"/>
-    <line x1="12" y1="8"  x2="12" y2="12"/>
-    <line x1="12" y1="16" x2="12.01" y2="16"/>
-  </svg>
-);
 const IconInfo = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="2" className="alert__icon">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="alert__icon">
     <circle cx="12" cy="12" r="10"/>
     <line x1="12" y1="16" x2="12" y2="12"/>
-    <line x1="12" y1="8"  x2="12.01" y2="8"/>
+    <line x1="12" y1="8" x2="12.01" y2="8"/>
   </svg>
 );
 
-// ─────────────────────────────────────────────────────────────
-// COMPOSANT PAGE
-// ─────────────────────────────────────────────────────────────
 export default function ForgotPasswordPage() {
-  const [email,       setEmail]       = useState('');
-  const [emailError,  setEmailError]  = useState('');
-  const [globalError, setGlobalError] = useState('');
-  const [submitted,   setSubmitted]   = useState(false);
-  const [isLoading,   setIsLoading]   = useState(false);
+  const [email,      setEmail]      = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [submitted,  setSubmitted]  = useState(false);
+  const [isLoading,  setIsLoading]  = useState(false);
 
-  // ── Validation locale de l'email ──
-  const validateEmail = () => {
-    if (!email.trim()) {
-      setEmailError("L'adresse email est requise");
-      return false;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setEmailError('Adresse email invalide');
-      return false;
-    }
-    return true;
-  };
-
-  // ── Soumission ──
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateEmail()) return;
+    if (!email.trim()) { setEmailError("L'adresse email est requise"); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setEmailError('Adresse email invalide'); return; }
 
     setIsLoading(true);
-    setGlobalError('');
-    try {
-      await forgotPassword({ email });
-      // Toujours afficher la confirmation, même si l'email
-      // n'existe pas (sécurité : ne pas divulguer les comptes)
-      setSubmitted(true);
-    } catch (err) {
-      setGlobalError(err instanceof Error ? err.message : 'Une erreur est survenue.');
-    } finally {
-      setIsLoading(false);
-    }
+    // Simuler l'envoi (endpoint à implémenter côté back-end)
+    await new Promise(r => setTimeout(r, 800));
+    setIsLoading(false);
+    setSubmitted(true);
   };
 
   return (
     <AuthLayout
       title="Mot de passe oublié"
-      subtitle="Renseignez votre email pour recevoir un lien de réinitialisation"
+      subtitle="Saisissez votre email pour recevoir un lien de réinitialisation"
     >
       {submitted ? (
-        /* ── État : email envoyé ── */
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', textAlign: 'center' }}>
-
-          {/* Icône succès */}
-          <div style={{
-            width: 72, height: 72, borderRadius: '50%',
-            background: '#F0FDF4', border: '2px solid #BBF7D0',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '8px auto 0',
-          }}>
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none"
-              stroke="var(--clr-green)" strokeWidth="2">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20, textAlign: 'center' }}>
+          <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#F0FDF4', border: '2px solid #BBF7D0', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '8px auto 0' }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--clr-green)" strokeWidth="2">
               <rect x="2" y="4" width="20" height="16" rx="2"/>
               <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
             </svg>
           </div>
-
-          {/* Message */}
           <div>
-            <h3 style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: '1.15rem',
-              color: 'var(--clr-navy)',
-              marginBottom: '8px',
-            }}>
-              Email envoyé !
-            </h3>
+            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.15rem', color: 'var(--clr-navy)', marginBottom: 8 }}>Email envoyé !</h3>
             <p style={{ fontSize: '.875rem', color: 'var(--clr-gray-600)', lineHeight: 1.6 }}>
-              Si un compte est associé à{' '}
-              <strong style={{ color: 'var(--clr-navy)' }}>{email}</strong>,
-              vous recevrez un lien de réinitialisation sous peu.
+              Si un compte est associé à <strong style={{ color: 'var(--clr-navy)' }}>{email}</strong>, vous recevrez un lien sous peu.
             </p>
           </div>
-
-          {/* Conseil spam */}
-          <div className="alert alert--info">
-            <IconInfo />
-            Vérifiez également vos dossiers spam et courrier indésirable.
-          </div>
-
-          {/* Retour */}
-          <Link href={APP_ROUTES.LOGIN}>
-            <Button variant="ghost" fullWidth>
-              Retour à la connexion
-            </Button>
-          </Link>
-
+          <div className="alert alert--info"><IconInfo />Vérifiez vos dossiers spam.</div>
+          <Link href={APP_ROUTES.LOGIN}><Button variant="ghost" fullWidth>Retour à la connexion</Button></Link>
         </div>
       ) : (
-        /* ── État : formulaire ── */
         <>
-          {globalError && (
-            <div className="alert alert--error" role="alert">
-              <IconAlert /> {globalError}
-            </div>
-          )}
-
           <form onSubmit={handleSubmit} noValidate>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
-              <Input
-                id="email" name="email" type="email"
-                label="Adresse email"
-                placeholder="vous@exemple.cm"
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <Input id="email" name="email" type="email"
+                label="Adresse email" placeholder="vous@exemple.cm"
                 value={email}
-                onChange={e => {
-                  setEmail(e.target.value);
-                  setEmailError('');
-                  setGlobalError('');
-                }}
-                error={emailError}
-                icon={<IconMail />}
-                autoComplete="email"
-                autoFocus
-                disabled={isLoading}
-              />
-
-              <Button type="submit" isLoading={isLoading} fullWidth>
-                Envoyer le lien
-              </Button>
-
+                onChange={e => { setEmail(e.target.value); setEmailError(''); }}
+                error={emailError} icon={<IconMail />}
+                autoComplete="email" autoFocus disabled={isLoading} />
+              <Button type="submit" isLoading={isLoading} fullWidth>Envoyer le lien</Button>
             </div>
           </form>
-
-          <p className="auth-switch">
-            <Link href={APP_ROUTES.LOGIN}>← Retour à la connexion</Link>
-          </p>
+          <p className="auth-switch"><Link href={APP_ROUTES.LOGIN}>← Retour à la connexion</Link></p>
         </>
       )}
     </AuthLayout>
@@ -196,96 +484,78 @@ export default function ForgotPasswordPage() {
 
 // ============================================================
 // FICHIER  : src/app/login/page.tsx
-// RÔLE     : Page de connexion.
-//            Champs  : email, matricule, mot de passe.
-//            Extras  : toggle visibilité mdp, lien "oublié ?",
-//                      redirection vers 2FA si activé.
+// RÔLE     : Page de connexion reliée au back-end GBE.
+//
+// FLUX :
+//   1. Utilisateur saisit email + mot de passe
+//   2. POST /api/v1/auth/login { email, password }
+//   3. Back-end répond :
+//      → { "mfaEnabled": true }  = 2FA requis → /two-factor
+//      → { "accessToken": "..." } = connexion directe → /dashboard
 // ============================================================
 
 import React, { useState } from 'react';
-import Link        from 'next/link';
+import Link          from 'next/link';
 import { useRouter } from 'next/navigation';
-import AuthLayout  from '@/components/auth/AuthLayout';
-import Input       from '@/components/ui/Input';
-import Button      from '@/components/ui/Button';
-import { loginUser } from '@/lib/authService';
-import { LoginPayload, FormErrors } from '@/types/auth';
-import { APP_ROUTES }  from '@/constants/auth';
+import AuthLayout    from '@/components/auth/AuthLayout';
+import Input         from '@/components/ui/Input';
+import Button        from '@/components/ui/Button';
+import { saveAccessToken } from '@/lib/authService';
+import { FormErrors }      from '@/types/auth';
+import { APP_ROUTES }      from '@/constants/auth';
 
-// ── Icônes SVG (inline, sans dépendance externe) ────────────
+// ── Icônes SVG inline ───────────────────────────────────────
 const IconMail = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="2">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <rect x="2" y="4" width="20" height="16" rx="2"/>
     <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
   </svg>
 );
 const IconLock = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="2">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <rect x="3" y="11" width="18" height="11" rx="2"/>
     <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
   </svg>
 );
-const IconId = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="2">
-    <rect x="2" y="5" width="20" height="14" rx="2"/>
-    <path d="M16 10h2M16 14h2M6 10h4v4H6z"/>
-  </svg>
-);
 const IconEye = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="2">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
     <circle cx="12" cy="12" r="3"/>
   </svg>
 );
 const IconEyeOff = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="2">
-    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8
-             a18.45 18.45 0 0 1 5.06-5.94"/>
-    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8
-             a18.5 18.5 0 0 1-2.16 3.19"/>
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
     <line x1="1" y1="1" x2="23" y2="23"/>
   </svg>
 );
 const IconShield = () => (
-  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="2">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
   </svg>
 );
 const IconAlert = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="2" className="alert__icon">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="alert__icon">
     <circle cx="12" cy="12" r="10"/>
-    <line x1="12" y1="8"  x2="12" y2="12"/>
+    <line x1="12" y1="8" x2="12" y2="12"/>
     <line x1="12" y1="16" x2="12.01" y2="16"/>
   </svg>
 );
 
 // ─────────────────────────────────────────────────────────────
-// Validation locale du formulaire de connexion
+// Validation locale avant appel API
 // ─────────────────────────────────────────────────────────────
-function validate(values: LoginPayload): FormErrors {
+function validate(email: string, password: string): FormErrors {
   const e: FormErrors = {};
-
-  if (!values.email.trim()) {
+  if (!email.trim()) {
     e.email = "L'adresse email est requise";
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     e.email = 'Adresse email invalide';
   }
-
-  if (!values.matricule.trim()) {
-    e.matricule = 'Le matricule est requis';
-  }
-
-  if (!values.password) {
+  if (!password) {
     e.password = 'Le mot de passe est requis';
   }
-
   return e;
 }
 
@@ -295,57 +565,72 @@ function validate(values: LoginPayload): FormErrors {
 export default function LoginPage() {
   const router = useRouter();
 
-  // ── État du formulaire ──
-  const [values, setValues] = useState<LoginPayload>({
-    email:     '',
-    matricule: '',
-    password:  '',
-  });
-  const [errors,      setErrors]      = useState<FormErrors>({});
-  const [globalError, setGlobalError] = useState('');
+  const [email,       setEmail]       = useState('');
+  const [password,    setPassword]    = useState('');
+  const [fieldErrors, setFieldErrors] = useState<FormErrors>({});
+  const [apiError,    setApiError]    = useState('');
   const [isLoading,   setIsLoading]   = useState(false);
   const [showPwd,     setShowPwd]     = useState(false);
 
-  // ── Mise à jour d'un champ + effacement de son erreur ──
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setValues(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: undefined }));
-    setGlobalError('');
+    if (name === 'email')    setEmail(value);
+    if (name === 'password') setPassword(value);
+    // Effacer l'erreur du champ modifié
+    if (fieldErrors[name]) setFieldErrors(prev => ({ ...prev, [name]: undefined }));
+    setApiError('');
   };
 
-  // ── Soumission ──
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // 1. Validation locale
-    const fieldErrors = validate(values);
-    if (Object.keys(fieldErrors).length > 0) {
-      setErrors(fieldErrors);
-      return;
-    }
+    // Validation locale
+    const errors = validate(email, password);
+    if (Object.keys(errors).length > 0) { setFieldErrors(errors); return; }
 
-    // 2. Appel API
     setIsLoading(true);
-    setGlobalError('');
-    try {
-      const res = await loginUser(values);
+    setApiError('');
 
-      if (res.success) {
-        if (res.data?.sessionToken) {
-          // Back-end demande une vérification 2FA
-          sessionStorage.setItem('gbe_session_token', res.data.sessionToken);
-          router.push(APP_ROUTES.TWO_FACTOR);
-        } else {
-          // Connexion directe (2FA désactivé)
-          router.push(APP_ROUTES.DASHBOARD);
-        }
-      } else {
-        setGlobalError(res.message || 'Identifiants incorrects. Veuillez réessayer.');
+    try {
+      // Appel POST /api/v1/auth/login
+      const res = await fetch('https://gbe-8clf.onrender.com/api/v1/auth/login', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body:    JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      // Erreur HTTP (401 mauvais identifiants, 404 compte inexistant…)
+      if (!res.ok) {
+        throw new Error(data.message || 'Identifiants incorrects. Veuillez réessayer.');
       }
+
+      // ✅ Cas 1 : Le back-end retourne { "mfaEnabled": true }
+      // → Stocker l'email → rediriger vers la page de saisie du code 2FA
+      if (data.mfaEnabled === true) {
+        sessionStorage.setItem('gbe_email_2fa', email);
+        router.push(APP_ROUTES.TWO_FACTOR);
+        return;
+      }
+
+      // ✅ Cas 2 : Connexion directe sans 2FA
+      // → accessToken présent directement
+      if (data.accessToken) {
+        saveAccessToken(data.accessToken);
+        router.push(APP_ROUTES.DASHBOARD);
+        return;
+      }
+
+      // ⚠️ Cas inattendu : réponse 200 mais structure inconnue
+      // Afficher les champs reçus pour debug
+      setApiError(
+        `Réponse inattendue du serveur. Champs reçus : ${Object.keys(data).join(', ')}`
+      );
+
     } catch (err) {
-      setGlobalError(
-        err instanceof Error ? err.message : 'Une erreur est survenue.'
+      setApiError(
+        err instanceof Error ? err.message : 'Une erreur est survenue. Veuillez réessayer.'
       );
     } finally {
       setIsLoading(false);
@@ -357,11 +642,10 @@ export default function LoginPage() {
       title="Connexion"
       subtitle="Accédez à votre espace de gestion budgétaire"
     >
-      {/* ── Erreur globale API ── */}
-      {globalError && (
+      {/* Erreur API */}
+      {apiError && (
         <div className="alert alert--error" role="alert">
-          <IconAlert />
-          {globalError}
+          <IconAlert /> {apiError}
         </div>
       )}
 
@@ -373,27 +657,25 @@ export default function LoginPage() {
             id="email" name="email" type="email"
             label="Adresse email"
             placeholder="vous@exemple.cm"
-            value={values.email}
+            value={email}
             onChange={handleChange}
-            error={errors.email}
+            error={fieldErrors.email}
             icon={<IconMail />}
             autoComplete="email"
             autoFocus
             disabled={isLoading}
           />
 
-         
-
-          {/* Mot de passe + lien oublié */}
+          {/* Mot de passe */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <Input
               id="password" name="password"
               type={showPwd ? 'text' : 'password'}
               label="Mot de passe"
               placeholder="••••••••"
-              value={values.password}
+              value={password}
               onChange={handleChange}
-              error={errors.password}
+              error={fieldErrors.password}
               icon={<IconLock />}
               autoComplete="current-password"
               disabled={isLoading}
@@ -408,7 +690,6 @@ export default function LoginPage() {
                 </button>
               }
             />
-            {/* Lien mot de passe oublié */}
             <Link href={APP_ROUTES.FORGOT_PASSWORD} className="forgot-link">
               Mot de passe oublié ?
             </Link>
@@ -428,7 +709,6 @@ export default function LoginPage() {
         </div>
       </form>
 
-      {/* Lien vers l'inscription */}
       <p className="auth-switch">
         Pas encore de compte ?{' '}
         <Link href={APP_ROUTES.REGISTER}>Créer un compte</Link>
@@ -440,34 +720,345 @@ export default function LoginPage() {
 // END OF FILE: src/app/login/page.tsx
 
 
+// FILE: src/app/register/qrcode/page.tsx
+-----------------------------------------------
+'use client';
+
+// ============================================================
+// FICHIER  : src/app/register/qrcode/page.tsx
+// RÔLE     : Page affichée après l'inscription réussie.
+//
+// FLUX :
+//   1. L'utilisateur arrive ici après POST /api/v1/auth/register
+//   2. La page lit le QR code URL depuis sessionStorage
+//      (stocké par register/page.tsx après réponse du back-end)
+//   3. Affiche le QR code à scanner avec Google Authenticator
+//      ou toute autre app TOTP (Authy, Microsoft Authenticator…)
+//   4. Une fois le QR scanné, l'utilisateur clique "J'ai scanné"
+//      → redirection vers /login pour se connecter
+//
+// SÉCURITÉ :
+//   - sessionStorage est effacé dès la fermeture de l'onglet
+//   - Si aucun QR code n'est trouvé → redirection vers /register
+// ============================================================
+
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Image         from 'next/image';
+import Link          from 'next/link';
+import Button        from '@/components/ui/Button';
+import { APP_ROUTES } from '@/constants/auth';
+
+export default function QrCodePage() {
+  const router = useRouter();
+
+  // URL du QR code (data:image/png;base64,... ou URL http)
+  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
+  // Email de l'utilisateur pour affichage informatif
+  const [userEmail, setUserEmail]  = useState<string>('');
+  // État du bouton "J'ai scanné le code"
+  const [confirmed, setConfirmed]  = useState(false);
+
+  // ── Lecture du QR code depuis sessionStorage ──
+  // useEffect s'exécute côté client uniquement (après hydration)
+  useEffect(() => {
+    const storedQr    = sessionStorage.getItem('gbe_qr_code');
+    const storedEmail = sessionStorage.getItem('gbe_email_2fa');
+
+    if (!storedQr) {
+      // Aucun QR code trouvé → l'utilisateur a accédé directement à
+      // cette URL sans passer par l'inscription → rediriger
+      router.replace(APP_ROUTES.REGISTER);
+      return;
+    }
+
+    setQrCodeUrl(storedQr);
+    setUserEmail(storedEmail ?? '');
+  }, [router]);
+
+  // ── Confirmation du scan ──
+  const handleConfirm = () => {
+    setConfirmed(true);
+
+    // Nettoyage du sessionStorage (sécurité : ne pas laisser traîner le QR)
+    sessionStorage.removeItem('gbe_qr_code');
+    // Garder gbe_email_2fa pour la page two-factor si besoin
+
+    // Rediriger vers la page de connexion après un court délai
+    // pour que l'animation de succès soit visible
+    setTimeout(() => {
+      router.push(APP_ROUTES.LOGIN);
+    }, 1500);
+  };
+
+  // ── Affichage de chargement pendant useEffect ──
+  if (!qrCodeUrl) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'var(--clr-off-white)',
+        fontFamily: 'var(--font-body)',
+      }}>
+        <div style={{ textAlign: 'center', color: 'var(--clr-gray-400)' }}>
+          <div style={{
+            width: 40, height: 40,
+            border: '3px solid var(--clr-gray-200)',
+            borderTopColor: 'var(--clr-navy)',
+            borderRadius: '50%',
+            animation: 'spin .7s linear infinite',
+            margin: '0 auto 16px',
+          }} />
+          Chargement…
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    // Page complète avec le fond de l'application
+    <div style={{
+      minHeight: '100vh',
+      background: 'var(--clr-off-white)',
+      fontFamily: 'var(--font-body)',
+      display: 'flex',
+      flexDirection: 'column',
+    }}>
+
+      {/* ── En-tête institutionnel ── */}
+      <header style={{
+        background: 'linear-gradient(160deg, var(--clr-navy) 0%, #091e3a 55%, var(--clr-navy-mid) 100%)',
+        padding: '24px 32px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '16px',
+        boxShadow: '0 4px 24px rgba(13,43,85,.30)',
+        position: 'relative',
+      }}>
+        {/* Bandes tricolores en bas */}
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 6, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr' }}>
+          <div style={{ background: 'var(--clr-green)' }} />
+          <div style={{ background: 'var(--clr-red)' }} />
+          <div style={{ background: 'var(--clr-yellow)' }} />
+        </div>
+        {/* Logo */}
+        <Image src="/images/logo-minfi.png" alt="MINFI" width={48} height={48}
+          style={{ borderRadius: '50%', border: '2px solid rgba(255,255,255,.3)' }} />
+        <div style={{ textAlign: 'center', color: '#fff' }}>
+          <p style={{ fontFamily: 'var(--font-display)', fontSize: '1rem', fontWeight: 600 }}>
+            République du Cameroun
+          </p>
+          <p style={{ fontSize: '.75rem', color: 'var(--clr-yellow)', letterSpacing: '.1em', textTransform: 'uppercase' }}>
+            Ministère des Finances – GBE
+          </p>
+        </div>
+        <Image src="/images/cameroon_flag.jpg" alt="Drapeau" width={60} height={40}
+          style={{ borderRadius: 4, border: '1px solid rgba(255,255,255,.2)' }} />
+      </header>
+
+      {/* ── Contenu principal ── */}
+      <main style={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '32px 20px',
+      }}>
+        <div style={{
+          width: '100%',
+          maxWidth: 480,
+          background: 'var(--clr-white)',
+          borderRadius: 'var(--radius-xl)',
+          boxShadow: 'var(--shadow-card)',
+          overflow: 'hidden',
+          animation: 'cardReveal .45s cubic-bezier(.22,.68,0,1.2) both',
+        }}>
+
+          {/* Bande tricolore en haut de la carte */}
+          <div style={{ height: 4, background: 'linear-gradient(90deg, var(--clr-green), var(--clr-yellow), var(--clr-red))' }} />
+
+          <div style={{ padding: '32px' }}>
+
+            {/* Titre */}
+            <div style={{ textAlign: 'center', marginBottom: 24 }}>
+              {/* Icône bouclier */}
+              <div style={{
+                width: 64, height: 64,
+                background: 'rgba(13,43,85,.06)',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 16px',
+                border: '2px solid rgba(13,43,85,.12)',
+              }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--clr-navy)" strokeWidth="1.8">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  <polyline points="9,12 11,14 15,10"/>
+                </svg>
+              </div>
+              <h1 style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: '1.5rem',
+                fontWeight: 700,
+                color: 'var(--clr-navy)',
+                marginBottom: 8,
+              }}>
+                Configurez votre authentification
+              </h1>
+              <p style={{ fontSize: '.875rem', color: 'var(--clr-gray-400)', lineHeight: 1.6 }}>
+                Scannez ce QR code avec votre application d&apos;authentification<br/>
+                (Google Authenticator, Authy, Microsoft Authenticator…)
+              </p>
+              {userEmail && (
+                <p style={{ fontSize: '.8rem', color: 'var(--clr-navy)', marginTop: 8, fontWeight: 500 }}>
+                  Compte : {userEmail}
+                </p>
+              )}
+            </div>
+
+            {/* QR Code */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              marginBottom: 24,
+            }}>
+              <div style={{
+                padding: 16,
+                background: '#fff',
+                borderRadius: 12,
+                border: '2px solid var(--clr-gray-100)',
+                boxShadow: '0 4px 20px rgba(0,0,0,.08)',
+              }}>
+                {/* Afficher l'image QR code retournée par le back-end */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={qrCodeUrl}
+                  alt="QR Code d'authentification à deux facteurs"
+                  style={{ width: 200, height: 200, display: 'block' }}
+                />
+              </div>
+            </div>
+
+            {/* Étapes */}
+            <div style={{
+              background: 'var(--clr-gray-50)',
+              borderRadius: 'var(--radius-md)',
+              padding: '16px 20px',
+              marginBottom: 24,
+            }}>
+              <p style={{ fontSize: '.8rem', fontWeight: 600, color: 'var(--clr-gray-600)', marginBottom: 10 }}>
+                Comment procéder :
+              </p>
+              {[
+                'Installez Google Authenticator sur votre téléphone',
+                'Appuyez sur "+" puis "Scanner un QR code"',
+                'Scannez le code ci-dessus avec votre téléphone',
+                'Un code à 6 chiffres apparaîtra dans l\'application',
+              ].map((step, i) => (
+                <div key={i} style={{ display: 'flex', gap: 10, marginBottom: 8, alignItems: 'flex-start' }}>
+                  <span style={{
+                    width: 20, height: 20,
+                    background: 'var(--clr-navy)',
+                    color: '#fff',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '.65rem',
+                    fontWeight: 700,
+                    flexShrink: 0,
+                    marginTop: 1,
+                  }}>{i + 1}</span>
+                  <p style={{ fontSize: '.82rem', color: 'var(--clr-gray-600)', lineHeight: 1.5 }}>{step}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Bouton confirmation */}
+            {!confirmed ? (
+              <Button onClick={handleConfirm} fullWidth>
+                J&apos;ai scanné le code — Continuer
+              </Button>
+            ) : (
+              /* Animation de succès après confirmation */
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 10,
+                padding: '14px',
+                background: '#F0FDF4',
+                border: '1px solid #BBF7D0',
+                borderRadius: 'var(--radius-md)',
+                color: '#166534',
+                fontSize: '.875rem',
+                fontWeight: 500,
+                animation: 'fadeSlideDown .3s ease',
+              }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="20,6 9,17 4,12"/>
+                </svg>
+                Configuration réussie ! Redirection vers la connexion…
+              </div>
+            )}
+
+            {/* Lien retour */}
+            <p style={{ textAlign: 'center', marginTop: 16, fontSize: '.82rem', color: 'var(--clr-gray-400)' }}>
+              <Link href={APP_ROUTES.LOGIN} style={{ color: 'var(--clr-navy)', fontWeight: 500 }}>
+                Aller directement à la connexion
+              </Link>
+            </p>
+
+          </div>
+        </div>
+
+        {/* Pied de page */}
+        <footer style={{ marginTop: 24, textAlign: 'center', fontSize: '.72rem', color: 'var(--clr-gray-400)' }}>
+          © {new Date().getFullYear()} MINFI – République du Cameroun
+        </footer>
+      </main>
+    </div>
+  );
+}
+
+// END OF FILE: src/app/register/qrcode/page.tsx
+
+
 // FILE: src/app/register/page.tsx
 -----------------------------------------------
 'use client';
 
 // ============================================================
 // FICHIER  : src/app/register/page.tsx
-// RÔLE     : Page d'inscription.
-//            Champs  : prénom, nom, email, matricule,
-//                      téléphone, date de naissance,
-//                      mot de passe, confirmation mdp.
-//            Extras  : indicateur force mdp, grille 2 colonnes.
+// RÔLE     : Page d'inscription reliée au back-end GBE.
+//
+// FLUX :
+//   1. Utilisateur remplit le formulaire
+//   2. POST /api/v1/auth/register { ...données, mfaEnabled: true }
+//   3. Back-end retourne :
+//      { "mfaEnabled": true, "secretImageUri": "data:image/png;base64,..." }
+//   4. On stocke secretImageUri dans sessionStorage
+//   5. Redirection vers /register/qrcode pour afficher le QR code
 // ============================================================
 
 import React, { useState } from 'react';
-import Link        from 'next/link';
+import Link          from 'next/link';
 import { useRouter } from 'next/navigation';
-import AuthLayout  from '@/components/auth/AuthLayout';
-import Input       from '@/components/ui/Input';
-import Button      from '@/components/ui/Button';
-import { registerUser } from '@/lib/authService';
-import { RegisterPayload, FormErrors } from '@/types/auth';
+import AuthLayout    from '@/components/auth/AuthLayout';
+import Input         from '@/components/ui/Input';
+import Button        from '@/components/ui/Button';
 import { APP_ROUTES } from '@/constants/auth';
+import { RegisterPayload, FormErrors } from '@/types/auth';
 
-// ── Icônes SVG ──────────────────────────────────────────────
+// ── Icônes SVG inline ───────────────────────────────────────
 const IconUser = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-    <circle cx="12" cy="7" r="4"/>
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
   </svg>
 );
 const IconMail = () => (
@@ -478,25 +1069,14 @@ const IconMail = () => (
 );
 const IconPhone = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07
-             A19.5 19.5 0 0 1 4.69 13.5a19.79 19.79 0 0 1-3.07-8.67
-             A2 2 0 0 1 3.6 2.69h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81
-             a2 2 0 0 1-.45 2.11L7.91 10.09a16 16 0 0 0 6 6l.91-.91
-             a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 17z"/>
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.5a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.69h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.09a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 17z"/>
   </svg>
 );
 const IconCalendar = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <rect x="3" y="4" width="18" height="18" rx="2"/>
-    <line x1="16" y1="2" x2="16" y2="6"/>
-    <line x1="8"  y1="2" x2="8"  y2="6"/>
-    <line x1="3"  y1="10" x2="21" y2="10"/>
-  </svg>
-);
-const IconId = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="2" y="5" width="20" height="14" rx="2"/>
-    <path d="M16 10h2M16 14h2M6 10h4v4H6z"/>
+    <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+    <line x1="3" y1="10" x2="21" y2="10"/>
   </svg>
 );
 const IconLock = () => (
@@ -507,81 +1087,58 @@ const IconLock = () => (
 );
 const IconEye = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-    <circle cx="12" cy="12" r="3"/>
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
   </svg>
 );
 const IconEyeOff = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8
-             a18.45 18.45 0 0 1 5.06-5.94"/>
-    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8
-             a18.5 18.5 0 0 1-2.16 3.19"/>
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
     <line x1="1" y1="1" x2="23" y2="23"/>
   </svg>
 );
-const IconCheck = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="2" className="alert__icon">
-    <polyline points="20,6 9,17 4,12"/>
-  </svg>
-);
 const IconAlert = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="2" className="alert__icon">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="alert__icon">
     <circle cx="12" cy="12" r="10"/>
-    <line x1="12" y1="8"  x2="12" y2="12"/>
-    <line x1="12" y1="16" x2="12.01" y2="16"/>
+    <line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
   </svg>
 );
 
 // ─────────────────────────────────────────────────────────────
-// Force du mot de passe (0 = vide, 1 = faible, 2 = moyen, 3 = fort)
+// Force du mot de passe
 // ─────────────────────────────────────────────────────────────
 function passwordStrength(pwd: string): 0 | 1 | 2 | 3 {
   if (!pwd) return 0;
   let score = 0;
-  if (pwd.length >= 8)                                        score++;
-  if (/[A-Z]/.test(pwd) && /[a-z]/.test(pwd))               score++;
-  if (/[0-9]/.test(pwd) && /[^A-Za-z0-9]/.test(pwd))        score++;
+  if (pwd.length >= 8) score++;
+  if (/[A-Z]/.test(pwd) && /[a-z]/.test(pwd)) score++;
+  if (/[0-9]/.test(pwd) && /[^A-Za-z0-9]/.test(pwd)) score++;
   return score as 0 | 1 | 2 | 3;
 }
-
-const STRENGTH_LABELS = ['', 'Faible', 'Moyen', 'Fort']        as const;
-const STRENGTH_MODS   = ['', 'weak',   'medium', 'strong']     as const;
+const STRENGTH_LABELS = ['', 'Faible', 'Moyen', 'Fort']    as const;
+const STRENGTH_MODS   = ['', 'weak',   'medium', 'strong'] as const;
 const STRENGTH_COLORS = ['', 'var(--clr-red)', 'var(--clr-yellow-dark)', 'var(--clr-green)'] as const;
 
 // ─────────────────────────────────────────────────────────────
-// Validation du formulaire d'inscription
+// Validation locale
 // ─────────────────────────────────────────────────────────────
 function validate(v: RegisterPayload): FormErrors {
   const e: FormErrors = {};
-
-  if (!v.firstName.trim())   e.firstName = 'Le prénom est requis';
-  if (!v.lastName.trim())    e.lastName  = 'Le nom est requis';
-
+  if (!v.firstName.trim())  e.firstName = 'Le prénom est requis';
+  if (!v.lastName.trim())   e.lastName  = 'Le nom est requis';
   if (!v.email.trim()) {
     e.email = "L'adresse email est requise";
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email)) {
     e.email = 'Adresse email invalide';
   }
-
-  if (!v.matricule.trim())   e.matricule = 'Le matricule est requis';
-
   if (!v.phoneNumber.trim()) {
     e.phoneNumber = 'Le numéro de téléphone est requis';
   } else if (!/^\+?[0-9\s\-]{8,15}$/.test(v.phoneNumber)) {
     e.phoneNumber = 'Format attendu : +237 6XX XXX XXX';
   }
-
   if (!v.dateOfBirth) {
     e.dateOfBirth = 'La date de naissance est requise';
-  } else {
-    const age = (Date.now() - new Date(v.dateOfBirth).getTime())
-                / (365.25 * 24 * 3600 * 1000);
-    if (age < 18) e.dateOfBirth = 'Vous devez avoir au moins 18 ans';
   }
-
   if (!v.password) {
     e.password = 'Le mot de passe est requis';
   } else if (v.password.length < 8) {
@@ -589,13 +1146,11 @@ function validate(v: RegisterPayload): FormErrors {
   } else if (!/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z\d])/.test(v.password)) {
     e.password = 'Requiert majuscule, minuscule, chiffre et caractère spécial';
   }
-
   if (!v.confirmPassword) {
     e.confirmPassword = 'Veuillez confirmer votre mot de passe';
   } else if (v.password !== v.confirmPassword) {
     e.confirmPassword = 'Les mots de passe ne correspondent pas';
   }
-
   return e;
 }
 
@@ -606,50 +1161,68 @@ export default function RegisterPage() {
   const router = useRouter();
 
   const [values, setValues] = useState<RegisterPayload>({
-    firstName: '', lastName: '', email: '', matricule: '',
-    phoneNumber: '', dateOfBirth: '', password: '', confirmPassword: '',
+    firstName: '', lastName: '', email: '', password: '',
+    confirmPassword: '', phoneNumber: '', dateOfBirth: '',
+    mfaEnabled: true,  // Toujours true — l'application impose le 2FA
   });
-  const [errors,      setErrors]      = useState<FormErrors>({});
-  const [globalError, setGlobalError] = useState('');
-  const [success,     setSuccess]     = useState('');
+  const [fieldErrors, setFieldErrors] = useState<FormErrors>({});
+  const [apiError,    setApiError]    = useState('');
   const [isLoading,   setIsLoading]   = useState(false);
   const [showPwd,     setShowPwd]     = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  // Calculer la force du mot de passe courant
   const strength = passwordStrength(values.password);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setValues(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: undefined }));
-    setGlobalError('');
+    if (fieldErrors[name]) setFieldErrors(prev => ({ ...prev, [name]: undefined }));
+    setApiError('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const fieldErrors = validate(values);
-    if (Object.keys(fieldErrors).length > 0) {
-      setErrors(fieldErrors);
-      return;
-    }
+    // Validation locale
+    const errors = validate(values);
+    if (Object.keys(errors).length > 0) { setFieldErrors(errors); return; }
 
     setIsLoading(true);
-    setGlobalError('');
-    try {
-      const res = await registerUser(values);
+    setApiError('');
 
-      if (res.success) {
-        setSuccess(res.message || 'Compte créé avec succès ! Redirection en cours…');
-        setTimeout(() => router.push(APP_ROUTES.LOGIN), 2500);
-      } else {
-        setGlobalError(res.message || "Échec de l'inscription.");
+    try {
+      // Appel API POST /api/v1/auth/register
+      const res = await fetch('https://gbe-8clf.onrender.com/api/v1/auth/register', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body:    JSON.stringify(values),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        // Erreur HTTP (400, 409 email déjà utilisé, etc.)
+        throw new Error(data.message || `Erreur ${res.status}`);
       }
+
+      // ✅ Le back-end retourne { mfaEnabled: true, secretImageUri: "data:image/png;base64,..." }
+      const qrImage = data.secretImageUri;
+
+      if (qrImage) {
+        // Stocker le QR code et l'email pour la page suivante
+        // sessionStorage est effacé à la fermeture de l'onglet (sécurité)
+        sessionStorage.setItem('gbe_qr_code',   qrImage);
+        sessionStorage.setItem('gbe_email_2fa', values.email);
+
+        // Rediriger vers la page de scan du QR code
+        router.push(APP_ROUTES.REGISTER_QR);
+      } else {
+        // Inscription réussie mais pas de QR code (ne devrait pas arriver)
+        setApiError("Inscription réussie mais aucun QR code reçu. Contactez l'administrateur.");
+      }
+
     } catch (err) {
-      setGlobalError(
-        err instanceof Error ? err.message : 'Une erreur est survenue.'
-      );
+      setApiError(err instanceof Error ? err.message : 'Une erreur est survenue.');
     } finally {
       setIsLoading(false);
     }
@@ -660,17 +1233,10 @@ export default function RegisterPage() {
       title="Créer un compte"
       subtitle="Renseignez vos informations pour accéder à la plateforme GBE"
     >
-      {/* Succès */}
-      {success && (
-        <div className="alert alert--success" role="status">
-          <IconCheck /> {success}
-        </div>
-      )}
-
-      {/* Erreur globale */}
-      {globalError && (
+      {/* Erreur API */}
+      {apiError && (
         <div className="alert alert--error" role="alert">
-          <IconAlert /> {globalError}
+          <IconAlert /> {apiError}
         </div>
       )}
 
@@ -682,13 +1248,12 @@ export default function RegisterPage() {
             <Input id="firstName" name="firstName" type="text"
               label="Prénom" placeholder="Ali"
               value={values.firstName} onChange={handleChange}
-              error={errors.firstName} icon={<IconUser />}
-              autoComplete="given-name" disabled={isLoading} />
-
+              error={fieldErrors.firstName} icon={<IconUser />}
+              autoComplete="given-name" disabled={isLoading} autoFocus />
             <Input id="lastName" name="lastName" type="text"
               label="Nom" placeholder="Bello"
               value={values.lastName} onChange={handleChange}
-              error={errors.lastName} icon={<IconUser />}
+              error={fieldErrors.lastName} icon={<IconUser />}
               autoComplete="family-name" disabled={isLoading} />
           </div>
 
@@ -696,38 +1261,30 @@ export default function RegisterPage() {
           <Input id="email" name="email" type="email"
             label="Adresse email" placeholder="vous@exemple.cm"
             value={values.email} onChange={handleChange}
-            error={errors.email} icon={<IconMail />}
+            error={fieldErrors.email} icon={<IconMail />}
             autoComplete="email" disabled={isLoading} />
 
-          {/* Matricule / Téléphone */}
-          <div className="form-grid-2">
-            <Input id="matricule" name="matricule" type="text"
-              label="Matricule" placeholder="123456A"
-              value={values.matricule} onChange={handleChange}
-              error={errors.matricule} icon={<IconId />}
-              disabled={isLoading} />
-
-            <Input id="phoneNumber" name="phoneNumber" type="tel"
-              label="Téléphone" placeholder="+237 6XX XXX XXX"
-              value={values.phoneNumber} onChange={handleChange}
-              error={errors.phoneNumber} icon={<IconPhone />}
-              autoComplete="tel" disabled={isLoading} />
-          </div>
+          {/* Téléphone */}
+          <Input id="phoneNumber" name="phoneNumber" type="tel"
+            label="Numéro de téléphone" placeholder="+237 6XX XXX XXX"
+            value={values.phoneNumber} onChange={handleChange}
+            error={fieldErrors.phoneNumber} icon={<IconPhone />}
+            autoComplete="tel" disabled={isLoading} />
 
           {/* Date de naissance */}
           <Input id="dateOfBirth" name="dateOfBirth" type="date"
             label="Date de naissance"
             value={values.dateOfBirth} onChange={handleChange}
-            error={errors.dateOfBirth} icon={<IconCalendar />}
+            error={fieldErrors.dateOfBirth} icon={<IconCalendar />}
             autoComplete="bday" disabled={isLoading} />
 
-          {/* Mot de passe + indicateur de force */}
+          {/* Mot de passe + force */}
           <div>
             <Input id="password" name="password"
               type={showPwd ? 'text' : 'password'}
               label="Mot de passe" placeholder="••••••••"
               value={values.password} onChange={handleChange}
-              error={errors.password} icon={<IconLock />}
+              error={fieldErrors.password} icon={<IconLock />}
               autoComplete="new-password" disabled={isLoading}
               rightElement={
                 <button type="button" className="pwd-toggle"
@@ -737,21 +1294,15 @@ export default function RegisterPage() {
                 </button>
               }
             />
-            {/* Barres de force */}
             {values.password && (
-              <div style={{ marginTop: '6px' }}>
+              <div style={{ marginTop: 6 }}>
                 <div className="pwd-strength">
                   {[1,2,3].map(i => (
-                    <div key={i}
-                      className={`pwd-strength__bar ${strength >= i ? `pwd-strength__bar--${STRENGTH_MODS[strength]}` : ''}`}
-                    />
+                    <div key={i} className={`pwd-strength__bar ${strength >= i ? `pwd-strength__bar--${STRENGTH_MODS[strength]}` : ''}`} />
                   ))}
                 </div>
                 <p className="pwd-strength__label">
-                  Force : {' '}
-                  <strong style={{ color: STRENGTH_COLORS[strength] }}>
-                    {STRENGTH_LABELS[strength]}
-                  </strong>
+                  Force : <strong style={{ color: STRENGTH_COLORS[strength] }}>{STRENGTH_LABELS[strength]}</strong>
                 </p>
               </div>
             )}
@@ -762,7 +1313,7 @@ export default function RegisterPage() {
             type={showConfirm ? 'text' : 'password'}
             label="Confirmer le mot de passe" placeholder="••••••••"
             value={values.confirmPassword} onChange={handleChange}
-            error={errors.confirmPassword} icon={<IconLock />}
+            error={fieldErrors.confirmPassword} icon={<IconLock />}
             autoComplete="new-password" disabled={isLoading}
             rightElement={
               <button type="button" className="pwd-toggle"
@@ -773,7 +1324,17 @@ export default function RegisterPage() {
             }
           />
 
-          {/* Bouton inscription */}
+          {/* Info 2FA */}
+          <div className="alert alert--info" style={{ fontSize: '.8rem' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="alert__icon">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+            Un QR code vous sera fourni pour configurer l&apos;authentification à deux facteurs.
+          </div>
+
+          {/* Bouton */}
           <Button type="submit" variant="secondary" isLoading={isLoading} fullWidth>
             Créer mon compte
           </Button>
@@ -798,48 +1359,47 @@ export default function RegisterPage() {
 
 // ============================================================
 // FICHIER  : src/app/two-factor/page.tsx
-// RÔLE     : Page de vérification 2FA.
-//            Saisie case par case d'un code OTP à 6 chiffres.
-//            Fonctionnalités : auto-focus, collage, minuterie,
-//                              renvoi de code, animation erreur.
+// RÔLE     : Page de vérification du code TOTP (2FA).
+//
+// FLUX :
+//   1. L'utilisateur arrive ici après une connexion réussie
+//      qui a retourné mfaRequired=true
+//   2. L'email de l'utilisateur a été stocké dans sessionStorage
+//      par la page de login (clé : 'gbe_email_2fa')
+//   3. L'utilisateur saisit le code à 6 chiffres généré par
+//      son application TOTP (Google Authenticator, Authy…)
+//   4. Appel POST /api/v1/auth/verify avec { email, code }
+//   5. Si code correct → accessToken reçu → stocké → /dashboard
+//   6. Si code incorrect → message d'erreur affiché
+//
+// SÉCURITÉ :
+//   - Si aucun email en sessionStorage → redirection vers /login
+//   - Le code OTP expire côté back-end (pas besoin de minuterie)
 // ============================================================
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import Link        from 'next/link';
+import Link          from 'next/link';
 import { useRouter } from 'next/navigation';
-import AuthLayout  from '@/components/auth/AuthLayout';
-import Button      from '@/components/ui/Button';
-import { verifyTwoFactor, resendTwoFactorCode } from '@/lib/authService';
-import {
-  APP_ROUTES,
-  TWO_FACTOR_CODE_LENGTH,
-  TWO_FACTOR_CODE_EXPIRY_SECONDS,
-} from '@/constants/auth';
+import AuthLayout    from '@/components/auth/AuthLayout';
+import Button        from '@/components/ui/Button';
+import { verifyTwoFactor, saveAccessToken } from '@/lib/authService';
+import { APP_ROUTES, TWO_FACTOR_CODE_LENGTH } from '@/constants/auth';
 
-// ── Formatage du minuteur en MM:SS ──
-const formatTime = (s: number) =>
-  `${String(Math.floor(s / 60)).padStart(2,'0')}:${String(s % 60).padStart(2,'0')}`;
-
-// ── Icônes ──────────────────────────────────────────────────
+// ── Icônes ─────────────────────────────────────────────────
 const IconAlert = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="2" className="alert__icon">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="alert__icon">
     <circle cx="12" cy="12" r="10"/>
-    <line x1="12" y1="8"  x2="12" y2="12"/>
-    <line x1="12" y1="16" x2="12.01" y2="16"/>
+    <line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
   </svg>
 );
 const IconCheck = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="2" className="alert__icon">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="alert__icon">
     <polyline points="20,6 9,17 4,12"/>
   </svg>
 );
 const IconArrowLeft = () => (
-  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="2">
-    <line x1="19" y1="12" x2="5" y2="12"/>
-    <polyline points="12,19 5,12 12,5"/>
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12,19 5,12 12,5"/>
   </svg>
 );
 
@@ -849,70 +1409,73 @@ const IconArrowLeft = () => (
 export default function TwoFactorPage() {
   const router = useRouter();
 
-  // Tableau d'une chaîne par case OTP
-  const [otp,          setOtp]          = useState<string[]>(
-    Array(TWO_FACTOR_CODE_LENGTH).fill('')
-  );
-  const [hasError,     setHasError]     = useState(false);
-  const [errorMsg,     setErrorMsg]     = useState('');
-  const [resendMsg,    setResendMsg]    = useState('');
-  const [isLoading,    setIsLoading]    = useState(false);
-  const [isResending,  setIsResending]  = useState(false);
-  const [timeLeft,     setTimeLeft]     = useState(TWO_FACTOR_CODE_EXPIRY_SECONDS);
+  // Tableau de 6 chaînes, une par case OTP
+  const [otp, setOtp]         = useState<string[]>(Array(TWO_FACTOR_CODE_LENGTH).fill(''));
+  const [hasError, setHasError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
+  const [isLoading, setIsLoading]   = useState(false);
+  // Email récupéré depuis sessionStorage (stocké par la page login)
+  const [userEmail, setUserEmail]   = useState('');
 
-  // Références sur chaque input pour le focus automatique
+  // Références sur les inputs pour le focus automatique
   const refs = useRef<Array<HTMLInputElement | null>>(
     Array(TWO_FACTOR_CODE_LENGTH).fill(null)
   );
 
-  // ── Minuterie ──
+  // ── Récupérer l'email depuis sessionStorage ──
   useEffect(() => {
-    if (timeLeft <= 0) return;
-    const t = setInterval(() => setTimeLeft(n => n - 1), 1000);
-    return () => clearInterval(t);
-  }, [timeLeft]);
+    const email = sessionStorage.getItem('gbe_email_2fa');
+    if (!email) {
+      // Aucun email trouvé → l'utilisateur n'est pas passé par le login
+      // → rediriger pour éviter une page inutilisable
+      router.replace(APP_ROUTES.LOGIN);
+      return;
+    }
+    setUserEmail(email);
+  }, [router]);
 
-  const isExpired   = timeLeft <= 0;
-  const codeIsFull  = otp.every(c => c !== '');
-  const otpValue    = otp.join('');
+  const codeIsFull = otp.every(c => c !== '');
+  const otpValue   = otp.join('');
 
-  // Récupérer le token de session stocké après le login
-  const getSessionToken = () => sessionStorage.getItem('gbe_session_token') ?? '';
-
-  // ── Gestion de la saisie dans une case ──
+  // ── Gestion de la saisie case par case ──
   const handleInput = useCallback((index: number, raw: string) => {
-    // N'accepter que les chiffres
-    if (!/^\d*$/.test(raw)) return;
+    if (!/^\d*$/.test(raw)) return; // Accepter uniquement les chiffres
+
     setHasError(false);
     setErrorMsg('');
 
     const next = [...otp];
 
+    // Cas collage : l'utilisateur colle un code entier (ex: "123456")
     if (raw.length > 1) {
-      // Cas collage : distribuer les chiffres sur les cases
-      const digits = raw.replace(/\D/g,'').slice(0, TWO_FACTOR_CODE_LENGTH);
+      const digits = raw.replace(/\D/g, '').slice(0, TWO_FACTOR_CODE_LENGTH);
       for (let i = 0; i < TWO_FACTOR_CODE_LENGTH; i++) {
         next[i] = digits[i] ?? '';
       }
       setOtp(next);
+      // Focus sur la dernière case remplie
       refs.current[Math.min(digits.length, TWO_FACTOR_CODE_LENGTH - 1)]?.focus();
       return;
     }
 
+    // Saisie normale : un chiffre à la fois
     next[index] = raw;
     setOtp(next);
-    // Auto-focus case suivante
+    // Auto-focus sur la case suivante après saisie
     if (raw && index < TWO_FACTOR_CODE_LENGTH - 1) {
       refs.current[index + 1]?.focus();
     }
   }, [otp]);
 
-  // ── Touches spéciales : Backspace, flèches ──
+  // ── Gestion des touches spéciales ──
   const handleKeyDown = useCallback((index: number, e: React.KeyboardEvent) => {
     if (e.key === 'Backspace') {
       if (otp[index]) {
+        // Effacer la case courante
         const next = [...otp]; next[index] = ''; setOtp(next);
       } else if (index > 0) {
+        // Reculer à la case précédente
         refs.current[index - 1]?.focus();
       }
     } else if (e.key === 'ArrowLeft'  && index > 0) {
@@ -922,96 +1485,103 @@ export default function TwoFactorPage() {
     }
   }, [otp]);
 
-  // ── Vérification du code ──
+  // ── Soumission du code ──
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!codeIsFull || isExpired) return;
+    if (!codeIsFull) return;
 
     setIsLoading(true);
     setHasError(false);
     setErrorMsg('');
+
     try {
-      const res = await verifyTwoFactor({
-        code:         otpValue,
-        sessionToken: getSessionToken(),
+      // Appel POST /api/v1/auth/verify avec email + code OTP
+      const response = await verifyTwoFactor({
+        email: userEmail,
+        code:  otpValue,
       });
 
-      if (res.success) {
-        sessionStorage.removeItem('gbe_session_token');
-        router.push(APP_ROUTES.DASHBOARD);
+      if (response.accessToken) {
+        // ✅ Code correct — sauvegarder le JWT
+        saveAccessToken(response.accessToken);
+
+        // Afficher un message de succès avant de rediriger
+        setSuccessMsg('Code vérifié avec succès ! Connexion en cours…');
+
+        // Nettoyage sessionStorage
+        sessionStorage.removeItem('gbe_email_2fa');
+
+        // Rediriger vers le tableau de bord après un court délai
+        setTimeout(() => router.push(APP_ROUTES.DASHBOARD), 1200);
+
       } else {
+        // Réponse inattendue du back-end
         setHasError(true);
-        setErrorMsg(res.message || 'Code incorrect. Veuillez réessayer.');
+        setErrorMsg(response.message || 'Code incorrect. Veuillez réessayer.');
       }
+
     } catch (err) {
       setHasError(true);
-      setErrorMsg(err instanceof Error ? err.message : 'Code invalide ou expiré.');
+      setErrorMsg(
+        err instanceof Error ? err.message : 'Code invalide ou expiré.'
+      );
+      // Secouer les cases visuellement (via classe CSS)
+      // Réinitialiser les cases pour faciliter la nouvelle saisie
+      setOtp(Array(TWO_FACTOR_CODE_LENGTH).fill(''));
+      refs.current[0]?.focus();
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  // ── Renvoi d'un nouveau code ──
-  const handleResend = async () => {
-    if (isResending) return;
-    setIsResending(true);
-    setResendMsg('');
-    setErrorMsg('');
-    setHasError(false);
-    try {
-      await resendTwoFactorCode(getSessionToken());
-      setOtp(Array(TWO_FACTOR_CODE_LENGTH).fill(''));
-      setTimeLeft(TWO_FACTOR_CODE_EXPIRY_SECONDS);
-      setResendMsg('Un nouveau code vous a été envoyé.');
-      refs.current[0]?.focus();
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'Impossible de renvoyer le code.');
-    } finally {
-      setIsResending(false);
     }
   };
 
   return (
     <AuthLayout
       title="Vérification en deux étapes"
-      subtitle="Saisissez le code à 6 chiffres envoyé à votre email ou téléphone"
+      subtitle="Saisissez le code à 6 chiffres de votre application d'authentification"
     >
-      {/* Erreur */}
+      {/* Alerte d'erreur */}
       {errorMsg && (
         <div className="alert alert--error" role="alert">
           <IconAlert /> {errorMsg}
         </div>
       )}
 
-      {/* Succès renvoi */}
-      {resendMsg && (
+      {/* Alerte de succès */}
+      {successMsg && (
         <div className="alert alert--success" role="status">
-          <IconCheck /> {resendMsg}
+          <IconCheck /> {successMsg}
         </div>
       )}
 
-      {/* Code expiré */}
-      {isExpired && !errorMsg && (
-        <div className="alert alert--error" role="alert">
-          <IconAlert /> Le code a expiré. Veuillez en demander un nouveau.
+      {/* Affichage de l'email pour confirmation */}
+      {userEmail && (
+        <div className="alert alert--info" style={{ fontSize: '.8rem' }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="alert__icon">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          Vérification pour : <strong>{userEmail}</strong>
         </div>
       )}
 
       <form onSubmit={handleSubmit} noValidate>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
-          {/* Cases OTP */}
+          {/* ── Cases OTP ── */}
           <div>
             <p style={{
               fontSize: '.8125rem', fontWeight: 600,
               color: 'var(--clr-gray-600)', marginBottom: '12px',
             }}>
-              Code à {TWO_FACTOR_CODE_LENGTH} chiffres
+              Code à {TWO_FACTOR_CODE_LENGTH} chiffres (Google Authenticator)
             </p>
 
-            <div className="otp-container"
+            <div
+              className="otp-container"
               role="group"
-              aria-label={`Code de vérification à ${TWO_FACTOR_CODE_LENGTH} chiffres`}>
+              aria-label={`Code de vérification à ${TWO_FACTOR_CODE_LENGTH} chiffres`}
+            >
               {otp.map((digit, i) => (
                 <input
                   key={i}
@@ -1026,24 +1596,16 @@ export default function TwoFactorPage() {
                   onFocus={e => e.target.select()}
                   autoFocus={i === 0}
                   autoComplete={i === 0 ? 'one-time-code' : 'off'}
-                  disabled={isLoading || isExpired}
-                  aria-label={`Chiffre ${i + 1}`}
+                  disabled={isLoading || !!successMsg}
+                  aria-label={`Chiffre ${i + 1} du code`}
                   className={[
                     'otp-input',
-                    digit              ? 'otp-input--filled' : '',
-                    hasError           ? 'otp-input--error'  : '',
+                    digit      ? 'otp-input--filled' : '',
+                    hasError   ? 'otp-input--error'  : '',
                   ].join(' ')}
                 />
               ))}
             </div>
-
-            {/* Minuterie */}
-            <p className={`otp-timer ${isExpired ? 'otp-timer--expired' : ''}`}>
-              {isExpired
-                ? <>Code <strong>expiré</strong></>
-                : <>Expire dans <strong>{formatTime(timeLeft)}</strong></>
-              }
-            </p>
           </div>
 
           {/* Bouton vérifier */}
@@ -1051,27 +1613,12 @@ export default function TwoFactorPage() {
             type="submit"
             isLoading={isLoading}
             fullWidth
-            disabled={!codeIsFull || isExpired || isLoading}
+            disabled={!codeIsFull || isLoading || !!successMsg}
           >
             Vérifier le code
           </Button>
 
-          {/* Renvoi code */}
-          <div style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: '.82rem', color: 'var(--clr-gray-400)', marginBottom: '6px' }}>
-              Vous n&apos;avez pas reçu de code ?
-            </p>
-            <button
-              type="button"
-              className="resend-btn"
-              onClick={handleResend}
-              disabled={isResending || isLoading}
-            >
-              {isResending ? 'Envoi en cours…' : 'Renvoyer le code'}
-            </button>
-          </div>
-
-          {/* Retour connexion */}
+          {/* Lien retour */}
           <div style={{
             textAlign: 'center',
             borderTop: '1px solid var(--clr-gray-100)',
@@ -1977,17 +2524,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 // FILE: src/app/page.tsx
 -----------------------------------------------
-// ============================================================
-// FICHIER  : src/app/page.tsx
-// RÔLE     : Redirection automatique de la racine "/" vers
-//            la page de connexion "/login".
-// ============================================================
-
+// src/app/page.tsx
 import { redirect } from 'next/navigation';
-
-export default function HomePage() {
-  redirect('/login');
-}
+export default function HomePage() { redirect('/login'); }
 
 // END OF FILE: src/app/page.tsx
 
@@ -2440,55 +2979,67 @@ export default Input;
 -----------------------------------------------
 // ============================================================
 // FICHIER  : src/constants/auth.ts
-// RÔLE     : Centralisation de toutes les constantes liées
-//            à l'authentification : URLs API et routes internes.
-//            Pour changer de back-end, modifier uniquement
-//            la variable NEXT_PUBLIC_API_URL dans .env.local.
+// RÔLE     : Centralise TOUTES les constantes de l'application.
+//
+// ✅ BACK-END CONNECTÉ : https://gbe-8clf.onrender.com
+//
+// Pour changer d'environnement, modifier uniquement
+// NEXT_PUBLIC_API_URL dans .env.local — aucun autre fichier
+// ne doit être touché.
 // ============================================================
 
 /**
- * URL de base de l'API.
- * Définie via la variable d'environnement NEXT_PUBLIC_API_URL.
- * Valeur par défaut : serveur local sur le port 8080.
+ * URL de base de l'API back-end.
+ *
+ * En développement  : défini dans .env.local
+ * En production     : défini dans les variables d'environnement du serveur
+ *
+ * Valeur par défaut → le back-end déployé sur Render
  */
 export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080/api/v1';
+  process.env.NEXT_PUBLIC_API_URL ?? 'https://gbe-8clf.onrender.com';
 
 /**
- * Endpoints de l'API d'authentification.
- * Préfixés par API_BASE_URL pour construire l'URL complète.
+ * Préfixe commun à tous les endpoints de l'API.
+ * Si le back-end change de version (v2, v3…), modifier ici uniquement.
+ */
+const API_PREFIX = `${API_BASE_URL}/api/v1`;
+
+/**
+ * Endpoints d'authentification.
+ *
+ * POST /api/v1/auth/register  → Inscription
+ * POST /api/v1/auth/login     → Connexion (retourne un sessionToken si 2FA actif)
+ * POST /api/v1/auth/verify    → Vérification du code 2FA (TOTP)
  */
 export const AUTH_ENDPOINTS = {
-  LOGIN:             `${API_BASE_URL}/auth/login`,
-  REGISTER:          `${API_BASE_URL}/auth/register`,
-  TWO_FACTOR_VERIFY: `${API_BASE_URL}/auth/2fa/verify`,
-  TWO_FACTOR_RESEND: `${API_BASE_URL}/auth/2fa/resend`,
-  FORGOT_PASSWORD:   `${API_BASE_URL}/auth/forgot-password`,
-  RESET_PASSWORD:    `${API_BASE_URL}/auth/reset-password`,
-  LOGOUT:            `${API_BASE_URL}/auth/logout`,
-  REFRESH_TOKEN:     `${API_BASE_URL}/auth/refresh`,
+  REGISTER:    `${API_PREFIX}/auth/register`,
+  LOGIN:       `${API_PREFIX}/auth/login`,
+  VERIFY_2FA:  `${API_PREFIX}/auth/verify`,
 } as const;
 
 /**
- * Routes de navigation de l'application Next.js.
- * Utiliser ces constantes dans router.push() pour éviter
- * les chaînes de caractères codées en dur.
+ * Routes de navigation Next.js.
+ * Utiliser ces constantes dans router.push() plutôt que
+ * des chaînes codées en dur, pour faciliter les refactors.
  */
 export const APP_ROUTES = {
   LOGIN:           '/login',
   REGISTER:        '/register',
-  TWO_FACTOR:      '/two-factor',
+  REGISTER_QR:     '/register/qrcode',   // Page QR code post-inscription
+  TWO_FACTOR:      '/two-factor',         // Page saisie code OTP
   FORGOT_PASSWORD: '/forgot-password',
-  DASHBOARD:       '/dashboard',
+  DASHBOARD:       '/dashboard',          // Page d'accueil après connexion
 } as const;
 
 /**
  * Durée de validité du code 2FA en secondes (5 minutes).
+ * Affichée dans le minuteur de la page two-factor.
  */
 export const TWO_FACTOR_CODE_EXPIRY_SECONDS = 300;
 
 /**
- * Nombre de chiffres du code OTP.
+ * Nombre de chiffres du code OTP affiché par les cases.
  */
 export const TWO_FACTOR_CODE_LENGTH = 6;
 
@@ -2499,111 +3050,212 @@ export const TWO_FACTOR_CODE_LENGTH = 6;
 -----------------------------------------------
 // ============================================================
 // FICHIER  : src/lib/authService.ts
-// RÔLE     : Couche d'abstraction pour tous les appels API
-//            d'authentification. Les composants ne font jamais
-//            de fetch directement — ils passent par ce service.
-//            Pour brancher un vrai back-end : modifier uniquement
-//            les endpoints dans src/constants/auth.ts.
+// RÔLE     : Couche d'abstraction entre les composants React
+//            et l'API back-end GBE (https://gbe-8clf.onrender.com).
+//
+// Principe : les composants n'appellent JAMAIS fetch() directement.
+//            Ils appellent les fonctions de ce fichier, qui :
+//              1. Construisent la requête HTTP
+//              2. Gèrent les erreurs réseau
+//              3. Retournent des objets typés
+//
+// Pour changer de back-end : modifier uniquement AUTH_ENDPOINTS
+// dans src/constants/auth.ts — ce fichier ne change pas.
 // ============================================================
 
 import {
   LoginPayload,
   RegisterPayload,
-  TwoFactorPayload,
+  VerifyPayload,
   ForgotPasswordPayload,
-  AuthApiResponse,
+  LoginResponse,
+  RegisterResponse,
+  VerifyResponse,
+  GenericResponse,
 } from '@/types/auth';
 import { AUTH_ENDPOINTS } from '@/constants/auth';
 
-// ── Headers par défaut pour toutes les requêtes ──
-const DEFAULT_HEADERS: HeadersInit = {
+// ── En-têtes par défaut pour toutes les requêtes JSON ──────
+const JSON_HEADERS: HeadersInit = {
   'Content-Type': 'application/json',
   'Accept':       'application/json',
 };
 
+// ─────────────────────────────────────────────────────────────
+// UTILITAIRE INTERNE
+// ─────────────────────────────────────────────────────────────
+
 /**
- * Utilitaire interne : exécute un POST et lève une exception
- * si la réponse HTTP n'est pas dans la plage 2xx.
+ * Exécute un POST JSON vers l'API et retourne le corps parsé.
  *
- * @param url     - URL de l'endpoint
- * @param payload - Corps de la requête (sera sérialisé en JSON)
- * @returns Réponse JSON typée AuthApiResponse
+ * Gestion des erreurs :
+ * - Erreur réseau (serveur injoignable) → throw Error
+ * - Réponse HTTP ≥ 400 → throw Error avec le message du serveur
+ * - Réponse 2xx → retourne le JSON parsé
+ *
+ * @param url     URL complète de l'endpoint
+ * @param payload Objet à sérialiser en JSON dans le corps
+ * @param token   (optionnel) JWT Bearer pour les routes protégées
  */
-async function postJson<T>(url: string, payload: T): Promise<AuthApiResponse> {
-  const response = await fetch(url, {
-    method:  'POST',
-    headers: DEFAULT_HEADERS,
-    body:    JSON.stringify(payload),
-  });
+async function postJson<TPayload, TResponse>(
+  url: string,
+  payload: TPayload,
+  token?: string
+): Promise<TResponse> {
+  // Construction des en-têtes : ajouter Authorization si token fourni
+  const headers: HeadersInit = { ...JSON_HEADERS };
+  if (token) {
+    (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
+  }
 
-  // Lire le corps même en cas d'erreur pour récupérer le message du serveur
-  const data: AuthApiResponse = await response.json().catch(() => ({
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method:  'POST',
+      headers,
+      body:    JSON.stringify(payload),
+    });
+  } catch {
+    // Erreur réseau (CORS, serveur éteint, pas d'internet…)
+    throw new Error(
+      'Impossible de joindre le serveur. Vérifiez votre connexion internet.'
+    );
+  }
+
+  // Lire le corps de la réponse (même en cas d'erreur HTTP)
+  const data = await response.json().catch(() => ({
     success: false,
-    message: 'Erreur réseau ou réponse invalide du serveur.',
-  }));
+    message: `Erreur HTTP ${response.status} — réponse invalide du serveur.`,
+  })) as TResponse & { message?: string; success?: boolean };
 
+  // Si le serveur retourne un code d'erreur (4xx, 5xx)
   if (!response.ok) {
-    // Lever une erreur avec le message renvoyé par l'API
-    throw new Error(data.message || `Erreur HTTP ${response.status}`);
+    const errMsg = data.message || `Erreur HTTP ${response.status}`;
+    throw new Error(errMsg);
   }
 
   return data;
 }
 
 // ─────────────────────────────────────────────────────────────
-// FONCTIONS PUBLIQUES
+// FONCTIONS PUBLIQUES — une par endpoint
 // ─────────────────────────────────────────────────────────────
 
 /**
- * Connecte un utilisateur avec email, matricule et mot de passe.
- * Si le 2FA est activé, la réponse contient un `sessionToken`
- * et non un `accessToken`.
- */
-export async function loginUser(
-  payload: LoginPayload
-): Promise<AuthApiResponse> {
-  return postJson(AUTH_ENDPOINTS.LOGIN, payload);
-}
-
-/**
- * Inscrit un nouvel utilisateur.
- * Le back-end doit valider l'unicité de l'email et du matricule.
+ * INSCRIPTION
+ * Route : POST /api/v1/auth/register
+ *
+ * Envoie les informations du formulaire d'inscription.
+ * Si mfaEnabled=true, le back-end retourne une qrCodeUrl
+ * que l'utilisateur doit scanner avec son téléphone.
+ *
+ * @param payload Données du formulaire d'inscription
+ * @returns Réponse contenant éventuellement qrCodeUrl
  */
 export async function registerUser(
   payload: RegisterPayload
-): Promise<AuthApiResponse> {
-  return postJson(AUTH_ENDPOINTS.REGISTER, payload);
+): Promise<RegisterResponse> {
+  return postJson<RegisterPayload, RegisterResponse>(
+    AUTH_ENDPOINTS.REGISTER,
+    payload
+  );
 }
 
 /**
- * Vérifie le code OTP reçu par email ou SMS.
- * Retourne un `accessToken` si le code est correct.
+ * CONNEXION
+ * Route : POST /api/v1/auth/login
+ *
+ * Envoie email + password. Si le compte a le 2FA activé,
+ * le back-end retourne mfaRequired=true et un sessionToken.
+ * Le front redirige alors vers /two-factor pour la vérification.
+ *
+ * Si 2FA désactivé → accessToken retourné directement.
+ *
+ * @param payload Email et mot de passe
+ * @returns Réponse avec token(s) ou indication de 2FA requis
+ */
+export async function loginUser(
+  payload: LoginPayload
+): Promise<LoginResponse> {
+  return postJson<LoginPayload, LoginResponse>(
+    AUTH_ENDPOINTS.LOGIN,
+    payload
+  );
+}
+
+/**
+ * VÉRIFICATION DU CODE 2FA
+ * Route : POST /api/v1/auth/verify
+ *
+ * Envoie l'email et le code TOTP à 6 chiffres saisi par l'utilisateur.
+ * Si correct → accessToken retourné → connexion complète.
+ * Si incorrect → erreur levée.
+ *
+ * @param payload Email de l'utilisateur + code OTP à 6 chiffres
+ * @returns Réponse avec accessToken si succès
  */
 export async function verifyTwoFactor(
-  payload: TwoFactorPayload
-): Promise<AuthApiResponse> {
-  return postJson(AUTH_ENDPOINTS.TWO_FACTOR_VERIFY, payload);
+  payload: VerifyPayload
+): Promise<VerifyResponse> {
+  return postJson<VerifyPayload, VerifyResponse>(
+    AUTH_ENDPOINTS.VERIFY_2FA,
+    payload
+  );
 }
 
 /**
- * Demande le renvoi d'un nouveau code OTP.
- * Nécessite le `sessionToken` de la session en cours.
- */
-export async function resendTwoFactorCode(
-  sessionToken: string
-): Promise<AuthApiResponse> {
-  return postJson(AUTH_ENDPOINTS.TWO_FACTOR_RESEND, { sessionToken });
-}
-
-/**
- * Envoie un email de réinitialisation de mot de passe.
- * Toujours retourner un succès côté UI (sécurité : ne pas
- * révéler si l'email existe dans la base).
+ * MOT DE PASSE OUBLIÉ
+ * Route : POST /api/v1/auth/forgot-password
+ *
+ * Envoie un email de réinitialisation.
+ * Par sécurité, toujours afficher un message de succès côté UI
+ * même si l'email n'existe pas (évite l'énumération de comptes).
+ *
+ * @param payload Email de l'utilisateur
  */
 export async function forgotPassword(
   payload: ForgotPasswordPayload
-): Promise<AuthApiResponse> {
-  return postJson(AUTH_ENDPOINTS.FORGOT_PASSWORD, payload);
+): Promise<GenericResponse> {
+  return postJson<ForgotPasswordPayload, GenericResponse>(
+    // Endpoint à ajouter dans constants/auth.ts si disponible
+    `https://gbe-8clf.onrender.com/api/v1/auth/forgot-password`,
+    payload
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// GESTION DU TOKEN EN SESSION (localStorage)
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Sauvegarde le JWT d'accès dans localStorage.
+ * Appelé après une connexion réussie (avec ou sans 2FA).
+ */
+export function saveAccessToken(token: string): void {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('gbe_access_token', token);
+  }
+}
+
+/**
+ * Récupère le JWT d'accès depuis localStorage.
+ * Utilisé pour les requêtes aux routes protégées.
+ */
+export function getAccessToken(): string | null {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('gbe_access_token');
+  }
+  return null;
+}
+
+/**
+ * Supprime le JWT d'accès (déconnexion).
+ */
+export function clearTokens(): void {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('gbe_access_token');
+    sessionStorage.removeItem('gbe_email_2fa');
+  }
 }
 
 // END OF FILE: src/lib/authService.ts
@@ -2613,80 +3265,92 @@ export async function forgotPassword(
 -----------------------------------------------
 // ============================================================
 // FICHIER  : src/types/auth.ts
-// RÔLE     : Définition de toutes les interfaces TypeScript
-//            utilisées dans les pages d'authentification.
-//            Centraliser ici facilite la maintenance et
-//            garantit la cohérence avec le back-end.
+// RÔLE     : Interfaces TypeScript pour l'API back-end GBE.
 // ============================================================
 
-/**
- * Payload envoyé au back-end lors de la connexion.
- * Route : POST /auth/login
- */
+// ── Payloads (ce qu'on ENVOIE) ──────────────────────────────
+
 export interface LoginPayload {
-  email:     string; // Adresse email de l'utilisateur
-  matricule: string; // Identifiant administratif unique
-  password:  string; // Mot de passe en clair (HTTPS obligatoire)
+  email:    string;
+  password: string;
 }
 
-/**
- * Payload envoyé au back-end lors de l'inscription.
- * Route : POST /auth/register
- */
 export interface RegisterPayload {
-  firstName:       string; // Prénom
-  lastName:        string; // Nom de famille
-  email:           string; // Adresse email
-  password:        string; // Mot de passe choisi
-  confirmPassword: string; // Confirmation (validé côté client seulement)
-  phoneNumber:     string; // Ex : +237655555555
-  dateOfBirth:     string; // Format ISO : "1990-01-25"
-  matricule:       string; // Matricule administratif
+  firstName:       string;
+  lastName:        string;
+  email:           string;
+  password:        string;
+  confirmPassword: string;
+  phoneNumber:     string;
+  dateOfBirth:     string;   // "1990-01-25"
+  mfaEnabled:      boolean;  // Toujours true
 }
 
-/**
- * Payload envoyé pour vérifier le code OTP 2FA.
- * Route : POST /auth/2fa/verify
- */
-export interface TwoFactorPayload {
-  code:         string; // Code à 6 chiffres reçu par email/SMS
-  sessionToken: string; // Token temporaire retourné après login réussi
+export interface VerifyPayload {
+  email: string;   // Email de l'utilisateur
+  code:  string;   // Code TOTP à 6 chiffres
 }
 
-/**
- * Payload pour demander la réinitialisation du mot de passe.
- * Route : POST /auth/forgot-password
- */
 export interface ForgotPasswordPayload {
   email: string;
 }
 
+// ── Réponses (ce que le back-end RETOURNE) ──────────────────
+
 /**
- * Structure de réponse standard de l'API d'authentification.
- * Toutes les routes auth renvoient ce format.
+ * Réponse après inscription.
+ * Le back-end retourne :
+ *   {
+ *     "mfaEnabled": true,
+ *     "secretImageUri": "data:image/png;base64,..."
+ *   }
  */
-export interface AuthApiResponse {
-  success: boolean;
-  message: string;
-  data?: {
-    accessToken?:  string; // JWT d'accès (connexion complète)
-    refreshToken?: string; // JWT de rafraîchissement
-    sessionToken?: string; // Token temporaire pour le flux 2FA
-    user?: {
-      id:        string;
-      firstName: string;
-      lastName:  string;
-      email:     string;
-      matricule: string;
-      role:      string;
-    };
-  };
+export interface RegisterResponse {
+  mfaEnabled?:    boolean;
+  secretImageUri?: string;  // ✅ Vrai nom du champ retourné par le back-end
+  // Champs alternatifs au cas où la structure change
+  qrCodeUrl?:     string;
+  qrCode?:        string;
+  message?:       string;
 }
 
 /**
- * Dictionnaire d'erreurs de validation par champ.
- * Clé = nom du champ, valeur = message d'erreur ou undefined.
+ * Réponse après connexion.
+ * Si 2FA activé → mfaRequired=true, pas d'accessToken.
+ * Si 2FA désactivé → accessToken direct.
  */
+export interface LoginResponse {
+  success?:       boolean;
+  message?:       string;
+  accessToken?:   string;
+  refreshToken?:  string;
+  mfaRequired?:   boolean;
+  email?:         string;
+}
+
+/**
+ * Réponse après vérification du code 2FA.
+ */
+export interface VerifyResponse {
+  success?:      boolean;
+  message?:      string;
+  accessToken?:  string;
+  refreshToken?: string;
+  user?: {
+    id:        string;
+    firstName: string;
+    lastName:  string;
+    email:     string;
+    role:      string;
+  };
+}
+
+export interface GenericResponse {
+  success?: boolean;
+  message?: string;
+}
+
+// Dictionnaire d'erreurs de validation par champ
 export type FormErrors = Record<string, string | undefined>;
 
 // END OF FILE: src/types/auth.ts
