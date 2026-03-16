@@ -1,0 +1,841 @@
+/* ============================================================
+   FICHIER  : src/app/globals.css
+   RÔLE     : Design system complet de l'application GBE-MINFI.
+              Organisation :
+              1. Imports de polices
+              2. Variables CSS (tokens)
+              3. Reset & base
+              4. Layout de la page d'authentification
+              5. AuthHeader (en-tête institutionnel)
+              6. AuthCard (carte du formulaire)
+              7. Composants UI (Input, Button, Alert)
+              8. Éléments spécifiques auth (OTP, force mdp…)
+              9. Animations
+             10. Responsive (mobile-first)
+   ============================================================ */
+
+/* ────────────────────────────────────────────────────────────
+   1. IMPORTS DE POLICES
+   Playfair Display → titres élégants (serif institutionnel)
+   DM Sans          → corps de texte moderne et lisible
+   ──────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
+
+/* ────────────────────────────────────────────────────────────
+   2. VARIABLES CSS — DESIGN TOKENS
+   Modifier ici pour changer la charte graphique globalement.
+   ──────────────────────────────────────────────────────────── */
+:root {
+  /* ── Couleurs camerounaises (drapeau) ── */
+  --clr-green:        #007A3D;
+  --clr-green-light:  #009A4E;
+  --clr-green-dark:   #005A2D;
+  --clr-red:          #CE1126;
+  --clr-yellow:       #FCD116;
+  --clr-yellow-dark:  #D4A800;
+
+  /* ── Couleurs institutionnelles MINFI ── */
+  --clr-navy:         #0D2B55;   /* Bleu marine principal */
+  --clr-navy-mid:     #1A3A6B;   /* Bleu marine intermédiaire */
+  --clr-navy-light:   #2451A0;   /* Bleu marine clair (hover) */
+  --clr-gold:         #C9A227;   /* Or du logo MINFI */
+
+  /* ── Neutrals ── */
+  --clr-white:        #FFFFFF;
+  --clr-off-white:    #F5F6FA;   /* Fond de page */
+  --clr-gray-50:      #F2F4F7;
+  --clr-gray-100:     #E8ECF0;
+  --clr-gray-200:     #D1D8E0;
+  --clr-gray-300:     #B4BEC8;
+  --clr-gray-400:     #8E9BAA;
+  --clr-gray-600:     #4A5568;
+  --clr-gray-800:     #1A202C;
+
+  /* ── Sémantique ── */
+  --clr-danger:       var(--clr-red);
+  --clr-success:      var(--clr-green);
+  --clr-warning:      var(--clr-yellow-dark);
+
+  /* ── Typographie ── */
+  --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-body:    'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* ── Espacements ── */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+
+  /* ── Bordures et rayons ── */
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+  --radius-full: 9999px;
+
+  /* ── Ombres ── */
+  --shadow-sm:   0 1px 4px rgba(0,0,0,.06);
+  --shadow-md:   0 4px 16px rgba(0,0,0,.09);
+  --shadow-lg:   0 12px 40px rgba(13,43,85,.13);
+  --shadow-card: 0 20px 60px rgba(13,43,85,.10);
+
+  /* ── Transitions ── */
+  --t-fast:   150ms ease;
+  --t-normal: 250ms ease;
+  --t-slow:   400ms ease;
+}
+
+/* ────────────────────────────────────────────────────────────
+   3. RESET & BASE
+   ──────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--clr-gray-800);
+  background-color: var(--clr-off-white);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a    { color: inherit; text-decoration: none; }
+img  { max-width: 100%; height: auto; display: block; }
+button { font-family: var(--font-body); }
+
+/* ────────────────────────────────────────────────────────────
+   4. LAYOUT — PAGE D'AUTHENTIFICATION
+   Structure :
+   .auth-page
+     ├── AuthHeader   (en-tête bleu marine)
+     └── .auth-main
+           ├── .auth-card   (formulaire)
+           └── .auth-footer
+   ──────────────────────────────────────────────────────────── */
+
+/* Conteneur pleine page */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--clr-off-white);
+}
+
+/* Zone principale sous le header */
+.auth-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: var(--sp-8) var(--sp-5) var(--sp-10);
+  /* Légère montée vers le header via padding top réduit */
+  padding-top: var(--sp-6);
+}
+
+/* ────────────────────────────────────────────────────────────
+   5. AUTH HEADER — EN-TÊTE INSTITUTIONNEL
+   Fond bleu marine + logo MINFI + textes + drapeau + bandes
+   ──────────────────────────────────────────────────────────── */
+.auth-header {
+  position: relative;
+  background: linear-gradient(160deg, var(--clr-navy) 0%, #091e3a 55%, var(--clr-navy-mid) 100%);
+  padding: var(--sp-8) var(--sp-6) calc(var(--sp-8) + 6px); /* +6px pour les bandes */
+  overflow: hidden;
+  /* Légère ombre portée vers le bas */
+  box-shadow: 0 4px 24px rgba(13,43,85,.30);
+}
+
+/* Motifs lumineux en arrière-plan (cercles de lumière) */
+.auth-header__bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% 50%,  rgba(0,122,61,.18)  0%, transparent 50%),
+    radial-gradient(circle at 85% 50%,  rgba(252,209,22,.12) 0%, transparent 50%),
+    radial-gradient(circle at 50% 100%, rgba(206,17,38,.08)  0%, transparent 45%);
+  pointer-events: none;
+}
+
+/* Motif de grille subtil */
+.auth-header::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 48px,
+    rgba(255,255,255,.018) 48px,
+    rgba(255,255,255,.018) 49px
+  );
+  pointer-events: none;
+}
+
+/* Bandes tricolores collées en bas du header */
+.auth-header__stripes {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  height: 10px;
+  z-index: 2;
+}
+.stripe {
+  height: 100%;
+  position: relative;
+}
+.stripe--green  { background: linear-gradient(135deg, #009A4E 0%, #007A3D 50%, #005A2D 100%); }
+.stripe--red    { 
+  background: linear-gradient(135deg, #E63946 0%, #CE1126 50%, #8B0914 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.stripe--yellow {
+  background: linear-gradient(135deg, #FCD116 0%, #D4A800 50%, #B89000 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.stripe__star {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.4));
+}
+
+/* Ligne de contenu : logo | textes | drapeau */
+.auth-header__content {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-6);
+}
+
+/* ── Logo MINFI ── */
+.auth-header__logo-wrap {
+  flex-shrink: 0;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.08);
+  border: 2px solid rgba(255,255,255,.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  /* Halo doré subtil */
+  box-shadow: 0 0 0 4px rgba(201,162,39,.18), 0 8px 24px rgba(0,0,0,.25);
+  transition: transform var(--t-slow), box-shadow var(--t-slow);
+}
+.auth-header__logo-wrap:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 0 6px rgba(201,162,39,.28), 0 10px 28px rgba(0,0,0,.30);
+}
+.auth-header__logo {
+  border-radius: 50%;
+  object-fit: cover;
+  width: 68px;
+  height: 68px;
+}
+
+/* ── Textes institutionnels ── */
+.auth-header__texts {
+  flex: 1;
+  text-align: center;
+  color: var(--clr-white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.auth-header__republic {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: rgba(255,255,255,.95);
+}
+.auth-header__motto {
+  font-size: .72rem;
+  font-weight: 500;
+  color: var(--clr-yellow);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+/* Séparateur tricolore sous la devise */
+.auth-header__divider {
+  position: relative;
+  width: 120px;
+  height: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: var(--sp-3) 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,.25);
+}
+
+/* Bandes tricolores avec dégradés */
+.divider__stripe {
+  position: relative;
+}
+
+/* Bande verte */
+.divider__stripe--green {
+  background: linear-gradient(135deg, #009A4E 0%, #007A3D 50%, #005A2D 100%);
+}
+
+/* Bande rouge avec étoile au centre */
+.divider__stripe--red {
+  background: linear-gradient(135deg, #E63946 0%, #CE1126 50%, #8B0914 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Bande jaune */
+.divider__stripe--yellow {
+  background: linear-gradient(135deg, #FCD116 0%, #D4A800 50%, #B89000 100%);
+}
+
+/* Étoile jaune au centre de la bande rouge */
+.divider__star {
+  width: 10px;
+  height: 10px;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.4));
+}
+.auth-header__ministry {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--clr-white);
+  line-height: 1.2;
+  letter-spacing: .01em;
+}
+.auth-header__app {
+  font-size: .78rem;
+  color: rgba(255,255,255,.55);
+  font-weight: 400;
+  letter-spacing: .06em;
+}
+
+/* ── Drapeau ── */
+.auth-header__flag-wrap {
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,.30);
+  border: 1.5px solid rgba(255,255,255,.20);
+}
+.auth-header__flag {
+  display: block;
+  width: 100px;
+  height: 70px;
+  object-fit: cover;
+}
+
+/* ────────────────────────────────────────────────────────────
+   6. AUTH CARD — CARTE FORMULAIRE
+   ──────────────────────────────────────────────────────────── */
+.auth-card {
+  width: 100%;
+  max-width: 480px;
+  background: var(--clr-white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  /* Animation d'entrée */
+  animation: cardReveal .45s cubic-bezier(.22,.68,0,1.2) both;
+}
+
+/* En-tête de la carte */
+.auth-card__header {
+  padding: var(--sp-8) var(--sp-8) var(--sp-5);
+  border-bottom: 1px solid var(--clr-gray-100);
+  /* Fine bande colorée en haut */
+  border-top: 4px solid transparent;
+  border-image: linear-gradient(90deg, var(--clr-green), var(--clr-yellow), var(--clr-red)) 1;
+}
+.auth-card__title {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--clr-navy);
+  margin-bottom: var(--sp-2);
+  /* Soulignement tricolore */
+  position: relative;
+}
+.auth-card__title::after {
+  content: '';
+  display: block;
+  width: 38px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--clr-navy), var(--clr-green));
+  border-radius: var(--radius-full);
+  margin-top: var(--sp-2);
+}
+.auth-card__subtitle {
+  font-size: .875rem;
+  color: var(--clr-gray-400);
+  line-height: 1.5;
+}
+
+/* Corps de la carte */
+.auth-card__body {
+  padding: var(--sp-6) var(--sp-8) var(--sp-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+/* ────────────────────────────────────────────────────────────
+   7. COMPOSANTS UI
+   ──────────────────────────────────────────────────────────── */
+
+/* ── Input ── */
+.inp-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.inp-label {
+  font-size: .8125rem;   /* 13px */
+  font-weight: 600;
+  color: var(--clr-gray-600);
+  letter-spacing: .025em;
+  user-select: none;
+}
+
+.inp-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Icône gauche */
+.inp-icon-left {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--clr-gray-300);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  transition: color var(--t-fast);
+  z-index: 1;
+}
+
+/* Icône / bouton droit */
+.inp-icon-right {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  z-index: 1;
+}
+
+/* Champ de saisie */
+.inp-field {
+  width: 100%;
+  height: 46px;
+  border: 1.5px solid var(--clr-gray-200);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: .875rem;
+  color: var(--clr-gray-800);
+  background: var(--clr-white);
+  padding: 0 var(--sp-4);
+  outline: none;
+  -webkit-appearance: none;
+  transition: border-color var(--t-fast), box-shadow var(--t-fast);
+}
+/* Padding gauche supplémentaire si icône gauche */
+.inp-field--with-icon  { padding-left: 40px; }
+/* Padding droit supplémentaire si élément droit */
+.inp-field--with-right { padding-right: 42px; }
+
+.inp-field::placeholder {
+  color: var(--clr-gray-200);
+  font-weight: 300;
+}
+/* Focus */
+.inp-field:focus {
+  border-color: var(--clr-navy);
+  box-shadow: 0 0 0 3px rgba(13,43,85,.08);
+}
+/* L'icône gauche prend la couleur navy au focus */
+.inp-wrapper:focus-within .inp-icon-left {
+  color: var(--clr-navy);
+}
+/* Erreur de validation */
+.inp-field--error {
+  border-color: var(--clr-danger);
+  box-shadow: 0 0 0 3px rgba(206,17,38,.07);
+}
+/* Message d'erreur */
+.inp-error-msg {
+  font-size: .75rem;
+  color: var(--clr-danger);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  animation: fadeSlideDown .2s ease;
+}
+
+/* Bouton toggle affichage mot de passe */
+.pwd-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  color: var(--clr-gray-400);
+  transition: color var(--t-fast);
+}
+.pwd-toggle:hover { color: var(--clr-navy); }
+
+/* ── Button ── */
+.btn {
+  height: 46px;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: .9rem;
+  font-weight: 600;
+  letter-spacing: .025em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  padding: 0 var(--sp-6);
+  transition:
+    background var(--t-fast),
+    box-shadow var(--t-fast),
+    transform var(--t-fast),
+    opacity var(--t-fast);
+}
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn:disabled { opacity: .52; cursor: not-allowed; }
+.btn--full { width: 100%; }
+
+/* Primary : bleu marine MINFI */
+.btn--primary {
+  background: linear-gradient(135deg, var(--clr-navy) 0%, var(--clr-navy-mid) 100%);
+  color: var(--clr-white);
+  box-shadow: 0 4px 16px rgba(13,43,85,.24);
+}
+.btn--primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--clr-navy-mid) 0%, var(--clr-navy-light) 100%);
+  box-shadow: 0 6px 20px rgba(13,43,85,.34);
+  transform: translateY(-1px);
+}
+
+/* Secondary : vert MINFI */
+.btn--secondary {
+  background: linear-gradient(135deg, var(--clr-green-dark) 0%, var(--clr-green-light) 100%);
+  color: var(--clr-white);
+  box-shadow: 0 4px 16px rgba(0,122,61,.24);
+}
+.btn--secondary:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(0,122,61,.34);
+  transform: translateY(-1px);
+}
+
+/* Ghost : transparent avec bordure */
+.btn--ghost {
+  background: transparent;
+  color: var(--clr-navy);
+  border: 1.5px solid var(--clr-gray-200);
+}
+.btn--ghost:hover:not(:disabled) {
+  border-color: var(--clr-navy);
+  background: var(--clr-gray-50);
+}
+
+/* Spinner de chargement dans le bouton */
+.btn__loader { display: flex; align-items: center; gap: var(--sp-2); }
+.btn__spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,.3);
+  border-top-color: var(--clr-white);
+  border-radius: 50%;
+  animation: spin .65s linear infinite;
+  flex-shrink: 0;
+}
+
+/* ────────────────────────────────────────────────────────────
+   8. ÉLÉMENTS SPÉCIFIQUES AUX PAGES AUTH
+   ──────────────────────────────────────────────────────────── */
+
+/* ── Grille 2 colonnes (prénom/nom, matricule/téléphone) ── */
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-4);
+}
+
+/* ── Alertes (erreur globale, succès) ── */
+.alert {
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius-md);
+  font-size: .8375rem;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  animation: fadeSlideDown .28s ease;
+  line-height: 1.5;
+}
+.alert__icon { flex-shrink: 0; margin-top: 2px; }
+.alert--error {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+}
+.alert--success {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #166534;
+}
+.alert--info {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E40AF;
+}
+
+/* ── Lien "Mot de passe oublié" ── */
+.forgot-link {
+  display: block;
+  text-align: right;
+  font-size: .8rem;
+  color: var(--clr-navy);
+  font-weight: 500;
+  transition: color var(--t-fast);
+  margin-top: -10px; /* Colle au champ mot de passe */
+}
+.forgot-link:hover { color: var(--clr-green); text-decoration: underline; }
+
+/* ── Lien switch "Déjà inscrit ? / Pas de compte ?" ── */
+.auth-switch {
+  text-align: center;
+  font-size: .85rem;
+  color: var(--clr-gray-600);
+}
+.auth-switch a {
+  color: var(--clr-navy);
+  font-weight: 600;
+  transition: color var(--t-fast);
+}
+.auth-switch a:hover { color: var(--clr-green); }
+
+/* ── Badge sécurité ── */
+.secure-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  font-size: .73rem;
+  color: var(--clr-gray-400);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--clr-gray-100);
+}
+
+/* ── Cases OTP (page 2FA) ── */
+.otp-container {
+  display: flex;
+  gap: var(--sp-3);
+  justify-content: center;
+}
+.otp-input {
+  width: 52px;
+  height: 60px;
+  border: 2px solid var(--clr-gray-200);
+  border-radius: var(--radius-md);
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: var(--clr-navy);
+  text-align: center;
+  background: var(--clr-white);
+  outline: none;
+  transition: border-color var(--t-fast), box-shadow var(--t-fast), background var(--t-fast);
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+}
+.otp-input::-webkit-inner-spin-button,
+.otp-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.otp-input:focus {
+  border-color: var(--clr-navy);
+  box-shadow: 0 0 0 3px rgba(13,43,85,.10);
+}
+.otp-input--filled {
+  border-color: var(--clr-green);
+  background: #F0FDF4;
+  color: var(--clr-green-dark);
+}
+.otp-input--error {
+  border-color: var(--clr-danger);
+  background: #FEF2F2;
+  animation: shake .4s ease;
+}
+
+/* Minuterie 2FA */
+.otp-timer {
+  text-align: center;
+  font-size: .8rem;
+  color: var(--clr-gray-400);
+  margin-top: var(--sp-3);
+}
+.otp-timer strong       { color: var(--clr-navy); }
+.otp-timer--expired strong { color: var(--clr-danger); }
+
+/* Bouton renvoi code */
+.resend-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--clr-navy);
+  font-size: .85rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+  text-decoration: underline;
+  padding: 0;
+  transition: color var(--t-fast);
+}
+.resend-btn:hover:not(:disabled)  { color: var(--clr-green); }
+.resend-btn:disabled {
+  color: var(--clr-gray-400);
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+/* ── Indicateur de force du mot de passe ── */
+.pwd-strength {
+  display: flex;
+  gap: var(--sp-1);
+  margin-top: var(--sp-2);
+}
+.pwd-strength__bar {
+  flex: 1;
+  height: 3px;
+  border-radius: var(--radius-full);
+  background: var(--clr-gray-100);
+  transition: background var(--t-normal);
+}
+.pwd-strength__bar--weak   { background: var(--clr-red);        }
+.pwd-strength__bar--medium { background: var(--clr-yellow-dark); }
+.pwd-strength__bar--strong { background: var(--clr-green);       }
+
+.pwd-strength__label {
+  font-size: .73rem;
+  color: var(--clr-gray-400);
+  margin-top: var(--sp-1);
+}
+
+/* ── Pied de page auth ── */
+.auth-footer {
+  margin-top: var(--sp-6);
+  text-align: center;
+  font-size: .73rem;
+  color: var(--clr-gray-400);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.auth-footer__link {
+  color: var(--clr-navy);
+  font-weight: 500;
+  transition: color var(--t-fast);
+}
+.auth-footer__link:hover { color: var(--clr-green); }
+
+/* ────────────────────────────────────────────────────────────
+   9. ANIMATIONS
+   ──────────────────────────────────────────────────────────── */
+@keyframes cardReveal {
+  from { opacity: 0; transform: translateY(18px) scale(.98); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);   }
+}
+@keyframes fadeSlideDown {
+  from { opacity: 0; transform: translateY(-5px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20%      { transform: translateX(-5px); }
+  40%      { transform: translateX(5px); }
+  60%      { transform: translateX(-5px); }
+  80%      { transform: translateX(5px); }
+}
+
+/* ────────────────────────────────────────────────────────────
+  10. RESPONSIVE — MOBILE FIRST
+   ──────────────────────────────────────────────────────────── */
+/* Tablette et téléphone */
+@media (max-width: 640px) {
+  /* Header : empilement vertical sur très petits écrans */
+  .auth-header__content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--sp-4);
+  }
+  /* Réduire logo et drapeau */
+  .auth-header__logo-wrap { width: 64px; height: 64px; }
+  .auth-header__logo      { width: 52px; height: 52px; }
+  .auth-header__flag      { width: 56px; height: 37px; }
+  .auth-header__ministry  { font-size: 1.2rem; }
+
+  /* Carte pleine largeur */
+  .auth-card { border-radius: var(--radius-lg); }
+  .auth-card__header { padding: var(--sp-5) var(--sp-5) var(--sp-4); }
+  .auth-card__body   { padding: var(--sp-5); }
+  .auth-card__title  { font-size: 1.35rem; }
+
+  /* Formulaire d'inscription : 1 colonne */
+  .form-grid-2 { grid-template-columns: 1fr; }
+
+  /* OTP : cases légèrement plus petites */
+  .otp-input { width: 44px; height: 52px; font-size: 1.25rem; }
+
+  .auth-main { padding: var(--sp-5) var(--sp-4) var(--sp-8); }
+}
+
+/* Très petit écran */
+@media (max-width: 380px) {
+  .otp-input { width: 38px; height: 46px; font-size: 1.1rem; }
+  .otp-container { gap: var(--sp-2); }
+}

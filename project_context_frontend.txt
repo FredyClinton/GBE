@@ -1,0 +1,4212 @@
+﻿Next.js Project Context
+Generated On: 2026-03-16 14:12:21
+Root: C:\Users\steve\Documents\Front-end_GBE\MINFI-Application-de-Genstion-du-Budget
+===============================================
+
+// FILE: src/app/dashboard/page.tsx
+-----------------------------------------------
+'use client';
+
+// ============================================================
+// FICHIER  : src/app/dashboard/page.tsx
+// RÔLE     : Page d'accueil après connexion réussie.
+//            Page simulée — sera remplacée par le vrai dashboard
+//            GBE lors du développement de la suite de l'application.
+//
+// SÉCURITÉ (côté client) :
+//   - Vérifie la présence du JWT dans localStorage
+//   - Si absent → redirection vers /login
+//   - Le JWT doit être validé côté back-end pour les vraies routes
+// ============================================================
+
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Image         from 'next/image';
+import { getAccessToken, clearTokens } from '@/lib/authService';
+import { APP_ROUTES }                  from '@/constants/auth';
+
+// Modules budgétaires disponibles dans l'application GBE
+// (à remplacer par les vrais modules lors du développement)
+const MODULES = [
+  {
+    icon: '📊',
+    title: 'Budget de l\'État',
+    description: 'Consultation et suivi du budget général',
+    color: 'var(--clr-navy)',
+    bg: 'rgba(13,43,85,.06)',
+  },
+  {
+    icon: '💰',
+    title: 'Recettes',
+    description: 'Suivi des recettes budgétaires',
+    color: 'var(--clr-green)',
+    bg: 'rgba(0,122,61,.06)',
+  },
+  {
+    icon: '📋',
+    title: 'Dépenses',
+    description: 'Gestion des dépenses publiques',
+    color: 'var(--clr-red)',
+    bg: 'rgba(206,17,38,.06)',
+  },
+  {
+    icon: '📈',
+    title: 'Rapports',
+    description: 'Génération de rapports financiers',
+    color: 'var(--clr-yellow-dark)',
+    bg: 'rgba(212,168,0,.06)',
+  },
+  {
+    icon: '🏛️',
+    title: 'Programmes',
+    description: 'Suivi des programmes budgétaires',
+    color: 'var(--clr-navy-mid)',
+    bg: 'rgba(26,58,107,.06)',
+  },
+  {
+    icon: '⚙️',
+    title: 'Administration',
+    description: 'Paramètres et configuration',
+    color: 'var(--clr-gray-600)',
+    bg: 'rgba(74,85,104,.06)',
+  },
+];
+
+export default function DashboardPage() {
+  const router = useRouter();
+
+  const [isReady, setIsReady] = useState(false);
+
+  // ── Vérification de l'authentification côté client ──
+  useEffect(() => {
+    const token = getAccessToken();
+    if (!token) {
+      // Pas de token → l'utilisateur n'est pas connecté → rediriger
+      router.replace(APP_ROUTES.LOGIN);
+      return;
+    }
+    setIsReady(true);
+  }, [router]);
+
+  // ── Déconnexion ──
+  const handleLogout = () => {
+    clearTokens(); // Supprime JWT de localStorage + sessionStorage
+    router.push(APP_ROUTES.LOGIN);
+  };
+
+  // Affichage pendant la vérification du token
+  if (!isReady) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'var(--clr-off-white)',
+        fontFamily: 'var(--font-body)',
+      }}>
+        <div style={{ textAlign: 'center', color: 'var(--clr-gray-400)' }}>
+          <div style={{
+            width: 40, height: 40,
+            border: '3px solid var(--clr-gray-200)',
+            borderTopColor: 'var(--clr-navy)',
+            borderRadius: '50%',
+            animation: 'spin .7s linear infinite',
+            margin: '0 auto 16px',
+          }} />
+          Chargement de votre espace…
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      background: 'var(--clr-off-white)',
+      fontFamily: 'var(--font-body)',
+      color: 'var(--clr-gray-800)',
+    }}>
+
+      {/* ══════════════════════════════════════
+          BARRE DE NAVIGATION
+          ══════════════════════════════════════ */}
+      <nav style={{
+        background: 'linear-gradient(135deg, var(--clr-navy) 0%, var(--clr-navy-mid) 100%)',
+        padding: '0 32px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        height: 64,
+        boxShadow: '0 2px 16px rgba(13,43,85,.30)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
+      }}>
+        {/* Logo + nom */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <Image src="/images/logo-minfi.png" alt="MINFI" width={36} height={36}
+            style={{ borderRadius: '50%', border: '1.5px solid rgba(255,255,255,.3)' }} />
+          <div>
+            <p style={{ fontFamily: 'var(--font-display)', fontSize: '.9rem', fontWeight: 700, color: '#fff', lineHeight: 1 }}>
+              GBE – MINFI
+            </p>
+            <p style={{ fontSize: '.65rem', color: 'rgba(255,255,255,.55)', letterSpacing: '.05em' }}>
+              Gestion du Budget de l&apos;État
+            </p>
+          </div>
+        </div>
+
+        {/* Barre de navigation centrale (placeholder) */}
+        <div style={{ display: 'flex', gap: 8 }}>
+          {['Accueil', 'Budget', 'Rapports'].map(item => (
+            <button key={item} style={{
+              background: item === 'Accueil' ? 'rgba(255,255,255,.12)' : 'transparent',
+              border: 'none',
+              color: '#fff',
+              fontSize: '.82rem',
+              fontWeight: 500,
+              padding: '6px 14px',
+              borderRadius: 6,
+              cursor: 'pointer',
+              fontFamily: 'var(--font-body)',
+            }}>
+              {item}
+            </button>
+          ))}
+        </div>
+
+        {/* Bouton déconnexion */}
+        <button
+          onClick={handleLogout}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            background: 'rgba(255,255,255,.1)',
+            border: '1px solid rgba(255,255,255,.2)',
+            color: '#fff',
+            fontSize: '.82rem',
+            fontWeight: 500,
+            padding: '7px 14px',
+            borderRadius: 8,
+            cursor: 'pointer',
+            fontFamily: 'var(--font-body)',
+            transition: 'background .15s',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,.18)')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,.10)')}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16,17 21,12 16,7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Déconnexion
+        </button>
+      </nav>
+
+      {/* ══════════════════════════════════════
+          CONTENU PRINCIPAL
+          ══════════════════════════════════════ */}
+      <main style={{ maxWidth: 1100, margin: '0 auto', padding: '40px 24px' }}>
+
+        {/* Bannière de bienvenue */}
+        <div style={{
+          background: 'linear-gradient(135deg, var(--clr-navy) 0%, var(--clr-navy-mid) 100%)',
+          borderRadius: 'var(--radius-xl)',
+          padding: '32px 40px',
+          marginBottom: 40,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          boxShadow: '0 8px 32px rgba(13,43,85,.20)',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          {/* Motif décoratif */}
+          <div style={{
+            position: 'absolute', right: -40, top: -40,
+            width: 200, height: 200,
+            borderRadius: '50%',
+            background: 'rgba(255,255,255,.04)',
+            pointerEvents: 'none',
+          }} />
+          <div style={{
+            position: 'absolute', right: 60, bottom: -60,
+            width: 160, height: 160,
+            borderRadius: '50%',
+            background: 'rgba(252,209,22,.06)',
+            pointerEvents: 'none',
+          }} />
+          {/* Bandes tricolores en bas */}
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 4, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr' }}>
+            <div style={{ background: 'var(--clr-green)' }} />
+            <div style={{ background: 'var(--clr-red)' }} />
+            <div style={{ background: 'var(--clr-yellow)' }} />
+          </div>
+
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <p style={{ color: 'var(--clr-yellow)', fontSize: '.75rem', fontWeight: 500, letterSpacing: '.15em', textTransform: 'uppercase', marginBottom: 8 }}>
+              Bienvenue sur la plateforme
+            </p>
+            <h1 style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: '1.8rem',
+              fontWeight: 700,
+              color: '#fff',
+              marginBottom: 8,
+            }}>
+              Gestion du Budget de l&apos;État
+            </h1>
+            <p style={{ color: 'rgba(255,255,255,.65)', fontSize: '.875rem' }}>
+              Ministère des Finances du Cameroun • Exercice budgétaire {new Date().getFullYear()}
+            </p>
+          </div>
+
+          <Image src="/images/logo-minfi.png" alt="MINFI" width={80} height={80}
+            style={{
+              borderRadius: '50%',
+              border: '2px solid rgba(255,255,255,.2)',
+              position: 'relative',
+              zIndex: 1,
+              opacity: .9,
+            }} />
+        </div>
+
+        {/* Indicateur page en développement */}
+        <div style={{
+          background: '#FFF7ED',
+          border: '1px solid #FED7AA',
+          borderRadius: 'var(--radius-md)',
+          padding: '12px 16px',
+          marginBottom: 32,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          fontSize: '.82rem',
+          color: '#9A3412',
+        }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}>
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <span>
+            <strong>Tableau de bord en développement</strong> — Vous êtes connecté avec succès.
+            Les modules ci-dessous seront disponibles dans les prochaines versions.
+          </span>
+        </div>
+
+        {/* Grille des modules */}
+        <h2 style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: '1.2rem',
+          fontWeight: 700,
+          color: 'var(--clr-navy)',
+          marginBottom: 20,
+        }}>
+          Modules disponibles
+        </h2>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+          gap: 20,
+        }}>
+          {MODULES.map((mod, i) => (
+            <div key={i} style={{
+              background: '#fff',
+              borderRadius: 'var(--radius-lg)',
+              padding: '24px',
+              boxShadow: 'var(--shadow-sm)',
+              border: '1px solid var(--clr-gray-100)',
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: 16,
+              cursor: 'default',
+              transition: 'transform .2s, box-shadow .2s',
+              animation: `cardReveal .4s ${i * .06}s cubic-bezier(.22,.68,0,1.2) both`,
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.transform = 'translateY(-3px)';
+              e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+            }}
+            >
+              {/* Icône du module */}
+              <div style={{
+                width: 48, height: 48,
+                background: mod.bg,
+                borderRadius: 12,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.4rem',
+                flexShrink: 0,
+              }}>
+                {mod.icon}
+              </div>
+              <div>
+                <h3 style={{ fontSize: '.9rem', fontWeight: 600, color: mod.color, marginBottom: 4 }}>
+                  {mod.title}
+                </h3>
+                <p style={{ fontSize: '.8rem', color: 'var(--clr-gray-400)', lineHeight: 1.5 }}>
+                  {mod.description}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Loi de référence */}
+        <div style={{
+          marginTop: 40,
+          padding: '16px 20px',
+          background: 'rgba(13,43,85,.04)',
+          borderRadius: 'var(--radius-md)',
+          border: '1px solid rgba(13,43,85,.08)',
+          fontSize: '.75rem',
+          color: 'var(--clr-gray-400)',
+          textAlign: 'center',
+          fontStyle: 'italic',
+        }}>
+          Application développée conformément à la Loi N° 2018/012 du 11 Juillet 2018
+          portant régime financier de l&apos;État et des autres entités publiques
+          – République du Cameroun
+        </div>
+
+      </main>
+    </div>
+  );
+}
+
+// END OF FILE: src/app/dashboard/page.tsx
+
+
+// FILE: src/app/forgot-password/page.tsx
+-----------------------------------------------
+'use client';
+
+// ============================================================
+// FICHIER  : src/app/forgot-password/page.tsx
+// ============================================================
+
+import React, { useState } from 'react';
+import Link      from 'next/link';
+import AuthLayout from '@/components/auth/AuthLayout';
+import Input      from '@/components/ui/Input';
+import Button     from '@/components/ui/Button';
+import { APP_ROUTES } from '@/constants/auth';
+
+const IconMail = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="2" y="4" width="20" height="16" rx="2"/>
+    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+  </svg>
+);
+const IconInfo = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="alert__icon">
+    <circle cx="12" cy="12" r="10"/>
+    <line x1="12" y1="16" x2="12" y2="12"/>
+    <line x1="12" y1="8" x2="12.01" y2="8"/>
+  </svg>
+);
+
+export default function ForgotPasswordPage() {
+  const [email,      setEmail]      = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [submitted,  setSubmitted]  = useState(false);
+  const [isLoading,  setIsLoading]  = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) { setEmailError("L'adresse email est requise"); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setEmailError('Adresse email invalide'); return; }
+
+    setIsLoading(true);
+    // Simuler l'envoi (endpoint à implémenter côté back-end)
+    await new Promise(r => setTimeout(r, 800));
+    setIsLoading(false);
+    setSubmitted(true);
+  };
+
+  return (
+    <AuthLayout
+      title="Mot de passe oublié"
+      subtitle="Saisissez votre email pour recevoir un lien de réinitialisation"
+    >
+      {submitted ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20, textAlign: 'center' }}>
+          <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#F0FDF4', border: '2px solid #BBF7D0', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '8px auto 0' }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--clr-green)" strokeWidth="2">
+              <rect x="2" y="4" width="20" height="16" rx="2"/>
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+            </svg>
+          </div>
+          <div>
+            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.15rem', color: 'var(--clr-navy)', marginBottom: 8 }}>Email envoyé !</h3>
+            <p style={{ fontSize: '.875rem', color: 'var(--clr-gray-600)', lineHeight: 1.6 }}>
+              Si un compte est associé à <strong style={{ color: 'var(--clr-navy)' }}>{email}</strong>, vous recevrez un lien sous peu.
+            </p>
+          </div>
+          <div className="alert alert--info"><IconInfo />Vérifiez vos dossiers spam.</div>
+          <Link href={APP_ROUTES.LOGIN}><Button variant="ghost" fullWidth>Retour à la connexion</Button></Link>
+        </div>
+      ) : (
+        <>
+          <form onSubmit={handleSubmit} noValidate>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <Input id="email" name="email" type="email"
+                label="Adresse email" placeholder="vous@exemple.cm"
+                value={email}
+                onChange={e => { setEmail(e.target.value); setEmailError(''); }}
+                error={emailError} icon={<IconMail />}
+                autoComplete="email" autoFocus disabled={isLoading} />
+              <Button type="submit" isLoading={isLoading} fullWidth>Envoyer le lien</Button>
+            </div>
+          </form>
+          <p className="auth-switch"><Link href={APP_ROUTES.LOGIN}>← Retour à la connexion</Link></p>
+        </>
+      )}
+    </AuthLayout>
+  );
+}
+
+// END OF FILE: src/app/forgot-password/page.tsx
+
+
+// FILE: src/app/login/page.tsx
+-----------------------------------------------
+'use client';
+
+// ============================================================
+// FICHIER  : src/app/login/page.tsx
+// RÔLE     : Page de connexion reliée au back-end GBE.
+//
+// FLUX :
+//   1. Utilisateur saisit email + mot de passe
+//   2. POST /api/v1/auth/login { email, password }
+//   3. Back-end répond :
+//      → { "mfaEnabled": true }  = 2FA requis → /two-factor
+//      → { "accessToken": "..." } = connexion directe → /dashboard
+// ============================================================
+
+import React, { useState } from 'react';
+import Link          from 'next/link';
+import { useRouter } from 'next/navigation';
+import AuthLayout    from '@/components/auth/AuthLayout';
+import Input         from '@/components/ui/Input';
+import Button        from '@/components/ui/Button';
+import { saveAccessToken } from '@/lib/authService';
+import { FormErrors }      from '@/types/auth';
+import { APP_ROUTES }      from '@/constants/auth';
+
+// ── Icônes SVG inline ───────────────────────────────────────
+const IconMail = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="2" y="4" width="20" height="16" rx="2"/>
+    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+  </svg>
+);
+const IconLock = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="3" y="11" width="18" height="11" rx="2"/>
+    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+  </svg>
+);
+const IconEye = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+    <circle cx="12" cy="12" r="3"/>
+  </svg>
+);
+const IconEyeOff = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+    <line x1="1" y1="1" x2="23" y2="23"/>
+  </svg>
+);
+const IconShield = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+  </svg>
+);
+const IconAlert = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="alert__icon">
+    <circle cx="12" cy="12" r="10"/>
+    <line x1="12" y1="8" x2="12" y2="12"/>
+    <line x1="12" y1="16" x2="12.01" y2="16"/>
+  </svg>
+);
+
+// ─────────────────────────────────────────────────────────────
+// Validation locale avant appel API
+// ─────────────────────────────────────────────────────────────
+function validate(email: string, password: string): FormErrors {
+  const e: FormErrors = {};
+  if (!email.trim()) {
+    e.email = "L'adresse email est requise";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    e.email = 'Adresse email invalide';
+  }
+  if (!password) {
+    e.password = 'Le mot de passe est requis';
+  }
+  return e;
+}
+
+// ─────────────────────────────────────────────────────────────
+// COMPOSANT PAGE
+// ─────────────────────────────────────────────────────────────
+export default function LoginPage() {
+  const router = useRouter();
+
+  const [email,       setEmail]       = useState('');
+  const [password,    setPassword]    = useState('');
+  const [fieldErrors, setFieldErrors] = useState<FormErrors>({});
+  const [apiError,    setApiError]    = useState('');
+  const [isLoading,   setIsLoading]   = useState(false);
+  const [showPwd,     setShowPwd]     = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (name === 'email')    setEmail(value);
+    if (name === 'password') setPassword(value);
+    // Effacer l'erreur du champ modifié
+    if (fieldErrors[name]) setFieldErrors(prev => ({ ...prev, [name]: undefined }));
+    setApiError('');
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validation locale
+    const errors = validate(email, password);
+    if (Object.keys(errors).length > 0) { setFieldErrors(errors); return; }
+
+    setIsLoading(true);
+    setApiError('');
+
+    try {
+      // Appel POST /api/v1/auth/login
+      const res = await fetch('https://gbe-8clf.onrender.com/api/v1/auth/login', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body:    JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      // Erreur HTTP (401 mauvais identifiants, 404 compte inexistant…)
+      if (!res.ok) {
+        throw new Error(data.message || 'Identifiants incorrects. Veuillez réessayer.');
+      }
+
+      // ✅ Cas 1 : Le back-end retourne { "mfaEnabled": true }
+      // → Stocker l'email → rediriger vers la page de saisie du code 2FA
+      if (data.mfaEnabled === true) {
+        sessionStorage.setItem('gbe_email_2fa', email);
+        router.push(APP_ROUTES.TWO_FACTOR);
+        return;
+      }
+
+      // ✅ Cas 2 : Connexion directe sans 2FA
+      // → accessToken présent directement
+      if (data.accessToken) {
+        saveAccessToken(data.accessToken);
+        router.push(APP_ROUTES.DASHBOARD);
+        return;
+      }
+
+      // ⚠️ Cas inattendu : réponse 200 mais structure inconnue
+      // Afficher les champs reçus pour debug
+      setApiError(
+        `Réponse inattendue du serveur. Champs reçus : ${Object.keys(data).join(', ')}`
+      );
+
+    } catch (err) {
+      setApiError(
+        err instanceof Error ? err.message : 'Une erreur est survenue. Veuillez réessayer.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <AuthLayout
+      title="Connexion"
+      subtitle="Accédez à votre espace de gestion budgétaire"
+    >
+      {/* Erreur API */}
+      {apiError && (
+        <div className="alert alert--error" role="alert">
+          <IconAlert /> {apiError}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} noValidate>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+          {/* Email */}
+          <Input
+            id="email" name="email" type="email"
+            label="Adresse email"
+            placeholder="vous@exemple.cm"
+            value={email}
+            onChange={handleChange}
+            error={fieldErrors.email}
+            icon={<IconMail />}
+            autoComplete="email"
+            autoFocus
+            disabled={isLoading}
+          />
+
+          {/* Mot de passe */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <Input
+              id="password" name="password"
+              type={showPwd ? 'text' : 'password'}
+              label="Mot de passe"
+              placeholder="••••••••"
+              value={password}
+              onChange={handleChange}
+              error={fieldErrors.password}
+              icon={<IconLock />}
+              autoComplete="current-password"
+              disabled={isLoading}
+              rightElement={
+                <button
+                  type="button"
+                  className="pwd-toggle"
+                  onClick={() => setShowPwd(v => !v)}
+                  aria-label={showPwd ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                >
+                  {showPwd ? <IconEyeOff /> : <IconEye />}
+                </button>
+              }
+            />
+            <Link href={APP_ROUTES.FORGOT_PASSWORD} className="forgot-link">
+              Mot de passe oublié ?
+            </Link>
+          </div>
+
+          {/* Bouton connexion */}
+          <Button type="submit" isLoading={isLoading} fullWidth>
+            Se connecter
+          </Button>
+
+          {/* Badge sécurité */}
+          <div className="secure-badge">
+            <IconShield />
+            Connexion sécurisée – MINFI Cameroun
+          </div>
+
+        </div>
+      </form>
+
+      <p className="auth-switch">
+        Pas encore de compte ?{' '}
+        <Link href={APP_ROUTES.REGISTER}>Créer un compte</Link>
+      </p>
+    </AuthLayout>
+  );
+}
+
+// END OF FILE: src/app/login/page.tsx
+
+
+// FILE: src/app/register/qrcode/page.tsx
+-----------------------------------------------
+'use client';
+
+// ============================================================
+// FICHIER  : src/app/register/qrcode/page.tsx
+// RÔLE     : Page affichée après l'inscription réussie.
+//
+// FLUX :
+//   1. L'utilisateur arrive ici après POST /api/v1/auth/register
+//   2. La page lit le QR code URL depuis sessionStorage
+//      (stocké par register/page.tsx après réponse du back-end)
+//   3. Affiche le QR code à scanner avec Google Authenticator
+//      ou toute autre app TOTP (Authy, Microsoft Authenticator…)
+//   4. Une fois le QR scanné, l'utilisateur clique "J'ai scanné"
+//      → redirection vers /login pour se connecter
+//
+// SÉCURITÉ :
+//   - sessionStorage est effacé dès la fermeture de l'onglet
+//   - Si aucun QR code n'est trouvé → redirection vers /register
+// ============================================================
+
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Image         from 'next/image';
+import Link          from 'next/link';
+import Button        from '@/components/ui/Button';
+import { APP_ROUTES } from '@/constants/auth';
+
+export default function QrCodePage() {
+  const router = useRouter();
+
+  // URL du QR code (data:image/png;base64,... ou URL http)
+  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
+  // Email de l'utilisateur pour affichage informatif
+  const [userEmail, setUserEmail]  = useState<string>('');
+  // État du bouton "J'ai scanné le code"
+  const [confirmed, setConfirmed]  = useState(false);
+
+  // ── Lecture du QR code depuis sessionStorage ──
+  // useEffect s'exécute côté client uniquement (après hydration)
+  useEffect(() => {
+    const storedQr    = sessionStorage.getItem('gbe_qr_code');
+    const storedEmail = sessionStorage.getItem('gbe_email_2fa');
+
+    if (!storedQr) {
+      // Aucun QR code trouvé → l'utilisateur a accédé directement à
+      // cette URL sans passer par l'inscription → rediriger
+      router.replace(APP_ROUTES.REGISTER);
+      return;
+    }
+
+    setQrCodeUrl(storedQr);
+    setUserEmail(storedEmail ?? '');
+  }, [router]);
+
+  // ── Confirmation du scan ──
+  const handleConfirm = () => {
+    setConfirmed(true);
+
+    // Nettoyage du sessionStorage (sécurité : ne pas laisser traîner le QR)
+    sessionStorage.removeItem('gbe_qr_code');
+    // Garder gbe_email_2fa pour la page two-factor si besoin
+
+    // Rediriger vers la page de connexion après un court délai
+    // pour que l'animation de succès soit visible
+    setTimeout(() => {
+      router.push(APP_ROUTES.LOGIN);
+    }, 1500);
+  };
+
+  // ── Affichage de chargement pendant useEffect ──
+  if (!qrCodeUrl) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'var(--clr-off-white)',
+        fontFamily: 'var(--font-body)',
+      }}>
+        <div style={{ textAlign: 'center', color: 'var(--clr-gray-400)' }}>
+          <div style={{
+            width: 40, height: 40,
+            border: '3px solid var(--clr-gray-200)',
+            borderTopColor: 'var(--clr-navy)',
+            borderRadius: '50%',
+            animation: 'spin .7s linear infinite',
+            margin: '0 auto 16px',
+          }} />
+          Chargement…
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    // Page complète avec le fond de l'application
+    <div style={{
+      minHeight: '100vh',
+      background: 'var(--clr-off-white)',
+      fontFamily: 'var(--font-body)',
+      display: 'flex',
+      flexDirection: 'column',
+    }}>
+
+      {/* ── En-tête institutionnel ── */}
+      <header style={{
+        background: 'linear-gradient(160deg, var(--clr-navy) 0%, #091e3a 55%, var(--clr-navy-mid) 100%)',
+        padding: '24px 32px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '16px',
+        boxShadow: '0 4px 24px rgba(13,43,85,.30)',
+        position: 'relative',
+      }}>
+        {/* Bandes tricolores en bas */}
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 6, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr' }}>
+          <div style={{ background: 'var(--clr-green)' }} />
+          <div style={{ background: 'var(--clr-red)' }} />
+          <div style={{ background: 'var(--clr-yellow)' }} />
+        </div>
+        {/* Logo */}
+        <Image src="/images/logo-minfi.png" alt="MINFI" width={48} height={48}
+          style={{ borderRadius: '50%', border: '2px solid rgba(255,255,255,.3)' }} />
+        <div style={{ textAlign: 'center', color: '#fff' }}>
+          <p style={{ fontFamily: 'var(--font-display)', fontSize: '1rem', fontWeight: 600 }}>
+            République du Cameroun
+          </p>
+          <p style={{ fontSize: '.75rem', color: 'var(--clr-yellow)', letterSpacing: '.1em', textTransform: 'uppercase' }}>
+            Ministère des Finances – GBE
+          </p>
+        </div>
+        <Image src="/images/cameroon_flag.jpg" alt="Drapeau" width={60} height={40}
+          style={{ borderRadius: 4, border: '1px solid rgba(255,255,255,.2)' }} />
+      </header>
+
+      {/* ── Contenu principal ── */}
+      <main style={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '32px 20px',
+      }}>
+        <div style={{
+          width: '100%',
+          maxWidth: 480,
+          background: 'var(--clr-white)',
+          borderRadius: 'var(--radius-xl)',
+          boxShadow: 'var(--shadow-card)',
+          overflow: 'hidden',
+          animation: 'cardReveal .45s cubic-bezier(.22,.68,0,1.2) both',
+        }}>
+
+          {/* Bande tricolore en haut de la carte */}
+          <div style={{ height: 4, background: 'linear-gradient(90deg, var(--clr-green), var(--clr-yellow), var(--clr-red))' }} />
+
+          <div style={{ padding: '32px' }}>
+
+            {/* Titre */}
+            <div style={{ textAlign: 'center', marginBottom: 24 }}>
+              {/* Icône bouclier */}
+              <div style={{
+                width: 64, height: 64,
+                background: 'rgba(13,43,85,.06)',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 16px',
+                border: '2px solid rgba(13,43,85,.12)',
+              }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--clr-navy)" strokeWidth="1.8">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  <polyline points="9,12 11,14 15,10"/>
+                </svg>
+              </div>
+              <h1 style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: '1.5rem',
+                fontWeight: 700,
+                color: 'var(--clr-navy)',
+                marginBottom: 8,
+              }}>
+                Configurez votre authentification
+              </h1>
+              <p style={{ fontSize: '.875rem', color: 'var(--clr-gray-400)', lineHeight: 1.6 }}>
+                Scannez ce QR code avec votre application d&apos;authentification<br/>
+                (Google Authenticator, Authy, Microsoft Authenticator…)
+              </p>
+              {userEmail && (
+                <p style={{ fontSize: '.8rem', color: 'var(--clr-navy)', marginTop: 8, fontWeight: 500 }}>
+                  Compte : {userEmail}
+                </p>
+              )}
+            </div>
+
+            {/* QR Code */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              marginBottom: 24,
+            }}>
+              <div style={{
+                padding: 16,
+                background: '#fff',
+                borderRadius: 12,
+                border: '2px solid var(--clr-gray-100)',
+                boxShadow: '0 4px 20px rgba(0,0,0,.08)',
+              }}>
+                {/* Afficher l'image QR code retournée par le back-end */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={qrCodeUrl}
+                  alt="QR Code d'authentification à deux facteurs"
+                  style={{ width: 200, height: 200, display: 'block' }}
+                />
+              </div>
+            </div>
+
+            {/* Étapes */}
+            <div style={{
+              background: 'var(--clr-gray-50)',
+              borderRadius: 'var(--radius-md)',
+              padding: '16px 20px',
+              marginBottom: 24,
+            }}>
+              <p style={{ fontSize: '.8rem', fontWeight: 600, color: 'var(--clr-gray-600)', marginBottom: 10 }}>
+                Comment procéder :
+              </p>
+              {[
+                'Installez Google Authenticator sur votre téléphone',
+                'Appuyez sur "+" puis "Scanner un QR code"',
+                'Scannez le code ci-dessus avec votre téléphone',
+                'Un code à 6 chiffres apparaîtra dans l\'application',
+              ].map((step, i) => (
+                <div key={i} style={{ display: 'flex', gap: 10, marginBottom: 8, alignItems: 'flex-start' }}>
+                  <span style={{
+                    width: 20, height: 20,
+                    background: 'var(--clr-navy)',
+                    color: '#fff',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '.65rem',
+                    fontWeight: 700,
+                    flexShrink: 0,
+                    marginTop: 1,
+                  }}>{i + 1}</span>
+                  <p style={{ fontSize: '.82rem', color: 'var(--clr-gray-600)', lineHeight: 1.5 }}>{step}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Bouton confirmation */}
+            {!confirmed ? (
+              <Button onClick={handleConfirm} fullWidth>
+                J&apos;ai scanné le code — Continuer
+              </Button>
+            ) : (
+              /* Animation de succès après confirmation */
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 10,
+                padding: '14px',
+                background: '#F0FDF4',
+                border: '1px solid #BBF7D0',
+                borderRadius: 'var(--radius-md)',
+                color: '#166534',
+                fontSize: '.875rem',
+                fontWeight: 500,
+                animation: 'fadeSlideDown .3s ease',
+              }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="20,6 9,17 4,12"/>
+                </svg>
+                Configuration réussie ! Redirection vers la connexion…
+              </div>
+            )}
+
+            {/* Lien retour */}
+            <p style={{ textAlign: 'center', marginTop: 16, fontSize: '.82rem', color: 'var(--clr-gray-400)' }}>
+              <Link href={APP_ROUTES.LOGIN} style={{ color: 'var(--clr-navy)', fontWeight: 500 }}>
+                Aller directement à la connexion
+              </Link>
+            </p>
+
+          </div>
+        </div>
+
+        {/* Pied de page */}
+        <footer style={{ marginTop: 24, textAlign: 'center', fontSize: '.72rem', color: 'var(--clr-gray-400)' }}>
+          © {new Date().getFullYear()} MINFI – République du Cameroun
+        </footer>
+      </main>
+    </div>
+  );
+}
+
+// END OF FILE: src/app/register/qrcode/page.tsx
+
+
+// FILE: src/app/register/page.tsx
+-----------------------------------------------
+'use client';
+
+// ============================================================
+// FICHIER  : src/app/register/page.tsx
+// RÔLE     : Page d'inscription reliée au back-end GBE.
+//
+// FLUX :
+//   1. Utilisateur remplit le formulaire
+//   2. POST /api/v1/auth/register { ...données, mfaEnabled: true }
+//   3. Back-end retourne :
+//      { "mfaEnabled": true, "secretImageUri": "data:image/png;base64,..." }
+//   4. On stocke secretImageUri dans sessionStorage
+//   5. Redirection vers /register/qrcode pour afficher le QR code
+// ============================================================
+
+import React, { useState } from 'react';
+import Link          from 'next/link';
+import { useRouter } from 'next/navigation';
+import AuthLayout    from '@/components/auth/AuthLayout';
+import Input         from '@/components/ui/Input';
+import Button        from '@/components/ui/Button';
+import { APP_ROUTES } from '@/constants/auth';
+import { RegisterPayload, FormErrors } from '@/types/auth';
+
+// ── Icônes SVG inline ───────────────────────────────────────
+const IconUser = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+  </svg>
+);
+const IconMail = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="2" y="4" width="20" height="16" rx="2"/>
+    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+  </svg>
+);
+const IconPhone = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.5a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.69h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.09a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 17z"/>
+  </svg>
+);
+const IconCalendar = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="3" y="4" width="18" height="18" rx="2"/>
+    <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+    <line x1="3" y1="10" x2="21" y2="10"/>
+  </svg>
+);
+const IconLock = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="3" y="11" width="18" height="11" rx="2"/>
+    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+  </svg>
+);
+const IconEye = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+  </svg>
+);
+const IconEyeOff = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+    <line x1="1" y1="1" x2="23" y2="23"/>
+  </svg>
+);
+const IconAlert = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="alert__icon">
+    <circle cx="12" cy="12" r="10"/>
+    <line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+  </svg>
+);
+
+// ─────────────────────────────────────────────────────────────
+// Force du mot de passe
+// ─────────────────────────────────────────────────────────────
+function passwordStrength(pwd: string): 0 | 1 | 2 | 3 {
+  if (!pwd) return 0;
+  let score = 0;
+  if (pwd.length >= 8) score++;
+  if (/[A-Z]/.test(pwd) && /[a-z]/.test(pwd)) score++;
+  if (/[0-9]/.test(pwd) && /[^A-Za-z0-9]/.test(pwd)) score++;
+  return score as 0 | 1 | 2 | 3;
+}
+const STRENGTH_LABELS = ['', 'Faible', 'Moyen', 'Fort']    as const;
+const STRENGTH_MODS   = ['', 'weak',   'medium', 'strong'] as const;
+const STRENGTH_COLORS = ['', 'var(--clr-red)', 'var(--clr-yellow-dark)', 'var(--clr-green)'] as const;
+
+// ─────────────────────────────────────────────────────────────
+// Validation locale
+// ─────────────────────────────────────────────────────────────
+function validate(v: RegisterPayload): FormErrors {
+  const e: FormErrors = {};
+  if (!v.firstName.trim())  e.firstName = 'Le prénom est requis';
+  if (!v.lastName.trim())   e.lastName  = 'Le nom est requis';
+  if (!v.email.trim()) {
+    e.email = "L'adresse email est requise";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email)) {
+    e.email = 'Adresse email invalide';
+  }
+  if (!v.phoneNumber.trim()) {
+    e.phoneNumber = 'Le numéro de téléphone est requis';
+  } else if (!/^\+?[0-9\s\-]{8,15}$/.test(v.phoneNumber)) {
+    e.phoneNumber = 'Format attendu : +237 6XX XXX XXX';
+  }
+  if (!v.dateOfBirth) {
+    e.dateOfBirth = 'La date de naissance est requise';
+  }
+  if (!v.password) {
+    e.password = 'Le mot de passe est requis';
+  } else if (v.password.length < 8) {
+    e.password = 'Minimum 8 caractères';
+  } else if (!/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z\d])/.test(v.password)) {
+    e.password = 'Requiert majuscule, minuscule, chiffre et caractère spécial';
+  }
+  if (!v.confirmPassword) {
+    e.confirmPassword = 'Veuillez confirmer votre mot de passe';
+  } else if (v.password !== v.confirmPassword) {
+    e.confirmPassword = 'Les mots de passe ne correspondent pas';
+  }
+  return e;
+}
+
+// ─────────────────────────────────────────────────────────────
+// COMPOSANT PAGE
+// ─────────────────────────────────────────────────────────────
+export default function RegisterPage() {
+  const router = useRouter();
+
+  const [values, setValues] = useState<RegisterPayload>({
+    firstName: '', lastName: '', email: '', password: '',
+    confirmPassword: '', phoneNumber: '', dateOfBirth: '',
+    mfaEnabled: true,  // Toujours true — l'application impose le 2FA
+  });
+  const [fieldErrors, setFieldErrors] = useState<FormErrors>({});
+  const [apiError,    setApiError]    = useState('');
+  const [isLoading,   setIsLoading]   = useState(false);
+  const [showPwd,     setShowPwd]     = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const strength = passwordStrength(values.password);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setValues(prev => ({ ...prev, [name]: value }));
+    if (fieldErrors[name]) setFieldErrors(prev => ({ ...prev, [name]: undefined }));
+    setApiError('');
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validation locale
+    const errors = validate(values);
+    if (Object.keys(errors).length > 0) { setFieldErrors(errors); return; }
+
+    setIsLoading(true);
+    setApiError('');
+
+    try {
+      // Appel API POST /api/v1/auth/register
+      const res = await fetch('https://gbe-8clf.onrender.com/api/v1/auth/register', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body:    JSON.stringify(values),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        // Erreur HTTP (400, 409 email déjà utilisé, etc.)
+        throw new Error(data.message || `Erreur ${res.status}`);
+      }
+
+      // ✅ Le back-end retourne { mfaEnabled: true, secretImageUri: "data:image/png;base64,..." }
+      const qrImage = data.secretImageUri;
+
+      if (qrImage) {
+        // Stocker le QR code et l'email pour la page suivante
+        // sessionStorage est effacé à la fermeture de l'onglet (sécurité)
+        sessionStorage.setItem('gbe_qr_code',   qrImage);
+        sessionStorage.setItem('gbe_email_2fa', values.email);
+
+        // Rediriger vers la page de scan du QR code
+        router.push(APP_ROUTES.REGISTER_QR);
+      } else {
+        // Inscription réussie mais pas de QR code (ne devrait pas arriver)
+        setApiError("Inscription réussie mais aucun QR code reçu. Contactez l'administrateur.");
+      }
+
+    } catch (err) {
+      setApiError(err instanceof Error ? err.message : 'Une erreur est survenue.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <AuthLayout
+      title="Créer un compte"
+      subtitle="Renseignez vos informations pour accéder à la plateforme GBE"
+    >
+      {/* Erreur API */}
+      {apiError && (
+        <div className="alert alert--error" role="alert">
+          <IconAlert /> {apiError}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} noValidate>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+
+          {/* Prénom / Nom */}
+          <div className="form-grid-2">
+            <Input id="firstName" name="firstName" type="text"
+              label="Prénom" placeholder="Ali"
+              value={values.firstName} onChange={handleChange}
+              error={fieldErrors.firstName} icon={<IconUser />}
+              autoComplete="given-name" disabled={isLoading} autoFocus />
+            <Input id="lastName" name="lastName" type="text"
+              label="Nom" placeholder="Bello"
+              value={values.lastName} onChange={handleChange}
+              error={fieldErrors.lastName} icon={<IconUser />}
+              autoComplete="family-name" disabled={isLoading} />
+          </div>
+
+          {/* Email */}
+          <Input id="email" name="email" type="email"
+            label="Adresse email" placeholder="vous@exemple.cm"
+            value={values.email} onChange={handleChange}
+            error={fieldErrors.email} icon={<IconMail />}
+            autoComplete="email" disabled={isLoading} />
+
+          {/* Téléphone */}
+          <Input id="phoneNumber" name="phoneNumber" type="tel"
+            label="Numéro de téléphone" placeholder="+237 6XX XXX XXX"
+            value={values.phoneNumber} onChange={handleChange}
+            error={fieldErrors.phoneNumber} icon={<IconPhone />}
+            autoComplete="tel" disabled={isLoading} />
+
+          {/* Date de naissance */}
+          <Input id="dateOfBirth" name="dateOfBirth" type="date"
+            label="Date de naissance"
+            value={values.dateOfBirth} onChange={handleChange}
+            error={fieldErrors.dateOfBirth} icon={<IconCalendar />}
+            autoComplete="bday" disabled={isLoading} />
+
+          {/* Mot de passe + force */}
+          <div>
+            <Input id="password" name="password"
+              type={showPwd ? 'text' : 'password'}
+              label="Mot de passe" placeholder="••••••••"
+              value={values.password} onChange={handleChange}
+              error={fieldErrors.password} icon={<IconLock />}
+              autoComplete="new-password" disabled={isLoading}
+              rightElement={
+                <button type="button" className="pwd-toggle"
+                  onClick={() => setShowPwd(v => !v)}
+                  aria-label={showPwd ? 'Masquer' : 'Afficher'}>
+                  {showPwd ? <IconEyeOff /> : <IconEye />}
+                </button>
+              }
+            />
+            {values.password && (
+              <div style={{ marginTop: 6 }}>
+                <div className="pwd-strength">
+                  {[1,2,3].map(i => (
+                    <div key={i} className={`pwd-strength__bar ${strength >= i ? `pwd-strength__bar--${STRENGTH_MODS[strength]}` : ''}`} />
+                  ))}
+                </div>
+                <p className="pwd-strength__label">
+                  Force : <strong style={{ color: STRENGTH_COLORS[strength] }}>{STRENGTH_LABELS[strength]}</strong>
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Confirmation mot de passe */}
+          <Input id="confirmPassword" name="confirmPassword"
+            type={showConfirm ? 'text' : 'password'}
+            label="Confirmer le mot de passe" placeholder="••••••••"
+            value={values.confirmPassword} onChange={handleChange}
+            error={fieldErrors.confirmPassword} icon={<IconLock />}
+            autoComplete="new-password" disabled={isLoading}
+            rightElement={
+              <button type="button" className="pwd-toggle"
+                onClick={() => setShowConfirm(v => !v)}
+                aria-label={showConfirm ? 'Masquer' : 'Afficher'}>
+                {showConfirm ? <IconEyeOff /> : <IconEye />}
+              </button>
+            }
+          />
+
+          {/* Info 2FA */}
+          <div className="alert alert--info" style={{ fontSize: '.8rem' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="alert__icon">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+            Un QR code vous sera fourni pour configurer l&apos;authentification à deux facteurs.
+          </div>
+
+          {/* Bouton */}
+          <Button type="submit" variant="secondary" isLoading={isLoading} fullWidth>
+            Créer mon compte
+          </Button>
+
+        </div>
+      </form>
+
+      <p className="auth-switch">
+        Déjà inscrit ?{' '}
+        <Link href={APP_ROUTES.LOGIN}>Se connecter</Link>
+      </p>
+    </AuthLayout>
+  );
+}
+
+// END OF FILE: src/app/register/page.tsx
+
+
+// FILE: src/app/two-factor/page.tsx
+-----------------------------------------------
+'use client';
+
+// ============================================================
+// FICHIER  : src/app/two-factor/page.tsx
+// RÔLE     : Page de vérification du code TOTP (2FA).
+//
+// FLUX :
+//   1. L'utilisateur arrive ici après une connexion réussie
+//      qui a retourné mfaRequired=true
+//   2. L'email de l'utilisateur a été stocké dans sessionStorage
+//      par la page de login (clé : 'gbe_email_2fa')
+//   3. L'utilisateur saisit le code à 6 chiffres généré par
+//      son application TOTP (Google Authenticator, Authy…)
+//   4. Appel POST /api/v1/auth/verify avec { email, code }
+//   5. Si code correct → accessToken reçu → stocké → /dashboard
+//   6. Si code incorrect → message d'erreur affiché
+//
+// SÉCURITÉ :
+//   - Si aucun email en sessionStorage → redirection vers /login
+//   - Le code OTP expire côté back-end (pas besoin de minuterie)
+// ============================================================
+
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import Link          from 'next/link';
+import { useRouter } from 'next/navigation';
+import AuthLayout    from '@/components/auth/AuthLayout';
+import Button        from '@/components/ui/Button';
+import { verifyTwoFactor, saveAccessToken } from '@/lib/authService';
+import { APP_ROUTES, TWO_FACTOR_CODE_LENGTH } from '@/constants/auth';
+
+// ── Icônes ─────────────────────────────────────────────────
+const IconAlert = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="alert__icon">
+    <circle cx="12" cy="12" r="10"/>
+    <line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+  </svg>
+);
+const IconCheck = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="alert__icon">
+    <polyline points="20,6 9,17 4,12"/>
+  </svg>
+);
+const IconArrowLeft = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12,19 5,12 12,5"/>
+  </svg>
+);
+
+// ─────────────────────────────────────────────────────────────
+// COMPOSANT PAGE
+// ─────────────────────────────────────────────────────────────
+export default function TwoFactorPage() {
+  const router = useRouter();
+
+  // Tableau de 6 chaînes, une par case OTP
+  const [otp, setOtp]         = useState<string[]>(Array(TWO_FACTOR_CODE_LENGTH).fill(''));
+  const [hasError, setHasError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
+  const [isLoading, setIsLoading]   = useState(false);
+  // Email récupéré depuis sessionStorage (stocké par la page login)
+  const [userEmail, setUserEmail]   = useState('');
+
+  // Références sur les inputs pour le focus automatique
+  const refs = useRef<Array<HTMLInputElement | null>>(
+    Array(TWO_FACTOR_CODE_LENGTH).fill(null)
+  );
+
+  // ── Récupérer l'email depuis sessionStorage ──
+  useEffect(() => {
+    const email = sessionStorage.getItem('gbe_email_2fa');
+    if (!email) {
+      // Aucun email trouvé → l'utilisateur n'est pas passé par le login
+      // → rediriger pour éviter une page inutilisable
+      router.replace(APP_ROUTES.LOGIN);
+      return;
+    }
+    setUserEmail(email);
+  }, [router]);
+
+  const codeIsFull = otp.every(c => c !== '');
+  const otpValue   = otp.join('');
+
+  // ── Gestion de la saisie case par case ──
+  const handleInput = useCallback((index: number, raw: string) => {
+    if (!/^\d*$/.test(raw)) return; // Accepter uniquement les chiffres
+
+    setHasError(false);
+    setErrorMsg('');
+
+    const next = [...otp];
+
+    // Cas collage : l'utilisateur colle un code entier (ex: "123456")
+    if (raw.length > 1) {
+      const digits = raw.replace(/\D/g, '').slice(0, TWO_FACTOR_CODE_LENGTH);
+      for (let i = 0; i < TWO_FACTOR_CODE_LENGTH; i++) {
+        next[i] = digits[i] ?? '';
+      }
+      setOtp(next);
+      // Focus sur la dernière case remplie
+      refs.current[Math.min(digits.length, TWO_FACTOR_CODE_LENGTH - 1)]?.focus();
+      return;
+    }
+
+    // Saisie normale : un chiffre à la fois
+    next[index] = raw;
+    setOtp(next);
+    // Auto-focus sur la case suivante après saisie
+    if (raw && index < TWO_FACTOR_CODE_LENGTH - 1) {
+      refs.current[index + 1]?.focus();
+    }
+  }, [otp]);
+
+  // ── Gestion des touches spéciales ──
+  const handleKeyDown = useCallback((index: number, e: React.KeyboardEvent) => {
+    if (e.key === 'Backspace') {
+      if (otp[index]) {
+        // Effacer la case courante
+        const next = [...otp]; next[index] = ''; setOtp(next);
+      } else if (index > 0) {
+        // Reculer à la case précédente
+        refs.current[index - 1]?.focus();
+      }
+    } else if (e.key === 'ArrowLeft'  && index > 0) {
+      refs.current[index - 1]?.focus();
+    } else if (e.key === 'ArrowRight' && index < TWO_FACTOR_CODE_LENGTH - 1) {
+      refs.current[index + 1]?.focus();
+    }
+  }, [otp]);
+
+  // ── Soumission du code ──
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!codeIsFull) return;
+
+    setIsLoading(true);
+    setHasError(false);
+    setErrorMsg('');
+
+    try {
+      // Appel POST /api/v1/auth/verify avec email + code OTP
+      const response = await verifyTwoFactor({
+        email: userEmail,
+        code:  otpValue,
+      });
+
+      if (response.accessToken) {
+        // ✅ Code correct — sauvegarder le JWT
+        saveAccessToken(response.accessToken);
+
+        // Afficher un message de succès avant de rediriger
+        setSuccessMsg('Code vérifié avec succès ! Connexion en cours…');
+
+        // Nettoyage sessionStorage
+        sessionStorage.removeItem('gbe_email_2fa');
+
+        // Rediriger vers le tableau de bord après un court délai
+        setTimeout(() => router.push(APP_ROUTES.DASHBOARD), 1200);
+
+      } else {
+        // Réponse inattendue du back-end
+        setHasError(true);
+        setErrorMsg(response.message || 'Code incorrect. Veuillez réessayer.');
+      }
+
+    } catch (err) {
+      setHasError(true);
+      setErrorMsg(
+        err instanceof Error ? err.message : 'Code invalide ou expiré.'
+      );
+      // Secouer les cases visuellement (via classe CSS)
+      // Réinitialiser les cases pour faciliter la nouvelle saisie
+      setOtp(Array(TWO_FACTOR_CODE_LENGTH).fill(''));
+      refs.current[0]?.focus();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <AuthLayout
+      title="Vérification en deux étapes"
+      subtitle="Saisissez le code à 6 chiffres de votre application d'authentification"
+    >
+      {/* Alerte d'erreur */}
+      {errorMsg && (
+        <div className="alert alert--error" role="alert">
+          <IconAlert /> {errorMsg}
+        </div>
+      )}
+
+      {/* Alerte de succès */}
+      {successMsg && (
+        <div className="alert alert--success" role="status">
+          <IconCheck /> {successMsg}
+        </div>
+      )}
+
+      {/* Affichage de l'email pour confirmation */}
+      {userEmail && (
+        <div className="alert alert--info" style={{ fontSize: '.8rem' }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="alert__icon">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          Vérification pour : <strong>{userEmail}</strong>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} noValidate>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
+          {/* ── Cases OTP ── */}
+          <div>
+            <p style={{
+              fontSize: '.8125rem', fontWeight: 600,
+              color: 'var(--clr-gray-600)', marginBottom: '12px',
+            }}>
+              Code à {TWO_FACTOR_CODE_LENGTH} chiffres (Google Authenticator)
+            </p>
+
+            <div
+              className="otp-container"
+              role="group"
+              aria-label={`Code de vérification à ${TWO_FACTOR_CODE_LENGTH} chiffres`}
+            >
+              {otp.map((digit, i) => (
+                <input
+                  key={i}
+                  ref={el => { refs.current[i] = el; }}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="\d*"
+                  maxLength={TWO_FACTOR_CODE_LENGTH}
+                  value={digit}
+                  onChange={e => handleInput(i, e.target.value)}
+                  onKeyDown={e => handleKeyDown(i, e)}
+                  onFocus={e => e.target.select()}
+                  autoFocus={i === 0}
+                  autoComplete={i === 0 ? 'one-time-code' : 'off'}
+                  disabled={isLoading || !!successMsg}
+                  aria-label={`Chiffre ${i + 1} du code`}
+                  className={[
+                    'otp-input',
+                    digit      ? 'otp-input--filled' : '',
+                    hasError   ? 'otp-input--error'  : '',
+                  ].join(' ')}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Bouton vérifier */}
+          <Button
+            type="submit"
+            isLoading={isLoading}
+            fullWidth
+            disabled={!codeIsFull || isLoading || !!successMsg}
+          >
+            Vérifier le code
+          </Button>
+
+          {/* Lien retour */}
+          <div style={{
+            textAlign: 'center',
+            borderTop: '1px solid var(--clr-gray-100)',
+            paddingTop: '14px',
+          }}>
+            <Link href={APP_ROUTES.LOGIN} style={{
+              fontSize: '.8rem',
+              color: 'var(--clr-gray-400)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+            }}>
+              <IconArrowLeft /> Retour à la connexion
+            </Link>
+          </div>
+
+        </div>
+      </form>
+    </AuthLayout>
+  );
+}
+
+// END OF FILE: src/app/two-factor/page.tsx
+
+
+// FILE: src/app/globals.css
+-----------------------------------------------
+/* ============================================================
+   FICHIER  : src/app/globals.css
+   RÔLE     : Design system complet de l'application GBE-MINFI.
+              Organisation :
+              1. Imports de polices
+              2. Variables CSS (tokens)
+              3. Reset & base
+              4. Layout de la page d'authentification
+              5. AuthHeader (en-tête institutionnel)
+              6. AuthCard (carte du formulaire)
+              7. Composants UI (Input, Button, Alert)
+              8. Éléments spécifiques auth (OTP, force mdp…)
+              9. Animations
+             10. Responsive (mobile-first)
+   ============================================================ */
+
+/* ────────────────────────────────────────────────────────────
+   1. IMPORTS DE POLICES
+   Playfair Display → titres élégants (serif institutionnel)
+   DM Sans          → corps de texte moderne et lisible
+   ──────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
+
+/* ────────────────────────────────────────────────────────────
+   2. VARIABLES CSS — DESIGN TOKENS
+   Modifier ici pour changer la charte graphique globalement.
+   ──────────────────────────────────────────────────────────── */
+:root {
+  /* ── Couleurs camerounaises (drapeau) ── */
+  --clr-green:        #007A3D;
+  --clr-green-light:  #009A4E;
+  --clr-green-dark:   #005A2D;
+  --clr-red:          #CE1126;
+  --clr-yellow:       #FCD116;
+  --clr-yellow-dark:  #D4A800;
+
+  /* ── Couleurs institutionnelles MINFI ── */
+  --clr-navy:         #0D2B55;   /* Bleu marine principal */
+  --clr-navy-mid:     #1A3A6B;   /* Bleu marine intermédiaire */
+  --clr-navy-light:   #2451A0;   /* Bleu marine clair (hover) */
+  --clr-gold:         #C9A227;   /* Or du logo MINFI */
+
+  /* ── Neutrals ── */
+  --clr-white:        #FFFFFF;
+  --clr-off-white:    #F5F6FA;   /* Fond de page */
+  --clr-gray-50:      #F2F4F7;
+  --clr-gray-100:     #E8ECF0;
+  --clr-gray-200:     #D1D8E0;
+  --clr-gray-300:     #B4BEC8;
+  --clr-gray-400:     #8E9BAA;
+  --clr-gray-600:     #4A5568;
+  --clr-gray-800:     #1A202C;
+
+  /* ── Sémantique ── */
+  --clr-danger:       var(--clr-red);
+  --clr-success:      var(--clr-green);
+  --clr-warning:      var(--clr-yellow-dark);
+
+  /* ── Typographie ── */
+  --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-body:    'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* ── Espacements ── */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+
+  /* ── Bordures et rayons ── */
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+  --radius-full: 9999px;
+
+  /* ── Ombres ── */
+  --shadow-sm:   0 1px 4px rgba(0,0,0,.06);
+  --shadow-md:   0 4px 16px rgba(0,0,0,.09);
+  --shadow-lg:   0 12px 40px rgba(13,43,85,.13);
+  --shadow-card: 0 20px 60px rgba(13,43,85,.10);
+
+  /* ── Transitions ── */
+  --t-fast:   150ms ease;
+  --t-normal: 250ms ease;
+  --t-slow:   400ms ease;
+}
+
+/* ────────────────────────────────────────────────────────────
+   3. RESET & BASE
+   ──────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--clr-gray-800);
+  background-color: var(--clr-off-white);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a    { color: inherit; text-decoration: none; }
+img  { max-width: 100%; height: auto; display: block; }
+button { font-family: var(--font-body); }
+
+/* ────────────────────────────────────────────────────────────
+   4. LAYOUT — PAGE D'AUTHENTIFICATION
+   Structure :
+   .auth-page
+     ├── AuthHeader   (en-tête bleu marine)
+     └── .auth-main
+           ├── .auth-card   (formulaire)
+           └── .auth-footer
+   ──────────────────────────────────────────────────────────── */
+
+/* Conteneur pleine page */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--clr-off-white);
+}
+
+/* Zone principale sous le header */
+.auth-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: var(--sp-8) var(--sp-5) var(--sp-10);
+  /* Légère montée vers le header via padding top réduit */
+  padding-top: var(--sp-6);
+}
+
+/* ────────────────────────────────────────────────────────────
+   5. AUTH HEADER — EN-TÊTE INSTITUTIONNEL
+   Fond bleu marine + logo MINFI + textes + drapeau + bandes
+   ──────────────────────────────────────────────────────────── */
+.auth-header {
+  position: relative;
+  background: linear-gradient(160deg, var(--clr-navy) 0%, #091e3a 55%, var(--clr-navy-mid) 100%);
+  padding: var(--sp-8) var(--sp-6) calc(var(--sp-8) + 6px); /* +6px pour les bandes */
+  overflow: hidden;
+  /* Légère ombre portée vers le bas */
+  box-shadow: 0 4px 24px rgba(13,43,85,.30);
+}
+
+/* Motifs lumineux en arrière-plan (cercles de lumière) */
+.auth-header__bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% 50%,  rgba(0,122,61,.18)  0%, transparent 50%),
+    radial-gradient(circle at 85% 50%,  rgba(252,209,22,.12) 0%, transparent 50%),
+    radial-gradient(circle at 50% 100%, rgba(206,17,38,.08)  0%, transparent 45%);
+  pointer-events: none;
+}
+
+/* Motif de grille subtil */
+.auth-header::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 48px,
+    rgba(255,255,255,.018) 48px,
+    rgba(255,255,255,.018) 49px
+  );
+  pointer-events: none;
+}
+
+/* Bandes tricolores collées en bas du header */
+.auth-header__stripes {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  height: 10px;
+  z-index: 2;
+}
+.stripe {
+  height: 100%;
+  position: relative;
+}
+.stripe--green  { background: linear-gradient(135deg, #009A4E 0%, #007A3D 50%, #005A2D 100%); }
+.stripe--red    { 
+  background: linear-gradient(135deg, #E63946 0%, #CE1126 50%, #8B0914 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.stripe--yellow {
+  background: linear-gradient(135deg, #FCD116 0%, #D4A800 50%, #B89000 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.stripe__star {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.4));
+}
+
+/* Ligne de contenu : logo | textes | drapeau */
+.auth-header__content {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-6);
+}
+
+/* ── Logo MINFI ── */
+.auth-header__logo-wrap {
+  flex-shrink: 0;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.08);
+  border: 2px solid rgba(255,255,255,.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  /* Halo doré subtil */
+  box-shadow: 0 0 0 4px rgba(201,162,39,.18), 0 8px 24px rgba(0,0,0,.25);
+  transition: transform var(--t-slow), box-shadow var(--t-slow);
+}
+.auth-header__logo-wrap:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 0 6px rgba(201,162,39,.28), 0 10px 28px rgba(0,0,0,.30);
+}
+.auth-header__logo {
+  border-radius: 50%;
+  object-fit: cover;
+  width: 68px;
+  height: 68px;
+}
+
+/* ── Textes institutionnels ── */
+.auth-header__texts {
+  flex: 1;
+  text-align: center;
+  color: var(--clr-white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.auth-header__republic {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: rgba(255,255,255,.95);
+}
+.auth-header__motto {
+  font-size: .72rem;
+  font-weight: 500;
+  color: var(--clr-yellow);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+/* Séparateur tricolore sous la devise */
+.auth-header__divider {
+  position: relative;
+  width: 120px;
+  height: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: var(--sp-3) 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,.25);
+}
+
+/* Bandes tricolores avec dégradés */
+.divider__stripe {
+  position: relative;
+}
+
+/* Bande verte */
+.divider__stripe--green {
+  background: linear-gradient(135deg, #009A4E 0%, #007A3D 50%, #005A2D 100%);
+}
+
+/* Bande rouge avec étoile au centre */
+.divider__stripe--red {
+  background: linear-gradient(135deg, #E63946 0%, #CE1126 50%, #8B0914 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Bande jaune */
+.divider__stripe--yellow {
+  background: linear-gradient(135deg, #FCD116 0%, #D4A800 50%, #B89000 100%);
+}
+
+/* Étoile jaune au centre de la bande rouge */
+.divider__star {
+  width: 10px;
+  height: 10px;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.4));
+}
+.auth-header__ministry {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--clr-white);
+  line-height: 1.2;
+  letter-spacing: .01em;
+}
+.auth-header__app {
+  font-size: .78rem;
+  color: rgba(255,255,255,.55);
+  font-weight: 400;
+  letter-spacing: .06em;
+}
+
+/* ── Drapeau ── */
+.auth-header__flag-wrap {
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,.30);
+  border: 1.5px solid rgba(255,255,255,.20);
+}
+.auth-header__flag {
+  display: block;
+  width: 100px;
+  height: 70px;
+  object-fit: cover;
+}
+
+/* ────────────────────────────────────────────────────────────
+   6. AUTH CARD — CARTE FORMULAIRE
+   ──────────────────────────────────────────────────────────── */
+.auth-card {
+  width: 100%;
+  max-width: 480px;
+  background: var(--clr-white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  /* Animation d'entrée */
+  animation: cardReveal .45s cubic-bezier(.22,.68,0,1.2) both;
+}
+
+/* En-tête de la carte */
+.auth-card__header {
+  padding: var(--sp-8) var(--sp-8) var(--sp-5);
+  border-bottom: 1px solid var(--clr-gray-100);
+  /* Fine bande colorée en haut */
+  border-top: 4px solid transparent;
+  border-image: linear-gradient(90deg, var(--clr-green), var(--clr-yellow), var(--clr-red)) 1;
+}
+.auth-card__title {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--clr-navy);
+  margin-bottom: var(--sp-2);
+  /* Soulignement tricolore */
+  position: relative;
+}
+.auth-card__title::after {
+  content: '';
+  display: block;
+  width: 38px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--clr-navy), var(--clr-green));
+  border-radius: var(--radius-full);
+  margin-top: var(--sp-2);
+}
+.auth-card__subtitle {
+  font-size: .875rem;
+  color: var(--clr-gray-400);
+  line-height: 1.5;
+}
+
+/* Corps de la carte */
+.auth-card__body {
+  padding: var(--sp-6) var(--sp-8) var(--sp-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+/* ────────────────────────────────────────────────────────────
+   7. COMPOSANTS UI
+   ──────────────────────────────────────────────────────────── */
+
+/* ── Input ── */
+.inp-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.inp-label {
+  font-size: .8125rem;   /* 13px */
+  font-weight: 600;
+  color: var(--clr-gray-600);
+  letter-spacing: .025em;
+  user-select: none;
+}
+
+.inp-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Icône gauche */
+.inp-icon-left {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--clr-gray-300);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  transition: color var(--t-fast);
+  z-index: 1;
+}
+
+/* Icône / bouton droit */
+.inp-icon-right {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  z-index: 1;
+}
+
+/* Champ de saisie */
+.inp-field {
+  width: 100%;
+  height: 46px;
+  border: 1.5px solid var(--clr-gray-200);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: .875rem;
+  color: var(--clr-gray-800);
+  background: var(--clr-white);
+  padding: 0 var(--sp-4);
+  outline: none;
+  -webkit-appearance: none;
+  transition: border-color var(--t-fast), box-shadow var(--t-fast);
+}
+/* Padding gauche supplémentaire si icône gauche */
+.inp-field--with-icon  { padding-left: 40px; }
+/* Padding droit supplémentaire si élément droit */
+.inp-field--with-right { padding-right: 42px; }
+
+.inp-field::placeholder {
+  color: var(--clr-gray-200);
+  font-weight: 300;
+}
+/* Focus */
+.inp-field:focus {
+  border-color: var(--clr-navy);
+  box-shadow: 0 0 0 3px rgba(13,43,85,.08);
+}
+/* L'icône gauche prend la couleur navy au focus */
+.inp-wrapper:focus-within .inp-icon-left {
+  color: var(--clr-navy);
+}
+/* Erreur de validation */
+.inp-field--error {
+  border-color: var(--clr-danger);
+  box-shadow: 0 0 0 3px rgba(206,17,38,.07);
+}
+/* Message d'erreur */
+.inp-error-msg {
+  font-size: .75rem;
+  color: var(--clr-danger);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  animation: fadeSlideDown .2s ease;
+}
+
+/* Bouton toggle affichage mot de passe */
+.pwd-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  color: var(--clr-gray-400);
+  transition: color var(--t-fast);
+}
+.pwd-toggle:hover { color: var(--clr-navy); }
+
+/* ── Button ── */
+.btn {
+  height: 46px;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: .9rem;
+  font-weight: 600;
+  letter-spacing: .025em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  padding: 0 var(--sp-6);
+  transition:
+    background var(--t-fast),
+    box-shadow var(--t-fast),
+    transform var(--t-fast),
+    opacity var(--t-fast);
+}
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn:disabled { opacity: .52; cursor: not-allowed; }
+.btn--full { width: 100%; }
+
+/* Primary : bleu marine MINFI */
+.btn--primary {
+  background: linear-gradient(135deg, var(--clr-navy) 0%, var(--clr-navy-mid) 100%);
+  color: var(--clr-white);
+  box-shadow: 0 4px 16px rgba(13,43,85,.24);
+}
+.btn--primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--clr-navy-mid) 0%, var(--clr-navy-light) 100%);
+  box-shadow: 0 6px 20px rgba(13,43,85,.34);
+  transform: translateY(-1px);
+}
+
+/* Secondary : vert MINFI */
+.btn--secondary {
+  background: linear-gradient(135deg, var(--clr-green-dark) 0%, var(--clr-green-light) 100%);
+  color: var(--clr-white);
+  box-shadow: 0 4px 16px rgba(0,122,61,.24);
+}
+.btn--secondary:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(0,122,61,.34);
+  transform: translateY(-1px);
+}
+
+/* Ghost : transparent avec bordure */
+.btn--ghost {
+  background: transparent;
+  color: var(--clr-navy);
+  border: 1.5px solid var(--clr-gray-200);
+}
+.btn--ghost:hover:not(:disabled) {
+  border-color: var(--clr-navy);
+  background: var(--clr-gray-50);
+}
+
+/* Spinner de chargement dans le bouton */
+.btn__loader { display: flex; align-items: center; gap: var(--sp-2); }
+.btn__spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,.3);
+  border-top-color: var(--clr-white);
+  border-radius: 50%;
+  animation: spin .65s linear infinite;
+  flex-shrink: 0;
+}
+
+/* ────────────────────────────────────────────────────────────
+   8. ÉLÉMENTS SPÉCIFIQUES AUX PAGES AUTH
+   ──────────────────────────────────────────────────────────── */
+
+/* ── Grille 2 colonnes (prénom/nom, matricule/téléphone) ── */
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-4);
+}
+
+/* ── Alertes (erreur globale, succès) ── */
+.alert {
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius-md);
+  font-size: .8375rem;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  animation: fadeSlideDown .28s ease;
+  line-height: 1.5;
+}
+.alert__icon { flex-shrink: 0; margin-top: 2px; }
+.alert--error {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+}
+.alert--success {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #166534;
+}
+.alert--info {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E40AF;
+}
+
+/* ── Lien "Mot de passe oublié" ── */
+.forgot-link {
+  display: block;
+  text-align: right;
+  font-size: .8rem;
+  color: var(--clr-navy);
+  font-weight: 500;
+  transition: color var(--t-fast);
+  margin-top: -10px; /* Colle au champ mot de passe */
+}
+.forgot-link:hover { color: var(--clr-green); text-decoration: underline; }
+
+/* ── Lien switch "Déjà inscrit ? / Pas de compte ?" ── */
+.auth-switch {
+  text-align: center;
+  font-size: .85rem;
+  color: var(--clr-gray-600);
+}
+.auth-switch a {
+  color: var(--clr-navy);
+  font-weight: 600;
+  transition: color var(--t-fast);
+}
+.auth-switch a:hover { color: var(--clr-green); }
+
+/* ── Badge sécurité ── */
+.secure-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  font-size: .73rem;
+  color: var(--clr-gray-400);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--clr-gray-100);
+}
+
+/* ── Cases OTP (page 2FA) ── */
+.otp-container {
+  display: flex;
+  gap: var(--sp-3);
+  justify-content: center;
+}
+.otp-input {
+  width: 52px;
+  height: 60px;
+  border: 2px solid var(--clr-gray-200);
+  border-radius: var(--radius-md);
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: var(--clr-navy);
+  text-align: center;
+  background: var(--clr-white);
+  outline: none;
+  transition: border-color var(--t-fast), box-shadow var(--t-fast), background var(--t-fast);
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+}
+.otp-input::-webkit-inner-spin-button,
+.otp-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.otp-input:focus {
+  border-color: var(--clr-navy);
+  box-shadow: 0 0 0 3px rgba(13,43,85,.10);
+}
+.otp-input--filled {
+  border-color: var(--clr-green);
+  background: #F0FDF4;
+  color: var(--clr-green-dark);
+}
+.otp-input--error {
+  border-color: var(--clr-danger);
+  background: #FEF2F2;
+  animation: shake .4s ease;
+}
+
+/* Minuterie 2FA */
+.otp-timer {
+  text-align: center;
+  font-size: .8rem;
+  color: var(--clr-gray-400);
+  margin-top: var(--sp-3);
+}
+.otp-timer strong       { color: var(--clr-navy); }
+.otp-timer--expired strong { color: var(--clr-danger); }
+
+/* Bouton renvoi code */
+.resend-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--clr-navy);
+  font-size: .85rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+  text-decoration: underline;
+  padding: 0;
+  transition: color var(--t-fast);
+}
+.resend-btn:hover:not(:disabled)  { color: var(--clr-green); }
+.resend-btn:disabled {
+  color: var(--clr-gray-400);
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+/* ── Indicateur de force du mot de passe ── */
+.pwd-strength {
+  display: flex;
+  gap: var(--sp-1);
+  margin-top: var(--sp-2);
+}
+.pwd-strength__bar {
+  flex: 1;
+  height: 3px;
+  border-radius: var(--radius-full);
+  background: var(--clr-gray-100);
+  transition: background var(--t-normal);
+}
+.pwd-strength__bar--weak   { background: var(--clr-red);        }
+.pwd-strength__bar--medium { background: var(--clr-yellow-dark); }
+.pwd-strength__bar--strong { background: var(--clr-green);       }
+
+.pwd-strength__label {
+  font-size: .73rem;
+  color: var(--clr-gray-400);
+  margin-top: var(--sp-1);
+}
+
+/* ── Pied de page auth ── */
+.auth-footer {
+  margin-top: var(--sp-6);
+  text-align: center;
+  font-size: .73rem;
+  color: var(--clr-gray-400);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.auth-footer__link {
+  color: var(--clr-navy);
+  font-weight: 500;
+  transition: color var(--t-fast);
+}
+.auth-footer__link:hover { color: var(--clr-green); }
+
+/* ────────────────────────────────────────────────────────────
+   9. ANIMATIONS
+   ──────────────────────────────────────────────────────────── */
+@keyframes cardReveal {
+  from { opacity: 0; transform: translateY(18px) scale(.98); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);   }
+}
+@keyframes fadeSlideDown {
+  from { opacity: 0; transform: translateY(-5px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20%      { transform: translateX(-5px); }
+  40%      { transform: translateX(5px); }
+  60%      { transform: translateX(-5px); }
+  80%      { transform: translateX(5px); }
+}
+
+/* ────────────────────────────────────────────────────────────
+  10. RESPONSIVE — MOBILE FIRST
+   ──────────────────────────────────────────────────────────── */
+/* Tablette et téléphone */
+@media (max-width: 640px) {
+  /* Header : empilement vertical sur très petits écrans */
+  .auth-header__content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--sp-4);
+  }
+  /* Réduire logo et drapeau */
+  .auth-header__logo-wrap { width: 64px; height: 64px; }
+  .auth-header__logo      { width: 52px; height: 52px; }
+  .auth-header__flag      { width: 56px; height: 37px; }
+  .auth-header__ministry  { font-size: 1.2rem; }
+
+  /* Carte pleine largeur */
+  .auth-card { border-radius: var(--radius-lg); }
+  .auth-card__header { padding: var(--sp-5) var(--sp-5) var(--sp-4); }
+  .auth-card__body   { padding: var(--sp-5); }
+  .auth-card__title  { font-size: 1.35rem; }
+
+  /* Formulaire d'inscription : 1 colonne */
+  .form-grid-2 { grid-template-columns: 1fr; }
+
+  /* OTP : cases légèrement plus petites */
+  .otp-input { width: 44px; height: 52px; font-size: 1.25rem; }
+
+  .auth-main { padding: var(--sp-5) var(--sp-4) var(--sp-8); }
+}
+
+/* Très petit écran */
+@media (max-width: 380px) {
+  .otp-input { width: 38px; height: 46px; font-size: 1.1rem; }
+  .otp-container { gap: var(--sp-2); }
+}
+
+// END OF FILE: src/app/globals.css
+
+
+// FILE: src/app/layout.tsx
+-----------------------------------------------
+// ============================================================
+// FICHIER  : src/app/layout.tsx
+// RÔLE     : Layout racine Next.js (App Router).
+//            Charge la feuille de style globale et définit
+//            les métadonnées HTML de l'application.
+// ============================================================
+
+import type { Metadata } from 'next';
+import './globals.css';
+
+export const metadata: Metadata = {
+  title:       "GBE – Gestion du Budget de l'État | MINFI Cameroun",
+  description: "Plateforme officielle de gestion du budget de l'État du Cameroun. "
+             + "Ministère des Finances (MINFI). Accès réservé aux agents autorisés.",
+  keywords:    ['MINFI', 'budget', 'Cameroun', 'GBE', 'finances publiques'],
+  icons: { icon: '/images/logo-minfi.png' },
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="fr">
+      <body>{children}</body>
+    </html>
+  );
+}
+
+// END OF FILE: src/app/layout.tsx
+
+
+// FILE: src/app/page.tsx
+-----------------------------------------------
+// src/app/page.tsx
+import { redirect } from 'next/navigation';
+export default function HomePage() { redirect('/login'); }
+
+// END OF FILE: src/app/page.tsx
+
+
+// FILE: src/components/auth/AuthHeader.tsx
+-----------------------------------------------
+// ============================================================
+// FICHIER  : src/components/auth/AuthHeader.tsx
+// RÔLE     : En-tête institutionnel affiché EN HAUT de toutes
+//            les pages d'authentification, au-dessus du formulaire.
+//            Contient :
+//            - Logo MINFI (gauche)
+//            - Textes officiels (centre)
+//            - Drapeau camerounais (droite)
+//            - Bandes tricolores en bas avec étoile sur le jaune
+// ============================================================
+
+import React from 'react';
+import Image from 'next/image';
+
+/**
+ * En-tête de marque GBE-MINFI.
+ * Partagé par toutes les pages d'authentification via AuthLayout.
+ */
+const AuthHeader: React.FC = () => {
+  return (
+    <header className="auth-header">
+
+      {/* ── Motifs lumineux en arrière-plan (dégradés radiaux) ── */}
+      <div className="auth-header__bg" aria-hidden="true" />
+
+      {/* ── Bandes tricolores camerounaises en bas du header ── */}
+      <div className="auth-header__stripes" aria-hidden="true">
+
+        {/* Bande verte */}
+        <div className="stripe stripe--green" />
+
+        {/* Bande rouge avec étoile jaune au centre */}
+        <div className="stripe stripe--red">
+          <span className="stripe__star">
+            <svg
+              viewBox="0 0 24 24"
+              height="8"
+              width="8"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <polygon
+                fill="#FCD116"
+                points="
+                  12,2
+                  15.09,8.26
+                  22,9.27
+                  17,14.14
+                  18.18,21.02
+                  12,17.77
+                  5.82,21.02
+                  7,14.14
+                  2,9.27
+                  8.91,8.26
+                "
+              />
+            </svg>
+          </span>
+        </div>
+
+        {/* Bande jaune */}
+        <div className="stripe stripe--yellow" />
+
+      </div>
+
+      {/* ── Contenu principal : logo | textes | drapeau ── */}
+      <div className="auth-header__content">
+
+        {/* Drapeau camerounais — remplacer .svg par .png officiel si disponible */}
+        <div className="auth-header__flag-wrap">
+          <Image
+            src="/images/cameroon_flag.jpg"
+            alt="Drapeau de la République du Cameroun"
+            width={72}
+            height={48}
+            className="auth-header__flag"
+          />
+        </div>
+        
+
+        {/* Bloc de textes institutionnels centré */}
+        <div className="auth-header__texts">
+
+          {/* République */}
+          <p className="auth-header__republic">République du Cameroun</p>
+
+          {/* Devise nationale */}
+          <p className="auth-header__motto">Paix – Travail – Patrie</p>
+
+          {/* Séparateur tricolore décoratif avec étoile jaune sur le rouge */}
+          <div className="auth-header__divider" aria-hidden="true">
+            <div className="divider__stripe divider__stripe--green" />
+            <div className="divider__stripe divider__stripe--red">
+              <svg
+                viewBox="0 0 24 24"
+                className="divider__star"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <polygon
+                  fill="#FCD116"
+                  points="
+                    12,2
+                    15.09,8.26
+                    22,9.27
+                    17,14.14
+                    18.18,21.02
+                    12,17.77
+                    5.82,21.02
+                    7,14.14
+                    2,9.27
+                    8.91,8.26
+                  "
+                />
+              </svg>
+            </div>
+            <div className="divider__stripe divider__stripe--yellow" />
+          </div>
+
+          {/* Nom du ministère */}
+          <h1 className="auth-header__ministry">Ministère des Finances</h1>
+
+          {/* Nom de l'application */}
+          <p className="auth-header__app">Direction du Budget de l&apos;État</p>
+
+        </div>
+
+       
+
+         {/* Logo MINFI — remplacer .svg par .png officiel si disponible */}
+        <div className="auth-header__logo-wrap">
+          <Image
+            src="/images/logo-minfi.png"
+            alt="Logo du Ministère des Finances du Cameroun – MINFI"
+            width={80}
+            height={80}
+            priority
+            className="auth-header__logo"
+          />
+        </div>
+
+
+      </div>
+    </header>
+  );
+};
+
+export default AuthHeader;
+
+// END OF FILE: src/components/auth/AuthHeader.tsx
+
+
+// FILE: src/components/auth/AuthLayout.tsx
+-----------------------------------------------
+// ============================================================
+// FICHIER  : src/components/auth/AuthLayout.tsx
+// RÔLE     : Layout partagé par toutes les pages d'auth.
+//            Structure (colonne unique centrée) :
+//            ┌─────────────────────────────────┐
+//            │  AuthHeader (logo + textes)     │  ← bleu marine
+//            ├─────────────────────────────────┤
+//            │  Titre du formulaire            │
+//            │  Sous-titre                     │
+//            │  {children} (formulaire)        │
+//            │  Footer                         │
+//            └─────────────────────────────────┘
+// ============================================================
+
+import React from 'react';
+import Link  from 'next/link';
+import AuthHeader from './AuthHeader';
+
+// ── Props du composant ──
+interface AuthLayoutProps {
+  /** Titre principal du formulaire (ex : "Connexion") */
+  title: string;
+  /** Description courte sous le titre */
+  subtitle: string;
+  /** Contenu du formulaire injecté par chaque page */
+  children: React.ReactNode;
+}
+
+/**
+ * Enveloppe de mise en page pour toutes les pages d'authentification.
+ *
+ * Usage :
+ * ```tsx
+ * <AuthLayout title="Connexion" subtitle="Accédez à votre espace">
+ *   <LoginForm />
+ * </AuthLayout>
+ * ```
+ */
+const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, children }) => {
+  return (
+    // Arrière-plan de la page entière
+    <div className="auth-page">
+
+      {/* ── En-tête institutionnel (logo MINFI + drapeau + textes) ── */}
+      <AuthHeader />
+
+      {/* ── Zone du formulaire ── */}
+      <main className="auth-main">
+
+        {/* Carte blanche qui contient le formulaire */}
+        <div className="auth-card">
+
+          {/* En-tête de la carte : titre + sous-titre */}
+          <div className="auth-card__header">
+            <h2 className="auth-card__title">{title}</h2>
+            <p  className="auth-card__subtitle">{subtitle}</p>
+          </div>
+
+          {/* Corps : formulaire injecté par la page parente */}
+          <div className="auth-card__body">
+            {children}
+          </div>
+
+        </div>
+
+        {/* ── Pied de page ── */}
+        <footer className="auth-footer">
+          <p>© {new Date().getFullYear()} MINFI – République du Cameroun</p>
+          <p>
+            <Link href="/aide"    className="auth-footer__link">Aide</Link>
+            {' · '}
+            <Link href="/contact" className="auth-footer__link">Contact</Link>
+          </p>
+        </footer>
+
+      </main>
+    </div>
+  );
+};
+
+export default AuthLayout;
+
+// END OF FILE: src/components/auth/AuthLayout.tsx
+
+
+// FILE: src/components/ui/Button.tsx
+-----------------------------------------------
+// ============================================================
+// FICHIER  : src/components/ui/Button.tsx
+// RÔLE     : Bouton réutilisable avec 3 variantes visuelles,
+//            état de chargement (spinner) et support disabled.
+// ============================================================
+
+import React, { ButtonHTMLAttributes } from 'react';
+
+// ── Props du composant ──
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  /**
+   * Variante visuelle :
+   * - primary   → bleu marine (action principale)
+   * - secondary → vert MINFI (action secondaire / inscription)
+   * - ghost     → transparent avec bordure (action tertiaire)
+   */
+  variant?: 'primary' | 'secondary' | 'ghost';
+  /** Affiche un spinner et désactive le bouton pendant un chargement */
+  isLoading?: boolean;
+  /** Prend toute la largeur du conteneur parent */
+  fullWidth?: boolean;
+}
+
+/**
+ * Bouton du design system GBE-MINFI.
+ *
+ * Usage :
+ * ```tsx
+ * <Button variant="primary" isLoading={isSubmitting} fullWidth>
+ *   Se connecter
+ * </Button>
+ * ```
+ */
+const Button: React.FC<ButtonProps> = ({
+  children,
+  variant   = 'primary',
+  isLoading = false,
+  fullWidth = false,
+  disabled,
+  className = '',
+  ...rest
+}) => {
+  const isDisabled = disabled || isLoading;
+
+  return (
+    <button
+      className={[
+        'btn',
+        `btn--${variant}`,
+        fullWidth ? 'btn--full' : '',
+        className,
+      ].join(' ')}
+      disabled={isDisabled}
+      aria-busy={isLoading}
+      {...rest}
+    >
+      {isLoading ? (
+        /* ── État chargement : spinner + texte ── */
+        <span className="btn__loader">
+          <span className="btn__spinner" aria-hidden="true" />
+          <span>Chargement...</span>
+        </span>
+      ) : (
+        /* ── État normal ── */
+        children
+      )}
+    </button>
+  );
+};
+
+export default Button;
+
+// END OF FILE: src/components/ui/Button.tsx
+
+
+// FILE: src/components/ui/Input.tsx
+-----------------------------------------------
+// ============================================================
+// FICHIER  : src/components/ui/Input.tsx
+// RÔLE     : Champ de saisie réutilisable avec label, icône
+//            gauche, élément droit (ex : toggle mot de passe)
+//            et affichage des erreurs de validation.
+//            Compatible react-hook-form grâce à forwardRef.
+// ============================================================
+
+import React, { InputHTMLAttributes, forwardRef } from 'react';
+
+// ── Props du composant ──────────────────────────────────────
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+  /** Label affiché au-dessus du champ */
+  label: string;
+  /** Message d'erreur de validation (optionnel) */
+  error?: string;
+  /** Icône SVG affichée à gauche dans le champ */
+  icon?: React.ReactNode;
+  /** Élément affiché à droite (ex : bouton afficher/masquer mdp) */
+  rightElement?: React.ReactNode;
+}
+
+/**
+ * Champ de saisie universel du design system GBE-MINFI.
+ *
+ * Usage :
+ * ```tsx
+ * <Input
+ *   name="email"
+ *   label="Adresse email"
+ *   type="email"
+ *   placeholder="vous@exemple.cm"
+ *   icon={<MailIcon />}
+ *   error={errors.email}
+ * />
+ * ```
+ */
+const Input = forwardRef<HTMLInputElement, InputProps>(
+  ({ label, error, icon, rightElement, className = '', id, name, ...rest }, ref) => {
+
+    // Utiliser `id` s'il est fourni, sinon `name` pour le lien label ↔ input
+    const fieldId = id ?? name;
+
+    return (
+      <div className="inp-group">
+
+        {/* ── Label ── */}
+        <label className="inp-label" htmlFor={fieldId}>
+          {label}
+        </label>
+
+        {/* ── Wrapper relatif pour positionner les icônes ── */}
+        <div className="inp-wrapper">
+
+          {/* Icône gauche (optionnelle) */}
+          {icon && (
+            <span className="inp-icon-left" aria-hidden="true">
+              {icon}
+            </span>
+          )}
+
+          {/* Champ de saisie */}
+          <input
+            ref={ref}
+            id={fieldId}
+            name={name}
+            className={[
+              'inp-field',
+              icon         ? 'inp-field--with-icon'  : '',
+              rightElement ? 'inp-field--with-right'  : '',
+              error        ? 'inp-field--error'        : '',
+              className,
+            ].filter(Boolean).join(' ')}
+            aria-describedby={error ? `${fieldId}-error` : undefined}
+            aria-invalid={error ? true : undefined}
+            {...rest}
+          />
+
+          {/* Élément droit (ex : toggle visibilité mot de passe) */}
+          {rightElement && (
+            <span className="inp-icon-right">
+              {rightElement}
+            </span>
+          )}
+
+        </div>
+
+        {/* ── Message d'erreur ── */}
+        {error && (
+          <p
+            id={`${fieldId}-error`}
+            className="inp-error-msg"
+            role="alert"
+          >
+            {/* Icône d'avertissement inline */}
+            <svg
+              width="12" height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8"  x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            {error}
+          </p>
+        )}
+
+      </div>
+    );
+  }
+);
+
+Input.displayName = 'Input';
+
+// ✅ Export par défaut — s'importe SANS accolades :
+// import Input from '@/components/ui/Input'
+export default Input;
+
+// END OF FILE: src/components/ui/Input.tsx
+
+
+// FILE: src/constants/auth.ts
+-----------------------------------------------
+// ============================================================
+// FICHIER  : src/constants/auth.ts
+// RÔLE     : Centralise TOUTES les constantes de l'application.
+//
+// ✅ BACK-END CONNECTÉ : https://gbe-8clf.onrender.com
+//
+// Pour changer d'environnement, modifier uniquement
+// NEXT_PUBLIC_API_URL dans .env.local — aucun autre fichier
+// ne doit être touché.
+// ============================================================
+
+/**
+ * URL de base de l'API back-end.
+ *
+ * En développement  : défini dans .env.local
+ * En production     : défini dans les variables d'environnement du serveur
+ *
+ * Valeur par défaut → le back-end déployé sur Render
+ */
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ?? 'https://gbe-8clf.onrender.com';
+
+/**
+ * Préfixe commun à tous les endpoints de l'API.
+ * Si le back-end change de version (v2, v3…), modifier ici uniquement.
+ */
+const API_PREFIX = `${API_BASE_URL}/api/v1`;
+
+/**
+ * Endpoints d'authentification.
+ *
+ * POST /api/v1/auth/register  → Inscription
+ * POST /api/v1/auth/login     → Connexion (retourne un sessionToken si 2FA actif)
+ * POST /api/v1/auth/verify    → Vérification du code 2FA (TOTP)
+ */
+export const AUTH_ENDPOINTS = {
+  REGISTER:    `${API_PREFIX}/auth/register`,
+  LOGIN:       `${API_PREFIX}/auth/login`,
+  VERIFY_2FA:  `${API_PREFIX}/auth/verify`,
+} as const;
+
+/**
+ * Routes de navigation Next.js.
+ * Utiliser ces constantes dans router.push() plutôt que
+ * des chaînes codées en dur, pour faciliter les refactors.
+ */
+export const APP_ROUTES = {
+  LOGIN:           '/login',
+  REGISTER:        '/register',
+  REGISTER_QR:     '/register/qrcode',   // Page QR code post-inscription
+  TWO_FACTOR:      '/two-factor',         // Page saisie code OTP
+  FORGOT_PASSWORD: '/forgot-password',
+  DASHBOARD:       '/dashboard',          // Page d'accueil après connexion
+} as const;
+
+/**
+ * Durée de validité du code 2FA en secondes (5 minutes).
+ * Affichée dans le minuteur de la page two-factor.
+ */
+export const TWO_FACTOR_CODE_EXPIRY_SECONDS = 300;
+
+/**
+ * Nombre de chiffres du code OTP affiché par les cases.
+ */
+export const TWO_FACTOR_CODE_LENGTH = 6;
+
+// END OF FILE: src/constants/auth.ts
+
+
+// FILE: src/lib/authService.ts
+-----------------------------------------------
+// ============================================================
+// FICHIER  : src/lib/authService.ts
+// RÔLE     : Couche d'abstraction entre les composants React
+//            et l'API back-end GBE (https://gbe-8clf.onrender.com).
+//
+// Principe : les composants n'appellent JAMAIS fetch() directement.
+//            Ils appellent les fonctions de ce fichier, qui :
+//              1. Construisent la requête HTTP
+//              2. Gèrent les erreurs réseau
+//              3. Retournent des objets typés
+//
+// Pour changer de back-end : modifier uniquement AUTH_ENDPOINTS
+// dans src/constants/auth.ts — ce fichier ne change pas.
+// ============================================================
+
+import {
+  LoginPayload,
+  RegisterPayload,
+  VerifyPayload,
+  ForgotPasswordPayload,
+  LoginResponse,
+  RegisterResponse,
+  VerifyResponse,
+  GenericResponse,
+} from '@/types/auth';
+import { AUTH_ENDPOINTS } from '@/constants/auth';
+
+// ── En-têtes par défaut pour toutes les requêtes JSON ──────
+const JSON_HEADERS: HeadersInit = {
+  'Content-Type': 'application/json',
+  'Accept':       'application/json',
+};
+
+// ─────────────────────────────────────────────────────────────
+// UTILITAIRE INTERNE
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Exécute un POST JSON vers l'API et retourne le corps parsé.
+ *
+ * Gestion des erreurs :
+ * - Erreur réseau (serveur injoignable) → throw Error
+ * - Réponse HTTP ≥ 400 → throw Error avec le message du serveur
+ * - Réponse 2xx → retourne le JSON parsé
+ *
+ * @param url     URL complète de l'endpoint
+ * @param payload Objet à sérialiser en JSON dans le corps
+ * @param token   (optionnel) JWT Bearer pour les routes protégées
+ */
+async function postJson<TPayload, TResponse>(
+  url: string,
+  payload: TPayload,
+  token?: string
+): Promise<TResponse> {
+  // Construction des en-têtes : ajouter Authorization si token fourni
+  const headers: HeadersInit = { ...JSON_HEADERS };
+  if (token) {
+    (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method:  'POST',
+      headers,
+      body:    JSON.stringify(payload),
+    });
+  } catch {
+    // Erreur réseau (CORS, serveur éteint, pas d'internet…)
+    throw new Error(
+      'Impossible de joindre le serveur. Vérifiez votre connexion internet.'
+    );
+  }
+
+  // Lire le corps de la réponse (même en cas d'erreur HTTP)
+  const data = await response.json().catch(() => ({
+    success: false,
+    message: `Erreur HTTP ${response.status} — réponse invalide du serveur.`,
+  })) as TResponse & { message?: string; success?: boolean };
+
+  // Si le serveur retourne un code d'erreur (4xx, 5xx)
+  if (!response.ok) {
+    const errMsg = data.message || `Erreur HTTP ${response.status}`;
+    throw new Error(errMsg);
+  }
+
+  return data;
+}
+
+// ─────────────────────────────────────────────────────────────
+// FONCTIONS PUBLIQUES — une par endpoint
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * INSCRIPTION
+ * Route : POST /api/v1/auth/register
+ *
+ * Envoie les informations du formulaire d'inscription.
+ * Si mfaEnabled=true, le back-end retourne une qrCodeUrl
+ * que l'utilisateur doit scanner avec son téléphone.
+ *
+ * @param payload Données du formulaire d'inscription
+ * @returns Réponse contenant éventuellement qrCodeUrl
+ */
+export async function registerUser(
+  payload: RegisterPayload
+): Promise<RegisterResponse> {
+  return postJson<RegisterPayload, RegisterResponse>(
+    AUTH_ENDPOINTS.REGISTER,
+    payload
+  );
+}
+
+/**
+ * CONNEXION
+ * Route : POST /api/v1/auth/login
+ *
+ * Envoie email + password. Si le compte a le 2FA activé,
+ * le back-end retourne mfaRequired=true et un sessionToken.
+ * Le front redirige alors vers /two-factor pour la vérification.
+ *
+ * Si 2FA désactivé → accessToken retourné directement.
+ *
+ * @param payload Email et mot de passe
+ * @returns Réponse avec token(s) ou indication de 2FA requis
+ */
+export async function loginUser(
+  payload: LoginPayload
+): Promise<LoginResponse> {
+  return postJson<LoginPayload, LoginResponse>(
+    AUTH_ENDPOINTS.LOGIN,
+    payload
+  );
+}
+
+/**
+ * VÉRIFICATION DU CODE 2FA
+ * Route : POST /api/v1/auth/verify
+ *
+ * Envoie l'email et le code TOTP à 6 chiffres saisi par l'utilisateur.
+ * Si correct → accessToken retourné → connexion complète.
+ * Si incorrect → erreur levée.
+ *
+ * @param payload Email de l'utilisateur + code OTP à 6 chiffres
+ * @returns Réponse avec accessToken si succès
+ */
+export async function verifyTwoFactor(
+  payload: VerifyPayload
+): Promise<VerifyResponse> {
+  return postJson<VerifyPayload, VerifyResponse>(
+    AUTH_ENDPOINTS.VERIFY_2FA,
+    payload
+  );
+}
+
+/**
+ * MOT DE PASSE OUBLIÉ
+ * Route : POST /api/v1/auth/forgot-password
+ *
+ * Envoie un email de réinitialisation.
+ * Par sécurité, toujours afficher un message de succès côté UI
+ * même si l'email n'existe pas (évite l'énumération de comptes).
+ *
+ * @param payload Email de l'utilisateur
+ */
+export async function forgotPassword(
+  payload: ForgotPasswordPayload
+): Promise<GenericResponse> {
+  return postJson<ForgotPasswordPayload, GenericResponse>(
+    // Endpoint à ajouter dans constants/auth.ts si disponible
+    `https://gbe-8clf.onrender.com/api/v1/auth/forgot-password`,
+    payload
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// GESTION DU TOKEN EN SESSION (localStorage)
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Sauvegarde le JWT d'accès dans localStorage.
+ * Appelé après une connexion réussie (avec ou sans 2FA).
+ */
+export function saveAccessToken(token: string): void {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('gbe_access_token', token);
+  }
+}
+
+/**
+ * Récupère le JWT d'accès depuis localStorage.
+ * Utilisé pour les requêtes aux routes protégées.
+ */
+export function getAccessToken(): string | null {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('gbe_access_token');
+  }
+  return null;
+}
+
+/**
+ * Supprime le JWT d'accès (déconnexion).
+ */
+export function clearTokens(): void {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('gbe_access_token');
+    sessionStorage.removeItem('gbe_email_2fa');
+  }
+}
+
+// END OF FILE: src/lib/authService.ts
+
+
+// FILE: src/types/auth.ts
+-----------------------------------------------
+// ============================================================
+// FICHIER  : src/types/auth.ts
+// RÔLE     : Interfaces TypeScript pour l'API back-end GBE.
+// ============================================================
+
+// ── Payloads (ce qu'on ENVOIE) ──────────────────────────────
+
+export interface LoginPayload {
+  email:    string;
+  password: string;
+}
+
+export interface RegisterPayload {
+  firstName:       string;
+  lastName:        string;
+  email:           string;
+  password:        string;
+  confirmPassword: string;
+  phoneNumber:     string;
+  dateOfBirth:     string;   // "1990-01-25"
+  mfaEnabled:      boolean;  // Toujours true
+}
+
+export interface VerifyPayload {
+  email: string;   // Email de l'utilisateur
+  code:  string;   // Code TOTP à 6 chiffres
+}
+
+export interface ForgotPasswordPayload {
+  email: string;
+}
+
+// ── Réponses (ce que le back-end RETOURNE) ──────────────────
+
+/**
+ * Réponse après inscription.
+ * Le back-end retourne :
+ *   {
+ *     "mfaEnabled": true,
+ *     "secretImageUri": "data:image/png;base64,..."
+ *   }
+ */
+export interface RegisterResponse {
+  mfaEnabled?:    boolean;
+  secretImageUri?: string;  // ✅ Vrai nom du champ retourné par le back-end
+  // Champs alternatifs au cas où la structure change
+  qrCodeUrl?:     string;
+  qrCode?:        string;
+  message?:       string;
+}
+
+/**
+ * Réponse après connexion.
+ * Si 2FA activé → mfaRequired=true, pas d'accessToken.
+ * Si 2FA désactivé → accessToken direct.
+ */
+export interface LoginResponse {
+  success?:       boolean;
+  message?:       string;
+  accessToken?:   string;
+  refreshToken?:  string;
+  mfaRequired?:   boolean;
+  email?:         string;
+}
+
+/**
+ * Réponse après vérification du code 2FA.
+ */
+export interface VerifyResponse {
+  success?:      boolean;
+  message?:      string;
+  accessToken?:  string;
+  refreshToken?: string;
+  user?: {
+    id:        string;
+    firstName: string;
+    lastName:  string;
+    email:     string;
+    role:      string;
+  };
+}
+
+export interface GenericResponse {
+  success?: boolean;
+  message?: string;
+}
+
+// Dictionnaire d'erreurs de validation par champ
+export type FormErrors = Record<string, string | undefined>;
+
+// END OF FILE: src/types/auth.ts
+
+
+// FILE: .gitignore
+-----------------------------------------------
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+
+// END OF FILE: .gitignore
+
+
+// FILE: eslint.config.mjs
+-----------------------------------------------
+import { defineConfig, globalIgnores } from "eslint/config";
+import nextVitals from "eslint-config-next/core-web-vitals";
+import nextTs from "eslint-config-next/typescript";
+
+const eslintConfig = defineConfig([
+  ...nextVitals,
+  ...nextTs,
+  // Override default ignores of eslint-config-next.
+  globalIgnores([
+    // Default ignores of eslint-config-next:
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+  ]),
+]);
+
+export default eslintConfig;
+
+
+// END OF FILE: eslint.config.mjs
+
+
+// FILE: extract_context.ps1
+-----------------------------------------------
+<#
+.SYNOPSIS
+Extrait le code source d'un projet Next.js pour l'utiliser comme contexte IA.
+#>
+
+param (
+    [string]$ProjectPath = "."
+)
+
+$OutputFilename = "project_context_frontend.txt"
+
+# Résolution du chemin absolu
+try {
+    $ResolvedPath = (Resolve-Path $ProjectPath -ErrorAction Stop).Path
+} catch {
+    Write-Error "Erreur: Répertoire invalide ($ProjectPath)."
+    exit 1
+}
+
+$OutputFile = Join-Path $ResolvedPath $OutputFilename
+
+# Suppression de l'ancien fichier s'il existe
+if (Test-Path $OutputFile) {
+    Remove-Item $OutputFile -Force
+}
+
+# Dossiers à ignorer (optimisation : on n'y entre même pas)
+$ExcludeDirs = @(
+    ".git", ".vscode", ".idea", "node_modules", ".next", 
+    "out", "build", "coverage", "public", "dist", ".vercel"
+)
+
+# Fichiers à ignorer (accepte les wildcards *)
+$ExcludeFiles = @(
+    "*.log", "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "bun.lockb",
+    ".env*", "*.ico", "*.png", "*.jpg", "*.jpeg", "*.svg", "*.webp", 
+    "*.pdf", "*.map", "*.ttf", "*.woff", "*.woff2", "*.eot", "*.mp4",
+    $OutputFilename
+)
+
+# Fonction pour vérifier si un fichier est binaire (contient des octets nuls)
+function Test-IsBinary {
+    param ([string]$FilePath)
+    try {
+        $bytes = [System.IO.File]::ReadAllBytes($FilePath)
+        $checkLength = [math]::Min(1024, $bytes.Length)
+        for ($i = 0; $i -lt $checkLength; $i++) {
+            if ($bytes[$i] -eq 0) { return $true }
+        }
+        return $false
+    } catch {
+        return $true # En cas d'erreur de lecture, on ignore par sécurité
+    }
+}
+
+$foundFiles = [System.Collections.Generic.List[string]]::new()
+
+# Fonction récursive pour lister les fichiers valides
+function Get-ValidFiles {
+    param ([string]$CurrentDir)
+    
+    $items = Get-ChildItem -Path $CurrentDir -Force -ErrorAction SilentlyContinue
+    
+    foreach ($item in $items) {
+        if ($item.PSIsContainer) {
+            # Si c'est un dossier et qu'il n'est pas dans la liste d'exclusion
+            if ($ExcludeDirs -notcontains $item.Name) {
+                Get-ValidFiles -CurrentDir $item.FullName
+            }
+        } else {
+            # Si c'est un fichier, on vérifie son extension/nom
+            $skip = $false
+            foreach ($pattern in $ExcludeFiles) {
+                if ($item.Name -like $pattern) {
+                    $skip = $true
+                    break
+                }
+            }
+            if (-not $skip) {
+                $foundFiles.Add($item.FullName)
+            }
+        }
+    }
+}
+
+Write-Host "Recherche des fichiers en cours..." -ForegroundColor Cyan
+Get-ValidFiles -CurrentDir $ResolvedPath
+
+# Écriture de l'en-tête
+$dateStr = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+$header = @"
+Next.js Project Context
+Generated On: $dateStr
+Root: $ResolvedPath
+===============================================
+"@
+
+Set-Content -Path $OutputFile -Value $header -Encoding UTF8
+
+Write-Host "Génération du fichier de contexte en cours..." -ForegroundColor Cyan
+
+foreach ($file in $foundFiles) {
+    # Calcul du chemin relatif
+    $relativePath = $file.Substring($ResolvedPath.Length).TrimStart('\')
+    $relativePath = $relativePath -replace '\\', '/' # Formatage type UNIX pour l'IA
+    
+    $fileHeader = "`n// FILE: $relativePath`n-----------------------------------------------"
+    Add-Content -Path $OutputFile -Value $fileHeader -Encoding UTF8
+    
+    if (Test-IsBinary -FilePath $file) {
+        Add-Content -Path $OutputFile -Value "[Fichier binaire ou asset omis]" -Encoding UTF8
+    } else {
+        try {
+            # Lecture du contenu brut
+            $content = Get-Content -Path $file -Raw -Encoding UTF8 -ErrorAction Stop
+            if ($null -ne $content) {
+                Add-Content -Path $OutputFile -Value $content -Encoding UTF8
+            }
+        } catch {
+            Add-Content -Path $OutputFile -Value "[Erreur lors de la lecture du fichier]" -Encoding UTF8
+        }
+    }
+    
+    Add-Content -Path $OutputFile -Value "`n// END OF FILE: $relativePath`n" -Encoding UTF8
+}
+
+Write-Host "Succès ! Ton contexte Next.js est prêt dans : $OutputFile" -ForegroundColor Green
+
+// END OF FILE: extract_context.ps1
+
+
+// FILE: extract_context.sh
+-----------------------------------------------
+#!/bin/bash
+
+# --- Configuration ---
+
+# Chemin par défaut ou premier argument
+PROJECT_PATH="${1:-.}"
+OUTPUT_FILENAME="project_context_frontend.txt"
+
+# Résolution du chemin absolu
+PROJECT_PATH=$(realpath "$PROJECT_PATH" 2>/dev/null)
+
+if [ ! -d "$PROJECT_PATH" ]; then
+    echo "Erreur: Répertoire invalide ($PROJECT_PATH)." >&2
+    exit 1
+fi
+
+OUTPUT_FILE="$PROJECT_PATH/$OUTPUT_FILENAME"
+
+# Dossiers à ignorer totalement (prune)
+EXCLUDE_DIRS=(
+    ".git" ".vscode" ".idea" "node_modules" ".next" 
+    "out" "build" "coverage" "public" "dist" ".vercel"
+)
+
+# Fichiers à ignorer (patterns)
+EXCLUDE_FILES=(
+    "*.log" "package-lock.json" "yarn.lock" "pnpm-lock.yaml" "bun.lockb"
+    ".env*" "*.ico" "*.png" "*.jpg" "*.jpeg" "*.svg" "*.webp" 
+    "*.pdf" "*.map" "*.ttf" "*.woff" "*.woff2" "*.eot" "*.mp4"
+    "$OUTPUT_FILENAME"
+)
+
+# --- Préparation de la commande find ---
+
+# Construction des arguments d'exclusion de dossiers
+PRUNE_ARGS=()
+for dir in "${EXCLUDE_DIRS[@]}"; do
+    if [ ${#PRUNE_ARGS[@]} -gt 0 ]; then PRUNE_ARGS+=("-o"); fi
+    PRUNE_ARGS+=("-name" "$dir")
+done
+
+# Construction des arguments d'exclusion de fichiers
+FILE_ARGS=()
+for file in "${EXCLUDE_FILES[@]}"; do
+    FILE_ARGS+=("!" "-name" "$file")
+done
+
+# --- Exécution ---
+
+echo "Recherche des fichiers dans : $PROJECT_PATH..."
+
+# Entête du fichier
+{
+    echo "Next.js Project Context"
+    echo "Generated On: $(date '+%Y-%m-%d %H:%M:%S')"
+    echo "Root: $PROJECT_PATH"
+    echo "==============================================="
+} > "$OUTPUT_FILE"
+
+# Recherche et traitement des fichiers
+# 1. On ignore les dossiers listés
+# 2. On prend uniquement les fichiers (-type f)
+# 3. On applique les exclusions de noms de fichiers
+find "$PROJECT_PATH" \( "${PRUNE_ARGS[@]}" \) -prune -o -type f "${FILE_ARGS[@]}" -print | sort | while read -r FILE; do
+    
+    # Calcul du chemin relatif
+    RELATIVE_PATH="${FILE#"$PROJECT_PATH"/}"
+    
+    echo "Traitement de : $RELATIVE_PATH"
+
+    {
+        echo -e "\n// FILE: $RELATIVE_PATH"
+        echo "-----------------------------------------------"
+    } >> "$OUTPUT_FILE"
+
+    # Vérification si le fichier est binaire
+    # Sur Linux, 'grep -I' est le moyen le plus rapide de détecter un binaire
+    if grep -qI . "$FILE"; then
+        cat "$FILE" >> "$OUTPUT_FILE"
+    else
+        echo "[Fichier binaire ou asset omis]" >> "$OUTPUT_FILE"
+    fi
+
+    echo -e "\n// END OF FILE: $RELATIVE_PATH" >> "$OUTPUT_FILE"
+done
+
+echo "-----------------------------------------------"
+echo "Succès ! Le contexte est prêt : $OUTPUT_FILE"
+
+
+// END OF FILE: extract_context.sh
+
+
+// FILE: MIGRATION.md
+-----------------------------------------------
+## ✅ Restructuration Complétée
+
+La structure de votre projet a été réorganisée avec succès selon vos spécifications.
+
+### Changements apportés
+
+#### 1. **Dossier src/** créé avec l'architecture complète
+- ✅ `src/app/` - Dossier principal Next.js App Router
+  - `layout.tsx` - Root layout avec métadonnées
+  - `globals.css` - Design system et variables CSS
+  - `page.tsx` - Redirection "/" → "/login"
+  - Pages d'authentification :
+    - `login/page.tsx`
+    - `register/page.tsx`
+    - `two-factor/page.tsx`
+    - `forgot-password/page.tsx`
+
+- ✅ `src/components/` - Composants réutilisables
+  - `auth/AuthHeader.tsx` - En-tête avec logo MINFI + drapeau
+  - `auth/AuthLayout.tsx` - Layout partagé pour toutes les pages d'auth
+  - `ui/Input.tsx` - Composant Input avec gestion d'erreurs
+  - `ui/Button.tsx` - Composant Button avec 3 variantes (primary, secondary, danger)
+
+- ✅ `src/constants/auth.ts` - Constantes centralisées
+  - URLs API
+  - Routes internes de l'application
+
+- ✅ `src/lib/authService.ts` - Service d'API d'authentification
+  - Appels API pour login, register, OTP, password reset, etc.
+  - Gestion des erreurs
+
+- ✅ `src/types/auth.ts` - Interfaces TypeScript
+  - LoginPayload, RegisterPayload, AuthResponse
+  - OtpVerificationPayload, PasswordResetPayload
+
+#### 2. **Dossier public/images/** créé
+- ✅ `public/images/minfi-logo.svg` - Placeholder logo MINFI
+- ✅ `public/images/cameroon-flag.svg` - Drapeau camerounais
+
+#### 3. **Fichiers de configuration**
+- ✅ `tsconfig.json` - Alias '@/*' mis à jour pour pointer sur './src/*'
+- ✅ `.env.example` - Modèle de variables d'environnement
+- ✅ `PROJECT_STRUCTURE.md` - Documentation complète
+- ✅ `MIGRATION.md` - Ce fichier
+
+#### 4. **Ancien dossier app/** supprimé
+- ✅ Ancien `/app` à la racine supprimé
+- ✅ Cache Next.js nettoyé
+
+### Vérification de la compilation
+
+```
+✅ Build Next.js réussit
+✅ TypeScript valide
+✅ Toutes les routes compilées :
+   - / (redirect to /login)
+   - /login
+   - /register
+   - /two-factor
+   - /forgot-password
+   - /_not-found
+```
+
+### Prochain pas
+
+1. **Configurer .env.local**
+   ```bash
+   cp .env.example .env.local
+   ```
+
+2. **Installer les dépendances** (si nécessaire)
+   ```bash
+   npm install
+   ```
+
+3. **Démarrer le serveur de développement**
+   ```bash
+   npm run dev
+   ```
+
+4. **Implémenter les formulaires d'authentification**
+   - Créer des fichiers pour chaque page (login, register, etc.)
+   - Intégrer les composants Input et Button
+   - Utiliser authService pour les appels API
+
+5. **Intégrer le backend**
+   - Configurer l'URL de l'API dans `.env.local`
+   - Adapter authService.ts aux endpoints réels
+
+### Structure finale prête pour développement
+
+Le projet est maintenant structuré profesionnellement et prêt pour :
+- ✅ Développement local
+- ✅ Tests unitaires et e2e
+- ✅ Déploiement en production
+- ✅ Scalabilité future
+
+Tous les fichiers sont en TypeScript avec une excellente expérience de développement (types, autocomplete, vérification de sécurité).
+
+
+// END OF FILE: MIGRATION.md
+
+
+// FILE: next-env.d.ts
+-----------------------------------------------
+/// <reference types="next" />
+/// <reference types="next/image-types/global" />
+import "./.next/dev/types/routes.d.ts";
+
+// NOTE: This file should not be edited
+// see https://nextjs.org/docs/app/api-reference/config/typescript for more information.
+
+
+// END OF FILE: next-env.d.ts
+
+
+// FILE: next.config.ts
+-----------------------------------------------
+// ============================================================
+// FICHIER  : next.config.ts
+// RÔLE     : Configuration Next.js.
+//            - Autorise les images PNG, JPG, SVG via next/image
+//            - reactStrictMode activé
+// ============================================================
+
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  reactStrictMode: true,
+  images: {
+    // ✅ Autorise les SVG via next/image
+    dangerouslyAllowSVG:    true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy:  "default-src 'self'; script-src 'none'; sandbox;",
+    // Formats modernes pour PNG/JPG
+    formats: ['image/avif', 'image/webp'],
+    // Ajouter des domaines distants ici si nécessaire :
+    // remotePatterns: [{ protocol: 'https', hostname: 'cdn.minfi.cm' }],
+  },
+};
+
+export default nextConfig;
+
+// END OF FILE: next.config.ts
+
+
+// FILE: package.json
+-----------------------------------------------
+{
+  "name": "front-gbe",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "@shadcn/ui": "^0.0.4",
+    "date-fns": "^4.1.0",
+    "lucide-react": "^0.577.0",
+    "next": "16.1.6",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-hook-form": "^7.71.2",
+    "recharts": "^3.8.0",
+    "zod": "^4.3.6",
+    "zustand": "^5.0.11"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
+
+
+// END OF FILE: package.json
+
+
+// FILE: postcss.config.mjs
+-----------------------------------------------
+const config = {
+  plugins: {
+    "@tailwindcss/postcss": {},
+  },
+};
+
+export default config;
+
+
+// END OF FILE: postcss.config.mjs
+
+
+// FILE: PROJECT_STRUCTURE.md
+-----------------------------------------------
+# MINFI - Front-end GBE
+
+Plateforme d'authentification Frontend pour le MINFI (Ministère des Finances du Cameroun).
+
+## Structure du Projet
+
+```
+front-gbe/
+├── public/
+│   └── images/
+│       ├── minfi-logo.svg        ← Logo du MINFI
+│       └── cameroon-flag.svg     ← Drapeau camerounais
+│
+├── src/
+│   ├── app/
+│   │   ├── globals.css           ← Design system (variables, composants)
+│   │   ├── layout.tsx            ← Root layout Next.js
+│   │   ├── page.tsx              ← Redirection "/" → "/login"
+│   │   ├── login/
+│   │   │   └── page.tsx          ← Page de connexion
+│   │   ├── register/
+│   │   │   └── page.tsx          ← Page d'inscription
+│   │   ├── two-factor/
+│   │   │   └── page.tsx          ← Page 2FA (code OTP)
+│   │   └── forgot-password/
+│   │       └── page.tsx          ← Page mot de passe oublié
+│   │
+│   ├── components/
+│   │   ├── auth/
+│   │   │   ├── AuthHeader.tsx    ← En-tête institutionnel
+│   │   │   └── AuthLayout.tsx    ← Layout partagé
+│   │   └── ui/
+│   │       ├── Input.tsx         ← Champ de saisie
+│   │       └── Button.tsx        ← Bouton (3 variantes)
+│   │
+│   ├── constants/
+│   │   └── auth.ts               ← URLs API et routes
+│   │
+│   ├── lib/
+│   │   └── authService.ts        ← Appels API
+│   │
+│   └── types/
+│       └── auth.ts               ← Interfaces TypeScript
+│
+├── .env.example                  ← Variables d'environnement
+├── .eslintrc.json
+├── .gitignore
+├── eslint.config.mjs
+├── next.config.ts
+├── package.json
+├── postcss.config.mjs
+├── tsconfig.json
+└── README.md
+
+```
+
+## Installation
+
+### Prérequis
+- Node.js >= 18
+- npm ou yarn
+
+### Étapes
+```bash
+# Installations des dépendances
+npm install
+
+# Copier le fichier d'environnement
+cp .env.example .env.local
+
+# Éditer .env.local avec vos configurations
+nano .env.local
+
+# Démarrer le serveur de développement
+npm run dev
+```
+
+L'application sera disponible à `http://localhost:3000`
+
+## Scripts disponibles
+
+```bash
+# Développement
+npm run dev
+
+# Build de production
+npm run build
+
+# Démarrage de la version production
+npm start
+
+# Lint (ESLint)
+npm run lint
+
+# Lint et correction automatique
+npm run lint:fix
+```
+
+## Architecture
+
+### Pages d'authentification
+- **Login** (`/login`) - Connexion utilisateur
+- **Register** (`/register`) - Inscription utilisateur
+- **2FA** (`/two-factor`) - Vérification code OTP
+- **Forgot Password** (`/forgot-password`) - Récupération du mot de passe
+
+### Composants réutilisables
+- **AuthHeader** - En-tête avec logo MINFI et drapeau Cameroun
+- **AuthLayout** - Conteneur partagé pour les pages d'auth
+- **Button** - Bouton avec 3 variantes (primary, secondary, danger)
+- **Input** - Champ de saisie avec gestion d'erreurs
+
+### Services API
+- `authService.ts` - Centralise tous les appels API d'authentification
+
+### Types TypeScript
+- `auth.ts` - Définit les interfaces pour les payloads et réponses API
+
+### Constantes
+- Endpoints API centralisés
+- Routes internes de l'application
+
+## Variables d'environnement
+
+Copier `.env.example` en `.env.local` et configurer :
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3000/api
+NEXT_PUBLIC_AUTH_ENABLED=true
+NEXT_PUBLIC_SESSION_TIMEOUT=3600
+NODE_ENV=development
+```
+
+## Technologies utilisées
+
+- **Framework** - Next.js 15+ (React 19)
+- **Langage** - TypeScript
+- **Styling** - Tailwind CSS
+- **Linter** - ESLint
+- **Formatage** - Prettier (configuration par ESLint)
+
+## Prochaines étapes
+
+1. [ ] Implémenter les formulaires de connexion/inscription
+2. [ ] Intégrer le backend API
+3. [ ] Ajouter la gestion des erreurs globale
+4. [ ] Mettre en place l'authentification avec tokens JWT
+5. [ ] Ajouter les redirections post-authentification
+6. [ ] Tester sur mobile
+7. [ ] Déployer en production
+
+## Support
+
+Pour toute question ou problème, contactez l'équipe de développement.
+
+
+// END OF FILE: PROJECT_STRUCTURE.md
+
+
+// FILE: README.md
+-----------------------------------------------
+# GBE – Gestion du Budget de l'État
+## Ministère des Finances du Cameroun (MINFI)
+
+Application **Next.js 14 + TypeScript** pour la gestion du budget de l'État
+selon la **Loi N° 2018/012 du 11 Juillet 2018**.
+
+---
+
+## 🚀 Démarrage rapide
+
+```bash
+# 1. Entrer dans le dossier
+cd front-gbe
+
+# 2. Installer les dépendances
+npm install
+
+# 3. Configurer les variables d'environnement
+cp .env.example .env.local
+# → Modifier NEXT_PUBLIC_API_URL avec votre URL back-end
+
+# 4. Lancer le serveur de développement
+npm run dev
+# → http://localhost:3000  (redirige vers /login)
+```
+
+---
+
+## 📁 Structure du projet
+
+```
+front-gbe/
+├── public/
+│   └── images/
+│       ├── minfi-logo.svg        ← Placeholder (remplacer par le PNG officiel)
+│       └── cameroon-flag.svg     ← Drapeau SVG (remplacer par PNG si besoin)
+│
+├── src/
+│   ├── app/
+│   │   ├── globals.css           ← Design system complet (variables, composants)
+│   │   ├── layout.tsx            ← Root layout Next.js (métadonnées, CSS global)
+│   │   ├── page.tsx              ← Redirection "/" → "/login"
+│   │   ├── login/
+│   │   │   └── page.tsx          ← Page de connexion
+│   │   ├── register/
+│   │   │   └── page.tsx          ← Page d'inscription
+│   │   ├── two-factor/
+│   │   │   └── page.tsx          ← Page 2FA (code OTP)
+│   │   └── forgot-password/
+│   │       └── page.tsx          ← Page mot de passe oublié
+│   │
+│   ├── components/
+│   │   ├── auth/
+│   │   │   ├── AuthHeader.tsx    ← En-tête institutionnel (logo + drapeau + textes)
+│   │   │   └── AuthLayout.tsx    ← Layout partagé : header + carte + footer
+│   │   └── ui/
+│   │       ├── Input.tsx         ← Champ de saisie réutilisable
+│   │       └── Button.tsx        ← Bouton réutilisable (3 variantes)
+│   │
+│   ├── constants/
+│   │   └── auth.ts               ← URLs API et routes app centralisées
+│   │
+│   ├── lib/
+│   │   └── authService.ts        ← Appels API d'authentification
+│   │
+│   └── types/
+│       └── auth.ts               ← Interfaces TypeScript (payloads, réponses)
+│
+├── .env.example                  ← Modèle de variables d'environnement
+├── .eslintrc.json
+├── .gitignore
+├── next.config.js
+├── package.json
+├── postcss.config.js
+└── tsconfig.json
+```
+
+---
+
+## 🖼️ Images à remplacer
+
+| Fichier                        | Description              | Dimensions conseillées |
+|--------------------------------|--------------------------|------------------------|
+| `public/images/minfi-logo.png` | Logo officiel MINFI      | 200 × 200 px (carré)   |
+| `public/images/cameroon-flag.png` | Drapeau PNG officiel  | 300 × 200 px           |
+
+Après remplacement, mettre à jour `src/components/auth/AuthHeader.tsx` :
+```tsx
+// Ligne logo
+src="/images/minfi-logo.png"
+
+// Ligne drapeau
+src="/images/cameroon-flag.png"
+```
+
+---
+
+## 🔌 Intégration back-end
+
+Modifier uniquement `src/constants/auth.ts` ou la variable `.env.local` :
+
+```env
+NEXT_PUBLIC_API_URL=https://api.gbe.minfi.cm/api/v1
+```
+
+### Endpoints attendus
+
+| Méthode | Route                   | Usage                         |
+|---------|-------------------------|-------------------------------|
+| POST    | `/auth/login`           | Connexion                     |
+| POST    | `/auth/register`        | Inscription                   |
+| POST    | `/auth/2fa/verify`      | Vérification OTP              |
+| POST    | `/auth/2fa/resend`      | Renvoi OTP                    |
+| POST    | `/auth/forgot-password` | Demande réinitialisation mdp  |
+| POST    | `/auth/reset-password`  | Nouveau mot de passe          |
+| POST    | `/auth/logout`          | Déconnexion                   |
+| POST    | `/auth/refresh`         | Rafraîchissement du token     |
+
+---
+
+## 🎨 Design
+
+| Élément       | Valeur                                 |
+|---------------|----------------------------------------|
+| Police titres | Playfair Display (serif élégant)       |
+| Police corps  | DM Sans (sans-serif moderne)           |
+| Bleu marine   | `#0D2B55` (couleur principale MINFI)   |
+| Vert drapeau  | `#007A3D`                              |
+| Rouge drapeau | `#CE1126`                              |
+| Jaune drapeau | `#FCD116`                              |
+| Or MINFI      | `#C9A227`                              |
+
+---
+
+## 📋 Scripts disponibles
+
+```bash
+npm run dev        # Serveur de développement (hot reload)
+npm run build      # Build de production
+npm run start      # Démarrer le build de production
+npm run lint       # Vérification ESLint
+npm run type-check # Vérification TypeScript sans compilation
+```
+
+// END OF FILE: README.md
+
+
+// FILE: tsconfig.json
+-----------------------------------------------
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "**/*.mts"
+  ],
+  "exclude": ["node_modules"]
+}
+
+
+// END OF FILE: tsconfig.json
+
