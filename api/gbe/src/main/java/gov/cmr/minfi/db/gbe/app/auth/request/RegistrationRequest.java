@@ -47,13 +47,13 @@ public record RegistrationRequest(
         @Schema(example = "minfi@email.com")
         String confirmPassword,
         @Pattern(
-                regexp = "^\\+?[0-9]{10,13}",
+                regexp = "^\\+?[0-9]{9,13}",
                 message = " VALIDATION.REGISTRATION.PHONE.FORMAT"
         )
         @Schema(example = "+237655555555")
         String phoneNumber,
         String dateOfBirth,
         boolean mfaEnabled
-        
+
 ) {
 }

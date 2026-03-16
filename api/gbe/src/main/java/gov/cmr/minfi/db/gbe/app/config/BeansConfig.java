@@ -34,7 +34,7 @@ public class BeansConfig {
         final CorsConfiguration config = new CorsConfiguration();
 
         // 1. Autoriser les origines spécifiques (Frontend, Swagger, etc.)
-        config.setAllowedOrigins(List.of("http://localhost:3000"));
+        config.setAllowedOrigins(List.of("http://localhost:3000", "https://minfi-application-de-genstion-du-bu.vercel.app/"));
 
         // 2. Autoriser les headers
         config.setAllowedHeaders(Arrays.asList(
