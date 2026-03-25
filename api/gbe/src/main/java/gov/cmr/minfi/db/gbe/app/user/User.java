@@ -99,29 +99,19 @@ public class User implements UserDetails {
     @Column(name = "LAST_MODIFIED_DATE", insertable = false)
     private LocalDateTime lastModifiedAt;
 
-    @ManyToMany(
-            cascade = {CascadeType.MERGE},
-            fetch = FetchType.EAGER
-    )
-    @JoinTable(
-            name = "USERS_ROLES",
-            joinColumns = {@JoinColumn(name = "USERS_ID")},
-            inverseJoinColumns = {@JoinColumn(name = "ROLES_ID")}
-    )
-    private List<Role> roles;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "ROLE_ID")
+    private Role role;
 
     @Transient
     private Set<Permission> grantedPermissions = new HashSet<>();
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         final List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 
-        if (!CollectionUtils.isEmpty(this.roles)) {
-            this.roles.forEach(role ->
-                    authorities.add(new SimpleGrantedAuthority(role.getName()))
-            );
+        if (this.role != null) {
+            authorities.add(new SimpleGrantedAuthority(this.role.getName()));
         }
 
         if (!CollectionUtils.isEmpty(this.grantedPermissions)) {
@@ -132,6 +122,7 @@ public class User implements UserDetails {
 
         return authorities;
     }
+
 
     @Override
     public String getUsername() {

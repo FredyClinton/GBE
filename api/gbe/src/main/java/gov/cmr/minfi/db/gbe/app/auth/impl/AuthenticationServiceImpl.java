@@ -10,6 +10,7 @@ import gov.cmr.minfi.db.gbe.app.auth.dto.response.UserContext;
 import gov.cmr.minfi.db.gbe.app.auth.tfa.TwoFactorAuthenticationService;
 import gov.cmr.minfi.db.gbe.app.common.exception.BusinessException;
 import gov.cmr.minfi.db.gbe.app.common.exception.ErrorCode;
+import gov.cmr.minfi.db.gbe.app.iam.role.RoleSysteme;
 import gov.cmr.minfi.db.gbe.app.security.JwtService;
 import gov.cmr.minfi.db.gbe.app.user.User;
 import gov.cmr.minfi.db.gbe.app.user.UserRepository;
@@ -152,6 +153,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 ).toList();
         return UserContext.builder()
                 .userId(user.getId())
+                .role(RoleSysteme.valueOf(user.getRole().getName().replace("ROLE_", "")))
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())
