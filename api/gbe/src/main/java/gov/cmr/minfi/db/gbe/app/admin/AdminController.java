@@ -1,7 +1,9 @@
 package gov.cmr.minfi.db.gbe.app.admin;
 
 import gov.cmr.minfi.db.gbe.app.admin.dto.CreateUserRequest;
+import gov.cmr.minfi.db.gbe.app.admin.dto.RoleResponse;
 import gov.cmr.minfi.db.gbe.app.admin.dto.UserSummaryResponse;
+import gov.cmr.minfi.db.gbe.app.iam.role.RoleSysteme;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -61,6 +64,19 @@ public class AdminController {
             @PathVariable String userId
     ) {
         adminService.deleteUserAccount(userId);
+    }
+
+    @GetMapping("/users/roles")
+    @ResponseStatus(HttpStatus.OK)
+    public List<RoleResponse> getRoles() {
+        return Arrays.stream(RoleSysteme.values())
+                .map(role -> RoleResponse.builder()
+                        .code(role.name())
+                        .libelle(role.getLibelle())
+                        .defaultPermissions(role.getDefaultPermissions())
+                        .build()
+                )
+                .toList();
     }
 
 

@@ -90,6 +90,7 @@ public class ReferentielController {
                 .toList();
     }
 
+
     private ExerciceResponse toExerciceResponse(Exercice exercice) {
         return ExerciceResponse.builder()
                 .id(exercice.getId())
