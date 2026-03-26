@@ -209,7 +209,9 @@ public class AdminServiceImpl implements AdminService {
                 .mfaEnabled(user.isMfaEnabled())
                 .createdDate(user.getCreatedDate())
                 .affectations(affectationSummaries)
-                .role(RoleSysteme.valueOf(user.getRole().getName().replace("ROLE_", "")))
+                .role(user.getRole() != null
+                        ? RoleSysteme.valueOf(user.getRole().getName().replace("ROLE_", ""))
+                        : null)
                 .build();
     }
 }
