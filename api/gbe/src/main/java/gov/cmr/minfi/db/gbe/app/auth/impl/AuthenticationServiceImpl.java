@@ -50,6 +50,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new BusinessException(ErrorCode.ENTITY_NOT_FOUND, "user not found" + request.email());
         }
 
+        // Generer le MFA token
+        final String mfaToken = jwtService.generateMfaToken(user.getUsername());
         // retourner le QR code si premiere connexion
         if (user.isFirstLogin()) {
             final String secretImageUri = tfaService.generateQrCodeImageUri(
@@ -59,6 +61,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .firstLogin(true)
                     .mfaEnabled(false)
                     .secretImageUri(secretImageUri)
+                    .mfaToken(mfaToken)
                     .build();
         }
 
@@ -66,15 +69,32 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return AuthenticationResponse.builder()
                 .firstLogin(false)
                 .mfaEnabled(true)
+                .mfaToken(mfaToken)
                 .build();
     }
 
 
     @Override
     public AuthenticationResponse verifyCode(VerificationRequest request) {
+
+        // Valider le MFA token
+        final String usernameFromToken;
+        try {
+            usernameFromToken = jwtService.extractUsernameFromMfaToken(request.mfaToken());
+        } catch (Exception e) {
+            throw new BusinessException(ErrorCode.INVALID_MFA_TOKEN);
+        }
+
+        // Verifier le username dans le token
+        if (!usernameFromToken.equalsIgnoreCase(request.email())) {
+            throw new BusinessException(ErrorCode.INVALID_MFA_TOKEN);
+        }
+
+
         final User user = userRepository.findByEmailIgnoreCase(request.email())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, request.email()));
 
+        // Valider le code TOTP
         if (tfaService.isNonOtpValid(user.getSecret(), request.code())) {
             throw new BusinessException(ErrorCode.BAD_CREDENTIALS);
         }
@@ -84,6 +104,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     @Transactional
     public AuthenticationResponse setupMfa(SetupMfaRequest request) {
+
+        // Valider le MFA token — si invalide ou expiré on rejette
+        final String usernameFromToken;
+        try {
+            usernameFromToken = jwtService.extractUsernameFromMfaToken(request.mfaToken());
+        } catch (Exception e) {
+            throw new BusinessException(ErrorCode.INVALID_MFA_TOKEN);
+        }
+
+        // Vérifier que l'email correspond au token
+        if (!usernameFromToken.equalsIgnoreCase(request.email())) {
+            throw new BusinessException(ErrorCode.INVALID_MFA_TOKEN);
+        }
+
+
         final User user = userRepository.findByEmailIgnoreCase(request.email())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, request.email()));
 
@@ -153,7 +188,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 ).toList();
         return UserContext.builder()
                 .userId(user.getId())
-                .role(RoleSysteme.valueOf(user.getRole().getName().replace("ROLE_", "")))
+                .role(user.getRole() != null
+                        ? RoleSysteme.valueOf(user.getRole().getName().replace("ROLE_", ""))
+                        : null)
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())

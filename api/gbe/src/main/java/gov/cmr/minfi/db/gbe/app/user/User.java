@@ -104,6 +104,7 @@ public class User implements UserDetails {
     private Role role;
 
     @Transient
+    @Builder.Default
     private Set<Permission> grantedPermissions = new HashSet<>();
 
     @Override
