@@ -8,4 +8,8 @@ public interface ProgrammeRepository extends JpaRepository<Programme, String> {
     List<Programme> findBySectionId(String sectionId);
 
     List<Programme> findBySectionIdAndActifTrue(String sectionId);
+
+    List<Programme> findBySectionIdAndExerciceIdAndActifTrue(
+            String sectionId, String exerciceId
+    );
 }
