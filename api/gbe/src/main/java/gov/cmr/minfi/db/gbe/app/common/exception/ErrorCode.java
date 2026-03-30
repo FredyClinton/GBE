@@ -38,7 +38,7 @@ public enum ErrorCode {
             "New CP amount cannot be less than already consumed amount", BAD_REQUEST),
     INVALID_MFA_TOKEN("INVALID_MFA_TOKEN", "Invalid or expired MFA token", UNAUTHORIZED),
     MFA_TOKEN_EXPIRED("MFA_TOKEN_EXPIRED", "MFA token has expired, please login again", UNAUTHORIZED),
-    ;
+    CHAPITRE_CYCLE_DETECTED("CHAPITRE_CYCLE_DETECTED", "This requete may create a chapter cycle", BAD_REQUEST);
 
     private final String code;
     private final String defaultMessage;

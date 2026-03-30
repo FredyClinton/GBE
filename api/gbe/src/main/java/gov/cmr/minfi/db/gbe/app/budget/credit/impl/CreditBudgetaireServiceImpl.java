@@ -59,6 +59,14 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
         // verifier que ce credit n'est pas encore creer
         validateImputationUniqueness(request);
 
+        // Verification du credit parent
+        CreditBudgetaire creditParent = null;
+        if (request.creditParentId() != null) {
+            creditParent = creditBudgetaireRepository.findById(request.creditParentId())
+                    .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, request.creditParentId()));
+            validateNoCreditCycle(request.creditParentId());
+        }
+
         // calculer le code d'imputation
         final String codeImputation = buildImputationCode(exercice, section,
                 programme, action, chapitre);
@@ -72,11 +80,29 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
                 .codeImputation(codeImputation)
                 .montantAE(request.montantAE())
                 .montantCP(request.montantCP())
+                .creditParent(creditParent)
                 .build();
 
         creditBudgetaireRepository.save(credit);
         log.info("Credit budgetaire created {} ", codeImputation);
         return toResponse(credit);
+    }
+
+    private void validateNoCreditCycle(String creditParentId) {
+        // On verifie que le creditr parent n'est pas lui-même enfant
+        final List<String> ancestorsId = creditBudgetaireRepository.findAllAncestorCreditIds(creditParentId);
+
+    }
+
+    private void validateNoChapitreParentCycle(String chapitreId, String proposedParentId) {
+        if (chapitreId.equals(proposedParentId)) {
+            throw new BusinessException(ErrorCode.CHAPITRE_CYCLE_DETECTED);
+
+        }
+        final List<String> ancestorsIds = chapitreRepository.findAllAncestorIds(proposedParentId);
+        if (ancestorsIds.contains(chapitreId)) {
+            throw new BusinessException(ErrorCode.CHAPITRE_CYCLE_DETECTED);
+        }
     }
 
     @Override
@@ -267,6 +293,11 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
                 .sectionCode(credit.getSection().getCodeSection())
                 .programmeId(credit.getProgramme().getId())
                 .programmeLibelle(credit.getProgramme().getLibelleFr())
+                // Tutelle du chapitre
+                .chapitreTutelleId(credit.getChapitre().getChapitreParent() != null
+                        ? credit.getChapitre().getChapitreParent().getId() : null)
+                .chapitreTutelleLibelle(credit.getChapitre().getChapitreParent() != null
+                        ? credit.getChapitre().getChapitreParent().getLibelleFr() : null)
                 .programmeCode(credit.getProgramme().getCode())
                 .actionId(credit.getAction().getId())
                 .actionLibelle(credit.getAction().getLibelleFr())
@@ -279,6 +310,11 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
                 .montantCPConsomme(credit.getMontantCPConsomme())
                 .montantCPDisponible(credit.getMontantCPDisponible())
                 .statut(credit.getStatut())
+                // AE pluriannuelle
+                .creditParentId(credit.getCreditParent() != null
+                        ? credit.getCreditParent().getId() : null)
+                .creditParentCodeImputation(credit.getCreditParent() != null
+                        ? credit.getCreditParent().getCodeImputation() : null)
                 .createdDate(credit.getCreatedDate())
                 .build();
     }

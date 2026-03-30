@@ -72,4 +72,22 @@ public interface CreditBudgetaireRepository extends JpaRepository<CreditBudgetai
             )
             """)
     List<CreditBudgetaire> findActifsByExerciceId(@Param("exerciceId") String exerciceId);
+
+    // Tous les credits enfants d'un credit parent
+    List<CreditBudgetaire> findByCreditParentId(String creditParentId);
+
+    // Tout le chaine d'un credit pluriannuel
+    @Query(value = """
+            WITH RECURSIVE chaine_ae AS (
+                SELECT id, credit_parent_id
+                FROM credit_budgetaire
+                WHERE id = :creditId
+                UNION ALL
+                SELECT c.id, c.credit_parent_id
+                FROM credit_budgetaire c
+                INNER JOIN chaine_ae ca ON c.id = ca.credit_parent_id
+            )
+            SELECT id FROM chaine_ae
+            """, nativeQuery = true)
+    List<String> findAllAncestorCreditIds(@Param("creditId") String creditId);
 }

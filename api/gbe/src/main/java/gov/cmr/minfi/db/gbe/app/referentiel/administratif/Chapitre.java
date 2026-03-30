@@ -3,7 +3,10 @@ package gov.cmr.minfi.db.gbe.app.referentiel.administratif;
 import gov.cmr.minfi.db.gbe.app.common.audit.BaseEntity;
 import gov.cmr.minfi.db.gbe.app.referentiel.geo.Arrondissement;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
@@ -41,6 +44,12 @@ public class Chapitre extends BaseEntity {
 
     @Column(name = "LIBELLE_EN", nullable = false)
     private String libelleEn;
+
+
+    // tutelle administrative
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CHAPITRE_TUTELLE_ID")
+    private Chapitre chapitreParent;
 
     @PrePersist
     @PreUpdate

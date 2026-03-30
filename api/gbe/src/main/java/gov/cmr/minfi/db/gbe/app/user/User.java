@@ -1,5 +1,6 @@
 package gov.cmr.minfi.db.gbe.app.user;
 
+import gov.cmr.minfi.db.gbe.app.agent.Agent;
 import gov.cmr.minfi.db.gbe.app.iam.permission.Permission;
 import gov.cmr.minfi.db.gbe.app.iam.role.Role;
 import jakarta.persistence.*;
@@ -102,6 +103,11 @@ public class User implements UserDetails {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ROLE_ID")
     private Role role;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "AGENT_ID", unique = true)
+    private Agent agent;
+
 
     @Transient
     @Builder.Default

@@ -34,9 +34,7 @@ import java.math.BigDecimal;
 public class CreditBudgetaire extends BaseEntity
         implements AEManageable, CPManageable, StatutTransitionable {
 
-    // ================================================
     // Classification administrative
-    // ================================================
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "EXERCICE_ID", nullable = false)
     private Exercice exercice;
@@ -93,6 +91,13 @@ public class CreditBudgetaire extends BaseEntity
     @Column(name = "STATUT", nullable = false)
     @Builder.Default
     private StatutCredit statut = StatutCredit.CANTONNE;
+
+    // reference AE plurianuelle (auto-reference)
+    // nullable = AE annuelle normale
+    // non-null = ce credit prolonge l'AE d'un exercice precedent
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CREDIT_PARENT_ID")
+    private CreditBudgetaire creditParent;
 
 
     // Calcul automatique des disponibles à la création
@@ -175,5 +180,9 @@ public class CreditBudgetaire extends BaseEntity
             throw new IllegalStateException("Seul un crédit cantonné peut être engagé");
         }
         this.statut = StatutCredit.ENGAGE;
+    }
+
+    public boolean isAEPlurianuelle() {
+        return this.creditParent != null;
     }
 }

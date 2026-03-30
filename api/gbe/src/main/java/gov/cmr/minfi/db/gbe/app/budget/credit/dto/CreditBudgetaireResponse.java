@@ -27,6 +27,10 @@ public record CreditBudgetaireResponse(
         String chapitreId,
         String chapitreLibelle,
 
+        // Tutelle du chapitre (null si chapitre racine)
+        String chapitreTutelleId,
+        String chapitreTutelleLibelle,
+
         // Montants AE
         BigDecimal montantAE,
         BigDecimal montantAEConsomme,
@@ -39,6 +43,10 @@ public record CreditBudgetaireResponse(
 
         // Statut
         StatutCredit statut,
+
+        // AE plurianuelle (null si AE annuelle)
+        String creditParentId,
+        String creditParentCodeImputation,
 
         // Audit
         LocalDate createdDate

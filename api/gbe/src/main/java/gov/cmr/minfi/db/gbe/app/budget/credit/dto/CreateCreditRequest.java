@@ -30,6 +30,9 @@ public record CreateCreditRequest(
 
         @NotNull(message = "VALIDATION.CREDIT.MONTANT_CP.NOT_NULL")
         @DecimalMin(value = "0.00", message = "VALIDATION.CREDIT.MONTANT_CP.MIN")
-        BigDecimal montantCP
+        BigDecimal montantCP,
+        
+        //Nullable
+        String creditParentId
 ) {
 }
