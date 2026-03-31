@@ -1,27 +1,31 @@
 package gov.cmr.minfi.db.gbe.app.iam.permission;
 
 public enum Permission {
-    // Ordonateur
+
+    // ── Ordonnateur ───────────────────────────────────
     ENGAGE_DEPENSE("Engager une dépense"),
-    REVISER_AE("Rèviser les AE"),
+    REVISER_AE("Réviser les AE"),
     REVISER_CP("Réviser les CP"),
     REJETER_DEPENSE("Rejeter une dépense"),
 
-    // Controleur financier
+    // ── Contrôleur financier ──────────────────────────
     VISA_CFI("Viser une dépense"),
     REJETER_CFI("Rejeter au niveau CFI"),
 
-    // Comptable
-    LIQUIDER_DEPENSE("Liquider une depense"),
+    // ── Comptable ─────────────────────────────────────
+    LIQUIDER_DEPENSE("Liquider une dépense"),
     PAYER_DEPENSE("Payer une dépense"),
 
-    // Admin
+    // ── Admin ─────────────────────────────────────────
     MANAGE_USERS("Gérer les utilisateurs"),
-    MANAGE_AFFECTATIONS("Gérer les affectations");
+    MANAGE_AFFECTATIONS("Gérer les mandats"),
 
-    private  final String libelle;
+    // ── Lecture seule (Gestionnaire) ──────────────────
+    CONSULTER("Consulter les crédits et dépenses");
 
-    Permission(String libelle){
+    private final String libelle;
+
+    Permission(String libelle) {
         this.libelle = libelle;
     }
 

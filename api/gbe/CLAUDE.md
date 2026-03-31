@@ -1387,8 +1387,8 @@ import gov.cmr.minfi.db.gbe.app.admin.AdminService;
 import gov.cmr.minfi.db.gbe.app.admin.dto.AffectationSummary;
 import gov.cmr.minfi.db.gbe.app.admin.dto.CreateUserRequest;
 import gov.cmr.minfi.db.gbe.app.admin.dto.UserSummaryResponse;
-import gov.cmr.minfi.db.gbe.app.affectation.UserAffectation;
-import gov.cmr.minfi.db.gbe.app.affectation.UserAffectationRepository;
+import gov.cmr.minfi.db.gbe.app.mandat.UserAffectation;
+import gov.cmr.minfi.db.gbe.app.mandat.MandatRepository;
 import gov.cmr.minfi.db.gbe.app.auth.tfa.TwoFactorAuthenticationService;
 import gov.cmr.minfi.db.gbe.app.common.exception.BusinessException;
 import gov.cmr.minfi.db.gbe.app.common.exception.ErrorCode;
@@ -1591,11 +1591,11 @@ private final UserAffectationRepository userAffectationRepository;
 //---> PATH:
 /home/therooster/Documents/FORMATIONS/MINFI-Application-de-Genstion-du-Budget/api/gbe/src/main/java/gov/cmr/minfi/db/gbe/app/affectation/AffectationController.java
 
-package gov.cmr.minfi.db.gbe.app.affectation;
+package gov.cmr.minfi.db.gbe.app.mandat;
 
 import gov.cmr.minfi.db.gbe.app.admin.dto.AffectationSummary;
-import gov.cmr.minfi.db.gbe.app.affectation.dto.AffectationRequest;
-import gov.cmr.minfi.db.gbe.app.affectation.dto.UpdateRoleRequest;
+import gov.cmr.minfi.db.gbe.app.mandat.dto.CreateMandatRequest;
+import gov.cmr.minfi.db.gbe.app.mandat.dto.UpdateRoleRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -1673,10 +1673,10 @@ public class AffectationController {
 //---> PATH:
 /home/therooster/Documents/FORMATIONS/MINFI-Application-de-Genstion-du-Budget/api/gbe/src/main/java/gov/cmr/minfi/db/gbe/app/affectation/AffectationService.java
 
-package gov.cmr.minfi.db.gbe.app.affectation;
+package gov.cmr.minfi.db.gbe.app.mandat;
 
 import gov.cmr.minfi.db.gbe.app.admin.dto.AffectationSummary;
-import gov.cmr.minfi.db.gbe.app.affectation.dto.AffectationRequest;
+import gov.cmr.minfi.db.gbe.app.mandat.dto.CreateMandatRequest;
 import gov.cmr.minfi.db.gbe.app.iam.role.RoleSysteme;
 
 import java.util.List;
@@ -1700,7 +1700,7 @@ AffectationSummary addAffectation(String userId, AffectationRequest request);
 //---> PATH:
 /home/therooster/Documents/FORMATIONS/MINFI-Application-de-Genstion-du-Budget/api/gbe/src/main/java/gov/cmr/minfi/db/gbe/app/affectation/dto/AffectationRequest.java
 
-package gov.cmr.minfi.db.gbe.app.affectation.dto;
+package gov.cmr.minfi.db.gbe.app.mandat.dto;
 
 import gov.cmr.minfi.db.gbe.app.iam.role.RoleSysteme;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -1722,7 +1722,7 @@ String programmeId,
 //---> PATH:
 /home/therooster/Documents/FORMATIONS/MINFI-Application-de-Genstion-du-Budget/api/gbe/src/main/java/gov/cmr/minfi/db/gbe/app/affectation/dto/UpdateRoleRequest.java
 
-package gov.cmr.minfi.db.gbe.app.affectation.dto;
+package gov.cmr.minfi.db.gbe.app.mandat.dto;
 
 import gov.cmr.minfi.db.gbe.app.iam.role.RoleSysteme;
 import jakarta.validation.constraints.NotNull;
@@ -1737,13 +1737,13 @@ RoleSysteme roleSysteme
 //---> PATH:
 /home/therooster/Documents/FORMATIONS/MINFI-Application-de-Genstion-du-Budget/api/gbe/src/main/java/gov/cmr/minfi/db/gbe/app/affectation/impl/AffectationServiceImpl.java
 
-package gov.cmr.minfi.db.gbe.app.affectation.impl;
+package gov.cmr.minfi.db.gbe.app.mandat.impl;
 
 import gov.cmr.minfi.db.gbe.app.admin.dto.AffectationSummary;
-import gov.cmr.minfi.db.gbe.app.affectation.AffectationService;
-import gov.cmr.minfi.db.gbe.app.affectation.UserAffectation;
-import gov.cmr.minfi.db.gbe.app.affectation.UserAffectationRepository;
-import gov.cmr.minfi.db.gbe.app.affectation.dto.AffectationRequest;
+import gov.cmr.minfi.db.gbe.app.mandat.MandatService;
+import gov.cmr.minfi.db.gbe.app.mandat.UserAffectation;
+import gov.cmr.minfi.db.gbe.app.mandat.MandatRepository;
+import gov.cmr.minfi.db.gbe.app.mandat.dto.CreateMandatRequest;
 import gov.cmr.minfi.db.gbe.app.common.exception.BusinessException;
 import gov.cmr.minfi.db.gbe.app.common.exception.ErrorCode;
 import gov.cmr.minfi.db.gbe.app.iam.role.RoleSysteme;
@@ -1896,7 +1896,7 @@ private final ProgrammeRepository programmeRepository;
 //---> PATH:
 /home/therooster/Documents/FORMATIONS/MINFI-Application-de-Genstion-du-Budget/api/gbe/src/main/java/gov/cmr/minfi/db/gbe/app/affectation/UserAffectation.java
 
-package gov.cmr.minfi.db.gbe.app.affectation;
+package gov.cmr.minfi.db.gbe.app.mandat;
 
 import gov.cmr.minfi.db.gbe.app.common.audit.BaseEntity;
 import gov.cmr.minfi.db.gbe.app.iam.permission.Permission;
@@ -1974,7 +1974,7 @@ public class UserAffectation extends BaseEntity {
 //---> PATH:
 /home/therooster/Documents/FORMATIONS/MINFI-Application-de-Genstion-du-Budget/api/gbe/src/main/java/gov/cmr/minfi/db/gbe/app/affectation/UserAffectationRepository.java
 
-package gov.cmr.minfi.db.gbe.app.affectation;
+package gov.cmr.minfi.db.gbe.app.mandat;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -2288,8 +2288,8 @@ List<AffectationContext> affectations
 
 package gov.cmr.minfi.db.gbe.app.auth.impl;
 
-import gov.cmr.minfi.db.gbe.app.affectation.UserAffectation;
-import gov.cmr.minfi.db.gbe.app.affectation.UserAffectationRepository;
+import gov.cmr.minfi.db.gbe.app.mandat.UserAffectation;
+import gov.cmr.minfi.db.gbe.app.mandat.MandatRepository;
 import gov.cmr.minfi.db.gbe.app.auth.AuthenticationService;
 import gov.cmr.minfi.db.gbe.app.auth.dto.request.*;
 import gov.cmr.minfi.db.gbe.app.auth.dto.response.AffectationContext;
@@ -2871,8 +2871,8 @@ public class BeansConfig {
 
 package gov.cmr.minfi.db.gbe.app.common.config;
 
-import gov.cmr.minfi.db.gbe.app.affectation.UserAffectation;
-import gov.cmr.minfi.db.gbe.app.affectation.UserAffectationRepository;
+import gov.cmr.minfi.db.gbe.app.mandat.UserAffectation;
+import gov.cmr.minfi.db.gbe.app.mandat.MandatRepository;
 import gov.cmr.minfi.db.gbe.app.auth.tfa.TwoFactorAuthenticationService;
 import gov.cmr.minfi.db.gbe.app.exercice.Exercice;
 import gov.cmr.minfi.db.gbe.app.exercice.ExerciceRepository;
@@ -4888,7 +4888,7 @@ public class SecurityConfig {
 
 package gov.cmr.minfi.db.gbe.app.user.impl;
 
-import gov.cmr.minfi.db.gbe.app.affectation.UserAffectationRepository;
+import gov.cmr.minfi.db.gbe.app.mandat.MandatRepository;
 import gov.cmr.minfi.db.gbe.app.common.exception.BusinessException;
 import gov.cmr.minfi.db.gbe.app.common.exception.ErrorCode;
 import gov.cmr.minfi.db.gbe.app.iam.permission.Permission;

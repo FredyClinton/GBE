@@ -2,6 +2,7 @@ package gov.cmr.minfi.db.gbe.app.admin.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import gov.cmr.minfi.db.gbe.app.iam.role.RoleSysteme;
+import gov.cmr.minfi.db.gbe.app.mandat.dto.MandatSummary;
 import lombok.Builder;
 
 import java.time.LocalDate;
@@ -23,8 +24,10 @@ public record UserSummaryResponse(
         boolean mfaEnabled,
         LocalDate createdDate,
         RoleSysteme role,
+        String agentId,
+        LocalDate dateOfBirth,
 
-        List<AffectationSummary> affectations
+        List<MandatSummary> mandats
 
 ) {
 }

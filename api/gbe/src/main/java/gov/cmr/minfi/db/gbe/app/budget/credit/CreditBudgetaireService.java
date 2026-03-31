@@ -22,13 +22,14 @@ public interface CreditBudgetaireService {
 
     void updateCP(String creditId, UpdateCreditBudgetaireRequest request);
 
-    void commitCredit(String creditId);
 
-    void freezeCredit(String creditId);
+    void engagerCredit(String creditId);
 
-    void unfreezeCredit(String creditId);
+    void suspendreCredit(String creditId);
 
-    void closeCredit(String creditId);
+    void debloquerCredit(String creditId);
 
-    void cancelCredit(String creditId);
+    void solderCredit(String creditId);
+
+    void annulerCredit(String creditId);
 }

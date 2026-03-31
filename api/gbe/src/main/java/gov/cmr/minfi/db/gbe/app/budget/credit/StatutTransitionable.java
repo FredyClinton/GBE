@@ -1,7 +1,7 @@
 package gov.cmr.minfi.db.gbe.app.budget.credit;
 
 public interface StatutTransitionable {
-    void bloquer();
+    void suspendre();
 
     void debloquer();
 
@@ -10,4 +10,5 @@ public interface StatutTransitionable {
     void solder();
 
     void engager();
+
 }

@@ -1,4 +1,4 @@
-package gov.cmr.minfi.db.gbe.app.affectation;
+package gov.cmr.minfi.db.gbe.app.mandat;
 
 import gov.cmr.minfi.db.gbe.app.common.audit.BaseEntity;
 import gov.cmr.minfi.db.gbe.app.iam.permission.Permission;
@@ -10,6 +10,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,13 +21,13 @@ import java.util.Set;
 @AllArgsConstructor
 @SuperBuilder
 @Table(
-        name = "USER_AFFECTATIONS",
+        name = "MANDAT",
         uniqueConstraints = @UniqueConstraint(
-                name = "uk_affectation_user_programme",
+                name = "uk_mandat_user_programme",
                 columnNames = {"USER_ID", "PROGRAMME_ID"}
         )
 )
-public class UserAffectation extends BaseEntity {
+public class Mandat extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID", nullable = false)
@@ -49,13 +50,22 @@ public class UserAffectation extends BaseEntity {
     // Peuvent être surchargées par l'admin
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
-            name = "AFFECTATION_PERMISSIONS",
-            joinColumns = @JoinColumn(name = "AFFECTATION_ID")
+            name = "MANDAT_PERMISSIONS",
+            joinColumns = @JoinColumn(name = "MANDAT_ID")
     )
     @Enumerated(EnumType.STRING)
     @Column(name = "PERMISSION")
     @Builder.Default
     private Set<Permission> permissions = new HashSet<>();
+
+    @Column(name = "START_MANDAT")
+    private LocalDate dateDebut;
+
+    @Column(name = "END_MANDAT")
+    private LocalDate dateFin;
+
+    @Column(name = "NUMERO_DECISION", length = 100)
+    private String numeroDecision;
 
     @Column(name = "ACTIF", nullable = false)
     @Builder.Default
@@ -66,8 +76,26 @@ public class UserAffectation extends BaseEntity {
         this.permissions = new HashSet<>(this.roleSysteme.getDefaultPermissions());
     }
 
-    // Vérifie si cette affectation donne accès à une permission donnée
+    // Vérifie si cette mandat donne accès à une permission donnée
     public boolean hasPermission(Permission permission) {
         return this.actif && this.permissions.contains(permission);
+    }
+
+    public boolean isValide() {
+        if (!this.actif) {
+            return false;
+        }
+        final LocalDate today = LocalDate.now();
+        if (this.dateDebut != null && today.isBefore(this.dateDebut)) {
+            return false;
+        }
+        if (this.dateFin != null && today.isAfter(this.dateFin)) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isSectionOnly() {
+        return this.section == null;
     }
 }

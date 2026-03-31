@@ -1,16 +1,16 @@
 package gov.cmr.minfi.db.gbe.app.auth.impl;
 
-import gov.cmr.minfi.db.gbe.app.affectation.UserAffectation;
-import gov.cmr.minfi.db.gbe.app.affectation.UserAffectationRepository;
 import gov.cmr.minfi.db.gbe.app.auth.AuthenticationService;
 import gov.cmr.minfi.db.gbe.app.auth.dto.request.*;
-import gov.cmr.minfi.db.gbe.app.auth.dto.response.AffectationContext;
 import gov.cmr.minfi.db.gbe.app.auth.dto.response.AuthenticationResponse;
+import gov.cmr.minfi.db.gbe.app.auth.dto.response.MandatContext;
 import gov.cmr.minfi.db.gbe.app.auth.dto.response.UserContext;
 import gov.cmr.minfi.db.gbe.app.auth.tfa.TwoFactorAuthenticationService;
 import gov.cmr.minfi.db.gbe.app.common.exception.BusinessException;
 import gov.cmr.minfi.db.gbe.app.common.exception.ErrorCode;
 import gov.cmr.minfi.db.gbe.app.iam.role.RoleSysteme;
+import gov.cmr.minfi.db.gbe.app.mandat.Mandat;
+import gov.cmr.minfi.db.gbe.app.mandat.MandatRepository;
 import gov.cmr.minfi.db.gbe.app.security.JwtService;
 import gov.cmr.minfi.db.gbe.app.user.User;
 import gov.cmr.minfi.db.gbe.app.user.UserRepository;
@@ -33,7 +33,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final TwoFactorAuthenticationService tfaService;
     private final UserRepository userRepository;
     private final JwtService jwtService;
-    private final UserAffectationRepository userAffectationRepository;
+    private final MandatRepository mandatRepository;
 
 
     @Override
@@ -159,7 +159,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     private AuthenticationResponse buildResponse(User user) {
-        final List<UserAffectation> affectations = userAffectationRepository.findByUserIdAndActifTrue(user.getId());
+        final List<Mandat> mandats = mandatRepository.findMandatsValidesParUser(user.getId());
 
         return AuthenticationResponse.builder()
                 .accessToken(jwtService.generateAccessToken(user.getUsername()))
@@ -167,14 +167,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .tokenType("Bearer")
                 .firstLogin(false)
                 .mfaEnabled(true)
-                .userContext(buildUserContext(user, affectations))
+                .userContext(buildUserContext(user, mandats))
                 .build();
     }
 
-    private UserContext buildUserContext(User user, List<UserAffectation> affectations) {
-        final List<AffectationContext> affectationsContext = affectations.stream()
-                .map(affectation -> AffectationContext.builder()
-                        .affectationId(affectation.getId())
+    private UserContext buildUserContext(User user, List<Mandat> mandats) {
+        final List<MandatContext> affectationsContext = mandats.stream()
+                .map(affectation -> MandatContext.builder()
+                        .mandatId(affectation.getId())
                         .roleSysteme(affectation.getRoleSysteme())
                         .sectionId(affectation.getSection().getId())
                         .sectionLibelle(affectation.getSection().getLibelleFr())
@@ -194,7 +194,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())
-                .affectations(affectationsContext)
+                .mandats(affectationsContext)
                 .build();
     }
 }

@@ -159,7 +159,7 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
 
     @Override
     @Transactional
-    public void commitCredit(String creditId) {
+    public void engagerCredit(String creditId) {
         final CreditBudgetaire credit = findCredit(creditId);
         credit.engager();
         creditBudgetaireRepository.save(credit);
@@ -168,16 +168,16 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
 
     @Override
     @Transactional
-    public void freezeCredit(String creditId) {
+    public void suspendreCredit(String creditId) {
         final CreditBudgetaire credit = findCredit(creditId);
-        credit.bloquer();
+        credit.suspendre();
         creditBudgetaireRepository.save(credit);
 
     }
 
     @Override
     @Transactional
-    public void unfreezeCredit(String creditId) {
+    public void debloquerCredit(String creditId) {
         final CreditBudgetaire credit = findCredit(creditId);
         credit.debloquer();
         creditBudgetaireRepository.save(credit);
@@ -187,7 +187,7 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
 
     @Override
     @Transactional
-    public void closeCredit(String creditId) {
+    public void solderCredit(String creditId) {
         final CreditBudgetaire credit = findCredit(creditId);
         credit.solder();
         creditBudgetaireRepository.save(credit);
@@ -198,7 +198,7 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
 
     @Override
     @Transactional
-    public void cancelCredit(String creditId) {
+    public void annulerCredit(String creditId) {
         final CreditBudgetaire credit = findCredit(creditId);
         credit.annuler();
         creditBudgetaireRepository.save(credit);

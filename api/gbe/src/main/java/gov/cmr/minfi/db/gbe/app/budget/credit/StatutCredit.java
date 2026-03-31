@@ -2,9 +2,9 @@ package gov.cmr.minfi.db.gbe.app.budget.credit;
 
 public enum StatutCredit {
     CANTONNE,
-    OUVERT, SUSPENDU, LIQUIDER, //TODO : FAIRE UNE NOUVELLE ETATE IMPLEMENTATION
+    DISPONIBLE,
     ENGAGE,
-    BLOQUE,
-    SOLDE,
-    ANNULE
+    SUSPENDU,
+    ANNULE,
+    SOLDE
 }

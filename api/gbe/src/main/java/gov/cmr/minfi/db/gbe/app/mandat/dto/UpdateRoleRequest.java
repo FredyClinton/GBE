@@ -1,4 +1,4 @@
-package gov.cmr.minfi.db.gbe.app.affectation.dto;
+package gov.cmr.minfi.db.gbe.app.mandat.dto;
 
 import gov.cmr.minfi.db.gbe.app.iam.role.RoleSysteme;
 import jakarta.validation.constraints.NotNull;

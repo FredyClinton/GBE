@@ -15,7 +15,7 @@ public record UserContext(
         String nui,
         String cni,
         RoleSysteme role,
-        List<AffectationContext> affectations
+        List<MandatContext> mandats
 ) {
 
 }

@@ -38,7 +38,43 @@ public enum ErrorCode {
             "New CP amount cannot be less than already consumed amount", BAD_REQUEST),
     INVALID_MFA_TOKEN("INVALID_MFA_TOKEN", "Invalid or expired MFA token", UNAUTHORIZED),
     MFA_TOKEN_EXPIRED("MFA_TOKEN_EXPIRED", "MFA token has expired, please login again", UNAUTHORIZED),
-    CHAPITRE_CYCLE_DETECTED("CHAPITRE_CYCLE_DETECTED", "This requete may create a chapter cycle", BAD_REQUEST);
+    CHAPITRE_CYCLE_DETECTED("CHAPITRE_CYCLE_DETECTED", "This requete may create a chapter cycle", BAD_REQUEST),
+    TRANSITION_STATUT_INVALIDE(
+            "TRANSITION_STATUT_INVALIDE",
+            "Transition invalide depuis le statut %s vers %s : %s",
+            BAD_REQUEST
+    ),
+    MONTANT_AE_INSUFFISANT(
+            "MONTANT_AE_INSUFFISANT",
+            "Le montant AE disponible est insuffisant pour cette opération",
+            BAD_REQUEST
+    ),
+    MONTANT_CP_INSUFFISANT(
+            "MONTANT_CP_INSUFFISANT",
+            "Le montant CP disponible est insuffisant pour cette opération",
+            BAD_REQUEST
+    ),
+    MANDAT_ALREADY_EXISTS(
+            "MANDAT_ALREADY_EXISTS",
+            "Un mandat existe déjà pour cet utilisateur sur ce périmètre",
+            BAD_REQUEST
+    ),
+    MANDAT_NOT_FOUND(
+            "MANDAT_NOT_FOUND",
+            "Mandat non trouvé pour cet utilisateur : %s",
+            NOT_FOUND
+    ),
+    MANDAT_ALREADY_ACTIVE(
+            "MANDAT_ALREADY_ACTIVE",
+            "Ce mandat est déjà actif",
+            BAD_REQUEST
+    ),
+    MANDAT_ALREADY_INACTIVE(
+            "MANDAT_ALREADY_INACTIVE",
+            "Ce mandat est déjà inactif",
+            BAD_REQUEST
+    ),
+    USER_ALREADY_EXISTS_FOR_AGENT("USER_ALREADY_EXISTS_FOR_AGENT", "USER_ALREADY_EXISTS_FOR_AGENT", BAD_REQUEST);
 
     private final String code;
     private final String defaultMessage;

@@ -96,16 +96,16 @@ public class CreditBudgetaireController {
     public void engagerCredit(
             @PathVariable String creditId
     ) {
-        creditBudgetaireService.commitCredit(creditId);
+        creditBudgetaireService.engagerCredit(creditId);
     }
 
-    @PatchMapping("/{creditId}/bloquer")
+    @PatchMapping("/{creditId}/suspendre")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('REVISER_AE')")
-    public void bloquerCredit(
+    public void suspendreCredit(
             @PathVariable String creditId
     ) {
-        creditBudgetaireService.freezeCredit(creditId);
+        creditBudgetaireService.suspendreCredit(creditId);
     }
 
     @PatchMapping("/{creditId}/debloquer")
@@ -114,7 +114,7 @@ public class CreditBudgetaireController {
     public void debloquerCredit(
             @PathVariable String creditId
     ) {
-        creditBudgetaireService.unfreezeCredit(creditId);
+        creditBudgetaireService.debloquerCredit(creditId);
     }
 
     @PatchMapping("/{creditId}/solder")
@@ -123,7 +123,7 @@ public class CreditBudgetaireController {
     public void solderCredit(
             @PathVariable String creditId
     ) {
-        creditBudgetaireService.closeCredit(creditId);
+        creditBudgetaireService.solderCredit(creditId);
     }
 
     @PatchMapping("/{creditId}/annuler")
@@ -132,6 +132,6 @@ public class CreditBudgetaireController {
     public void annulerCredit(
             @PathVariable String creditId
     ) {
-        creditBudgetaireService.cancelCredit(creditId);
+        creditBudgetaireService.annulerCredit(creditId);
     }
 }

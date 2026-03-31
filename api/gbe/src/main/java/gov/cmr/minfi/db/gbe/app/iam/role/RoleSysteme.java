@@ -15,37 +15,38 @@ public enum RoleSysteme {
             );
         }
     },
-    ORDONNATEUR_PRINCIPAL("Ordonnateur principal") {
+
+    // ── Fusion des 3 anciens ordonnateurs ─────────────
+    // Le scope (section/programme/chapitre) est porté par le Mandat
+    ORDONNATEUR("Ordonnateur") {
+        @Override
+        public Set<Permission> getDefaultPermissions() {
+            return Set.of(
+                    Permission.ENGAGE_DEPENSE,
+                    Permission.REVISER_AE,
+                    Permission.REVISER_CP
+            );
+        }
+    },
+
+    // ── Nouveau : vue section entière ─────────────────
+    // Art. 66 al.2 — chef de département ministériel
+    MINISTRE("Ministre") {
         @Override
         public Set<Permission> getDefaultPermissions() {
             return Set.of(
                     Permission.ENGAGE_DEPENSE,
                     Permission.REVISER_AE,
                     Permission.REVISER_CP,
-                    Permission.REJETER_DEPENSE
+                    Permission.REJETER_DEPENSE,
+                    Permission.MANAGE_USERS,
+                    Permission.MANAGE_AFFECTATIONS
             );
         }
     },
-    ORDONNATEUR_SECONDAIRE("Ordonnateur secondaire") {
-        @Override
-        public Set<Permission> getDefaultPermissions() {
-            return Set.of(
-                    Permission.ENGAGE_DEPENSE,
-                    Permission.REVISER_AE,
-                    Permission.REVISER_CP,
-                    Permission.REJETER_DEPENSE
-            );
-        }
-    },
-    ORDONNATEUR_DELEGUE("Ordonnateur délégué") {
-        @Override
-        public Set<Permission> getDefaultPermissions() {
-            return Set.of(
-                    Permission.ENGAGE_DEPENSE,
-                    Permission.REJETER_DEPENSE
-            );
-        }
-    },
+
+    // ── Contrôleur financier ──────────────────────────
+    // Art. 70 — visa obligatoire avant engagement
     CONTROLEUR_FINANCIER("Contrôleur financier") {
         @Override
         public Set<Permission> getDefaultPermissions() {
@@ -55,12 +56,40 @@ public enum RoleSysteme {
             );
         }
     },
+
+    // ── Comptable ─────────────────────────────────────
     COMPTABLE("Comptable") {
         @Override
         public Set<Permission> getDefaultPermissions() {
             return Set.of(
                     Permission.LIQUIDER_DEPENSE,
                     Permission.PAYER_DEPENSE
+            );
+        }
+    },
+
+    // ── Nouveau : lecture seule ───────────────────────
+    // Lié à Agent — consulte les crédits et dépenses qui le concernent
+    GESTIONNAIRE("Gestionnaire") {
+        @Override
+        public Set<Permission> getDefaultPermissions() {
+            return Set.of(
+                    Permission.CONSULTER,
+                    Permission.ENGAGE_DEPENSE,
+                    Permission.REVISER_AE,
+                    Permission.REVISER_CP,
+                    Permission.VISA_CFI
+            );
+        }
+    },
+
+    // ── Nouveau : rôle global de base ─────────────────
+    // Tout agent référencé dans le système
+    AGENT("Agent") {
+        @Override
+        public Set<Permission> getDefaultPermissions() {
+            return Set.of(
+                    Permission.CONSULTER
             );
         }
     };

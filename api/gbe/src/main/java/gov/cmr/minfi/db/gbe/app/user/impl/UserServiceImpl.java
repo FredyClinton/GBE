@@ -1,9 +1,9 @@
 package gov.cmr.minfi.db.gbe.app.user.impl;
 
-import gov.cmr.minfi.db.gbe.app.affectation.UserAffectationRepository;
 import gov.cmr.minfi.db.gbe.app.common.exception.BusinessException;
 import gov.cmr.minfi.db.gbe.app.common.exception.ErrorCode;
 import gov.cmr.minfi.db.gbe.app.iam.permission.Permission;
+import gov.cmr.minfi.db.gbe.app.mandat.MandatRepository;
 import gov.cmr.minfi.db.gbe.app.user.User;
 import gov.cmr.minfi.db.gbe.app.user.UserMapper;
 import gov.cmr.minfi.db.gbe.app.user.UserRepository;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserServices, UserDetailsService {
 
     private final UserRepository userRepository;
-    private final UserAffectationRepository affectationRepository;
+    private final MandatRepository affectationRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
 
@@ -38,9 +38,9 @@ public class UserServiceImpl implements UserServices, UserDetailsService {
                         "User not found : " + userEmail
                 ));
 
-        // Charger les permissions actives depuis les affectations
+        // Charger les permissions actives depuis les mandats
         final Set<Permission> permissions = affectationRepository
-                .findByUserIdAndActifTrue(user.getId())
+                .findMandatsValidesParUser(user.getId())
                 .stream()
                 .flatMap(affectation -> affectation.getPermissions().stream())
                 .collect(Collectors.toSet());
