@@ -24,7 +24,7 @@ public class CreditBudgetaireController {
     // Création
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasAuthority('REVISER_AE')")
+    @PreAuthorize("hasAuthority('INSCRIRE_CREDIT')")
     public CreditBudgetaireResponse createCredit(
             @Valid @RequestBody CreateCreditRequest request
     ) {
@@ -124,6 +124,24 @@ public class CreditBudgetaireController {
             @PathVariable String creditId
     ) {
         creditBudgetaireService.solderCredit(creditId);
+    }
+
+    @PatchMapping("/{creditId}/cantonner")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAuthority('REVISER_AE')")
+    public void cantionnerCredit(
+            @PathVariable String creditId
+    ) {
+        creditBudgetaireService.cantionnerCredit(creditId);
+    }
+
+    @PatchMapping("/{creditId}/decantionner")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAuthority('REVISER_AE')")
+    public void decantionnerCredit(
+            @PathVariable String creditId
+    ) {
+        creditBudgetaireService.decantionnerCredit(creditId);
     }
 
     @PatchMapping("/{creditId}/annuler")

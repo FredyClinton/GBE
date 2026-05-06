@@ -17,6 +17,7 @@ public enum Permission {
     PAYER_DEPENSE("Payer une dépense"),
 
     // ── Admin ─────────────────────────────────────────
+    INSCRIRE_CREDIT("Inscrire un crédit budgétaire au système"),
     MANAGE_USERS("Gérer les utilisateurs"),
     MANAGE_AFFECTATIONS("Gérer les mandats"),
 

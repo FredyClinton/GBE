@@ -10,6 +10,8 @@ import gov.cmr.minfi.db.gbe.app.common.exception.BusinessException;
 import gov.cmr.minfi.db.gbe.app.common.exception.ErrorCode;
 import gov.cmr.minfi.db.gbe.app.exercice.Exercice;
 import gov.cmr.minfi.db.gbe.app.exercice.ExerciceRepository;
+import gov.cmr.minfi.db.gbe.app.iam.permission.Permission;
+import gov.cmr.minfi.db.gbe.app.mandat.MandatScopeValidator;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.Chapitre;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.ChapitreRepository;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.Section;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
 import static gov.cmr.minfi.db.gbe.app.common.exception.ErrorCode.ACTION_NOT_IN_PROGRAMME;
 
@@ -38,6 +41,7 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
     private final SectionRepository sectionRepository;
     private final ExerciceRepository exerciceRepository;
     private final CreditBudgetaireRepository creditBudgetaireRepository;
+    private final MandatScopeValidator mandatScopeValidator;
 
     @Override
     public CreditBudgetaireResponse createCredit(CreateCreditRequest request) {
@@ -107,31 +111,50 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
 
     @Override
     public CreditBudgetaireResponse getCredit(String creditId) {
+        final CreditBudgetaire credit = findCredit(creditId);
+
+        mandatScopeValidator.checkAccessCredit(credit);
+
         return toResponse(findCredit(creditId));
     }
 
     @Override
     public List<CreditBudgetaireResponse> getCreditsByExercice(String exerciceId) {
         return creditBudgetaireRepository.findByExerciceId(exerciceId)
-                .stream().map(this::toResponse).toList();
+                .stream()
+                .filter(credit -> isInScope(credit))
+                .map(this::toResponse).toList();
     }
 
     @Override
     public List<CreditBudgetaireResponse> getCreditsBySection(String sectionId, String exerciceId) {
-        return creditBudgetaireRepository.findBySectionIdAndExerciceId(sectionId, exerciceId)
-                .stream().map(this::toResponse).toList();
+        // Verifie que l'utilisateur est dans le scope
+        mandatScopeValidator.checkSectionAccess(sectionId);
+
+        final Set<String> programmesAutorise = mandatScopeValidator.getProgrammeIdsAutorises(sectionId);
+
+        return creditBudgetaireRepository
+                .findBySectionIdAndExerciceId(sectionId, exerciceId)
+                .stream()
+                .filter(credit -> isAutoriseInProgramme(credit, programmesAutorise))
+                .map(this::toResponse).toList();
     }
 
     @Override
     public List<CreditBudgetaireResponse> getCreditsByProgramme(String programmeId) {
         return creditBudgetaireRepository.findByProgrammeId(programmeId)
-                .stream().map(this::toResponse).toList();
+                .stream()
+                .filter(credit -> isInScope(credit))
+                .map(this::toResponse)
+                .toList();
     }
 
     @Override
     @Transactional
     public void updateAE(String creditId, UpdateCreditBudgetaireRequest request) {
         final CreditBudgetaire credit = findCredit(creditId);
+
+        mandatScopeValidator.checkAccessCreditWithPermission(credit, Permission.REVISER_AE);
 
         validateRevisionAE(credit, request.montant());
 
@@ -147,6 +170,8 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
     public void updateCP(String creditId, UpdateCreditBudgetaireRequest request) {
         final CreditBudgetaire credit = findCredit(creditId);
 
+        mandatScopeValidator.checkAccessCreditWithPermission(credit, Permission.REVISER_CP);
+
         validateRevisionCP(credit, request.montant());
 
         credit.setMontantCP(request.montant());
@@ -161,6 +186,8 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
     @Transactional
     public void engagerCredit(String creditId) {
         final CreditBudgetaire credit = findCredit(creditId);
+        mandatScopeValidator.checkAccessCreditWithPermission(
+                credit, Permission.ENGAGE_DEPENSE);
         credit.engager();
         creditBudgetaireRepository.save(credit);
 
@@ -170,6 +197,8 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
     @Transactional
     public void suspendreCredit(String creditId) {
         final CreditBudgetaire credit = findCredit(creditId);
+        mandatScopeValidator.checkAccessCreditWithPermission(
+                credit, Permission.REVISER_AE);
         credit.suspendre();
         creditBudgetaireRepository.save(credit);
 
@@ -179,6 +208,9 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
     @Transactional
     public void debloquerCredit(String creditId) {
         final CreditBudgetaire credit = findCredit(creditId);
+
+        mandatScopeValidator.checkAccessCreditWithPermission(
+                credit, Permission.REVISER_AE);
         credit.debloquer();
         creditBudgetaireRepository.save(credit);
         log.info("Credit unfrozen : {}", creditId);
@@ -189,6 +221,10 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
     @Transactional
     public void solderCredit(String creditId) {
         final CreditBudgetaire credit = findCredit(creditId);
+
+        mandatScopeValidator.checkAccessCreditWithPermission(
+                credit, Permission.ENGAGE_DEPENSE);
+
         credit.solder();
         creditBudgetaireRepository.save(credit);
         log.info("Credit budgetaire close {}", creditId);
@@ -198,8 +234,33 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
 
     @Override
     @Transactional
+    public void cantionnerCredit(String creditId) {
+        final CreditBudgetaire credit = findCredit(creditId);
+        mandatScopeValidator.checkAccessCreditWithPermission(
+                credit, Permission.REVISER_AE);
+        credit.cantonner();
+        creditBudgetaireRepository.save(credit);
+        log.info("Credit {} cantonne", creditId);
+    }
+
+    @Override
+    @Transactional
+    public void decantionnerCredit(String creditId) {
+        final CreditBudgetaire credit = findCredit(creditId);
+        mandatScopeValidator.checkAccessCreditWithPermission(
+                credit, Permission.REVISER_AE);
+        credit.decantionner();
+        creditBudgetaireRepository.save(credit);
+        log.info("Credit {} decantonne", creditId);
+    }
+
+    @Override
+    @Transactional
     public void annulerCredit(String creditId) {
         final CreditBudgetaire credit = findCredit(creditId);
+        mandatScopeValidator.checkAccessCreditWithPermission(
+                credit, Permission.REVISER_AE);
+
         credit.annuler();
         creditBudgetaireRepository.save(credit);
         log.info("Credit {} canceled", creditId);
@@ -240,6 +301,7 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
         }
     }
 
+
     private CreditBudgetaire findCredit(String creditId) {
         return creditBudgetaireRepository.findById(creditId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, creditId));
@@ -268,6 +330,31 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
     private Chapitre findChapitre(String chapitreId) {
         return chapitreRepository.findById(chapitreId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, chapitreId));
+    }
+
+    private boolean isInScope(CreditBudgetaire credit) {
+        try {
+            mandatScopeValidator.checkAccessCredit(credit);
+            return true;
+        } catch (BusinessException e) {
+            return false;
+        }
+    }
+
+    private boolean isAutoriseInProgramme(CreditBudgetaire credit,
+                                          Set<String> programmesAutorises) {
+        if (programmesAutorises.contains(null)) {
+            return false;
+        }
+        return programmesAutorises.contains(credit.getProgramme().getId());
+    }
+
+    private CreditBudgetaire buildCreditTemporaire(Section section,
+                                                   Programme programme) {
+        return CreditBudgetaire.builder()
+                .section(section)
+                .programme(programme)
+                .build();
     }
 
 

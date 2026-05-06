@@ -29,6 +29,10 @@ public interface CreditBudgetaireService {
 
     void debloquerCredit(String creditId);
 
+    void cantionnerCredit(String creditId);
+
+    void decantionnerCredit(String creditId);
+
     void solderCredit(String creditId);
 
     void annulerCredit(String creditId);

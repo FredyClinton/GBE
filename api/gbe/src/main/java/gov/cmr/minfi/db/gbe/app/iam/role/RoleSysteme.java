@@ -11,7 +11,8 @@ public enum RoleSysteme {
         public Set<Permission> getDefaultPermissions() {
             return Set.of(
                     Permission.MANAGE_USERS,
-                    Permission.MANAGE_AFFECTATIONS
+                    Permission.MANAGE_AFFECTATIONS,
+                    Permission.INSCRIRE_CREDIT
             );
         }
     },

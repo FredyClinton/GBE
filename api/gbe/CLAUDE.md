@@ -61,21 +61,21 @@ DB_PASSWORD=password
 
 ### Package structure (`gov.cmr.minfi.db.gbe.app`)
 
-| Package        | Purpose                                                                                   |
-|----------------|-------------------------------------------------------------------------------------------|
-| `auth/`        | Login, MFA setup, token refresh — controller + service + DTOs                             |
-| `admin/`       | User CRUD (create, activate, deactivate, delete) — requires `MANAGE_USERS` permission     |
-| `affectation/` | Assign users to sections/programmes with a `RoleSysteme` — requires `MANAGE_AFFECTATIONS` |
-| `user/`        | User profile, password change                                                             |
-| `iam/role/`    | JPA `Role` entity + `RoleSysteme` enum + `Permission` enum                                |
-| `security/`    | `JwtService`, `JwtFilter`, `SecurityConfig`                                               |
-| `common/`      | `BaseEntity`, audit, config (`BeansConfig`, `DataInitializer`), exceptions                |
-| `exercice/`    | Budget year (`Exercice`)                                                                  |
-| `referentiel/` | Budget classification sub-packages (see below)                                            |
+| Package          | Purpose                                                                                   |
+|------------------|-------------------------------------------------------------------------------------------|
+| `auth/`          | Login, MFA setup, token refresh — controller + service + DTOs                             |
+| `admin/`         | User CRUD (create, activate, deactivate, delete) — requires `MANAGE_USERS` permission     |
+| `mandat/`        | Assign users to sections/programmes with a `RoleSysteme` — requires `MANAGE_AFFECTATIONS` |
+| `agent/`         | Civil servant profile (`Agent` entity) — linked 1-to-1 with `User`                       |
+| `budget/credit/` | Budget credit management (`CreditBudgetaire` with AE/CP tracking and status machine)     |
+| `user/`          | User profile, password change                                                             |
+| `iam/role/`      | JPA `Role` entity + `RoleSysteme` enum + `Permission` enum                                |
+| `security/`      | `JwtService`, `JwtFilter`, `SecurityConfig`                                               |
+| `common/`        | `BaseEntity`, audit, config (`BeansConfig`, `DataInitializer`), exceptions                |
+| `exercice/`      | Budget year (`Exercice`)                                                                  |
+| `referentiel/`   | Budget classification sub-packages (see below)                                            |
 
 ### Referentiel sub-packages
-
-The budget classification domain is split into four packages:
 
 - `referentiel/administratif/` — `Section`, `Chapitre`, `TypeSection`, `TypeAdministration`, `CategorieService`
 - `referentiel/programmatique/` — `Programme`, `Action`, `Activite`, `Operation`, `Tache`
@@ -86,20 +86,31 @@ The budget classification domain is split into four packages:
 
 ### Key domain concepts
 
-**UserAffectation** is the central authorization object. A user has zero or more affectations, each binding them to a
-`Section` + optional `Programme` + `RoleSysteme`. The affectation carries a set of `Permission` values (defaulted from
-the `RoleSysteme`, overridable by admins). On login, all active affectations are embedded in the JWT response as
-`AffectationContext`.
+**Mandat** (`mandat/Mandat`) is the central authorization object — previously named `UserAffectation`. A user has zero
+or more mandats, each binding them to a `Section` + optional `Programme` + `RoleSysteme`. A mandat carries a set of
+`Permission` values (defaulted from the `RoleSysteme`, overridable by admins) and optional `dateDebut`/`dateFin` for
+temporal validity plus a `numeroDecision` reference. `MandatRepository.findMandatsValidesParUser()` filters by
+`actif=true` and date range. On login, all active mandats are embedded in the JWT response as `AffectationContext`.
 
-**RoleSysteme** (enum, not DB-driven per affectation):
-`ADMIN`, `ORDONNATEUR_PRINCIPAL`, `ORDONNATEUR_SECONDAIRE`, `ORDONNATEUR_DELEGUE`, `CONTROLEUR_FINANCIER`, `COMPTABLE`
+**MandatScopeValidator** (`mandat/MandatScopeValidator`) is a `@Component` injected into services to enforce
+scope-based access on `CreditBudgetaire`. It loads the authenticated user's valid mandats and checks section/programme
+alignment. The `MINISTRE` role gets section-wide access via a mandat with `programme = null`.
+
+**CreditBudgetaire** (`budget/credit/`) tracks AE (Autorisations d'Engagement) and CP (Crédits de Paiement) with
+consumed/available split. It implements a status machine via `StatutTransitionable`:
+`DISPONIBLE → ENGAGE → SOLDE`, with `SUSPENDU ↔ ENGAGE` and any non-terminal state `→ ANNULE`. The `codeImputation`
+is computed as `codeExercice + codeSection + codeProgramme + codeAction + codeCompletChapitre`.
+
+**Agent** (`agent/Agent`) is a civil servant profile entity (matricule, NUI, CNI, phone) linked 1-to-1 with `User`.
+
+**RoleSysteme** (enum):
+`ADMIN`, `ORDONNATEUR`, `MINISTRE`, `CONTROLEUR_FINANCIER`, `COMPTABLE`, `GESTIONNAIRE`, `AGENT`
 
 **Permission** (enum): `ENGAGE_DEPENSE`, `REVISER_AE`, `REVISER_CP`, `REJETER_DEPENSE`, `VISA_CFI`, `REJETER_CFI`,
-`LIQUIDER_DEPENSE`, `PAYER_DEPENSE`, `MANAGE_USERS`, `MANAGE_AFFECTATIONS`
+`LIQUIDER_DEPENSE`, `PAYER_DEPENSE`, `INSCRIRE_CREDIT`, `MANAGE_USERS`, `MANAGE_AFFECTATIONS`, `CONSULTER`
 
-**IAM Role** (`iam/role/Role`) is a separate JPA entity used by Spring Security (`ROLE_ADMIN`,
-`ROLE_ORDONNATEUR_PRINCIPAL`, …). It is distinct from `RoleSysteme`. Method-level authorization uses
-`@PreAuthorize("hasAuthority('PERMISSION_NAME')")`.
+**IAM Role** (`iam/role/Role`) is a separate JPA entity used by Spring Security (`ROLE_ADMIN`, `ROLE_ORDONNATEUR`, …).
+It is distinct from `RoleSysteme`. Method-level authorization uses `@PreAuthorize("hasAuthority('PERMISSION_NAME')")`.
 
 ### Authentication flow
 
@@ -126,16 +137,15 @@ Throw `BusinessException(ErrorCode, ...)` anywhere in service code. `Application
 
 ### Service pattern
 
-Each feature has an interface (e.g., `AdminService`) and one or more implementations in an `impl/` sub-package (e.g.,
-`AdminServiceImpl`). Use `@Qualifier` if multiple implementations exist (see `AuthenticationServiceImpl` vs
-`AuthenticationServiceV1Impl`).
+Each feature has an interface (e.g., `AdminService`) and one implementation in an `impl/` sub-package. Use `@Qualifier`
+if multiple implementations exist.
 
 ### BaseEntity
 
 Domain entities that are not `User` extend `BaseEntity`, which provides UUID primary key, `createdDate`,
 `lastModifiedAt`, `createdBy`, `lastModifiedBy` (populated by `ApplicatorAuditoreAware`).
 
-# CONTEXT ACTUEL DU PROJET
+# CONTEXT ACTUEL DU PROJET (STALE — DO NOT RELY ON THIS SECTION)
 
 Project Context From: /home/therooster/Documents/FORMATIONS/MINFI-Application-de-Genstion-du-Budget/api/gbe
 Generated On: mer. 25 mars 2026 09:41:40 WAT
@@ -210,21 +220,21 @@ DB_PASSWORD=password
 
 ### Package structure (`gov.cmr.minfi.db.gbe.app`)
 
-| Package        | Purpose                                                                                   |
-|----------------|-------------------------------------------------------------------------------------------|
-| `auth/`        | Login, MFA setup, token refresh — controller + service + DTOs                             |
-| `admin/`       | User CRUD (create, activate, deactivate, delete) — requires `MANAGE_USERS` permission     |
-| `affectation/` | Assign users to sections/programmes with a `RoleSysteme` — requires `MANAGE_AFFECTATIONS` |
-| `user/`        | User profile, password change                                                             |
-| `iam/role/`    | JPA `Role` entity + `RoleSysteme` enum + `Permission` enum                                |
-| `security/`    | `JwtService`, `JwtFilter`, `SecurityConfig`                                               |
-| `common/`      | `BaseEntity`, audit, config (`BeansConfig`, `DataInitializer`), exceptions                |
-| `exercice/`    | Budget year (`Exercice`)                                                                  |
-| `referentiel/` | Budget classification sub-packages (see below)                                            |
+| Package          | Purpose                                                                                   |
+|------------------|-------------------------------------------------------------------------------------------|
+| `auth/`          | Login, MFA setup, token refresh — controller + service + DTOs                             |
+| `admin/`         | User CRUD (create, activate, deactivate, delete) — requires `MANAGE_USERS` permission     |
+| `mandat/`        | Assign users to sections/programmes with a `RoleSysteme` — requires `MANAGE_AFFECTATIONS` |
+| `agent/`         | Civil servant profile (`Agent` entity) — linked 1-to-1 with `User`                       |
+| `budget/credit/` | Budget credit management (`CreditBudgetaire` with AE/CP tracking and status machine)     |
+| `user/`          | User profile, password change                                                             |
+| `iam/role/`      | JPA `Role` entity + `RoleSysteme` enum + `Permission` enum                                |
+| `security/`      | `JwtService`, `JwtFilter`, `SecurityConfig`                                               |
+| `common/`        | `BaseEntity`, audit, config (`BeansConfig`, `DataInitializer`), exceptions                |
+| `exercice/`      | Budget year (`Exercice`)                                                                  |
+| `referentiel/`   | Budget classification sub-packages (see below)                                            |
 
 ### Referentiel sub-packages
-
-The budget classification domain is split into four packages:
 
 - `referentiel/administratif/` — `Section`, `Chapitre`, `TypeSection`, `TypeAdministration`, `CategorieService`
 - `referentiel/programmatique/` — `Programme`, `Action`, `Activite`, `Operation`, `Tache`
@@ -235,20 +245,31 @@ The budget classification domain is split into four packages:
 
 ### Key domain concepts
 
-**UserAffectation** is the central authorization object. A user has zero or more affectations, each binding them to a
-`Section` + optional `Programme` + `RoleSysteme`. The affectation carries a set of `Permission` values (defaulted from
-the `RoleSysteme`, overridable by admins). On login, all active affectations are embedded in the JWT response as
-`AffectationContext`.
+**Mandat** (`mandat/Mandat`) is the central authorization object — previously named `UserAffectation`. A user has zero
+or more mandats, each binding them to a `Section` + optional `Programme` + `RoleSysteme`. A mandat carries a set of
+`Permission` values (defaulted from the `RoleSysteme`, overridable by admins) and optional `dateDebut`/`dateFin` for
+temporal validity plus a `numeroDecision` reference. `MandatRepository.findMandatsValidesParUser()` filters by
+`actif=true` and date range. On login, all active mandats are embedded in the JWT response as `AffectationContext`.
 
-**RoleSysteme** (enum, not DB-driven per affectation):
-`ADMIN`, `ORDONNATEUR_PRINCIPAL`, `ORDONNATEUR_SECONDAIRE`, `ORDONNATEUR_DELEGUE`, `CONTROLEUR_FINANCIER`, `COMPTABLE`
+**MandatScopeValidator** (`mandat/MandatScopeValidator`) is a `@Component` injected into services to enforce
+scope-based access on `CreditBudgetaire`. It loads the authenticated user's valid mandats and checks section/programme
+alignment. The `MINISTRE` role gets section-wide access via a mandat with `programme = null`.
+
+**CreditBudgetaire** (`budget/credit/`) tracks AE (Autorisations d'Engagement) and CP (Crédits de Paiement) with
+consumed/available split. It implements a status machine via `StatutTransitionable`:
+`DISPONIBLE → ENGAGE → SOLDE`, with `SUSPENDU ↔ ENGAGE` and any non-terminal state `→ ANNULE`. The `codeImputation`
+is computed as `codeExercice + codeSection + codeProgramme + codeAction + codeCompletChapitre`.
+
+**Agent** (`agent/Agent`) is a civil servant profile entity (matricule, NUI, CNI, phone) linked 1-to-1 with `User`.
+
+**RoleSysteme** (enum):
+`ADMIN`, `ORDONNATEUR`, `MINISTRE`, `CONTROLEUR_FINANCIER`, `COMPTABLE`, `GESTIONNAIRE`, `AGENT`
 
 **Permission** (enum): `ENGAGE_DEPENSE`, `REVISER_AE`, `REVISER_CP`, `REJETER_DEPENSE`, `VISA_CFI`, `REJETER_CFI`,
-`LIQUIDER_DEPENSE`, `PAYER_DEPENSE`, `MANAGE_USERS`, `MANAGE_AFFECTATIONS`
+`LIQUIDER_DEPENSE`, `PAYER_DEPENSE`, `INSCRIRE_CREDIT`, `MANAGE_USERS`, `MANAGE_AFFECTATIONS`, `CONSULTER`
 
-**IAM Role** (`iam/role/Role`) is a separate JPA entity used by Spring Security (`ROLE_ADMIN`,
-`ROLE_ORDONNATEUR_PRINCIPAL`, …). It is distinct from `RoleSysteme`. Method-level authorization uses
-`@PreAuthorize("hasAuthority('PERMISSION_NAME')")`.
+**IAM Role** (`iam/role/Role`) is a separate JPA entity used by Spring Security (`ROLE_ADMIN`, `ROLE_ORDONNATEUR`, …).
+It is distinct from `RoleSysteme`. Method-level authorization uses `@PreAuthorize("hasAuthority('PERMISSION_NAME')")`.
 
 ### Authentication flow
 
@@ -275,9 +296,8 @@ Throw `BusinessException(ErrorCode, ...)` anywhere in service code. `Application
 
 ### Service pattern
 
-Each feature has an interface (e.g., `AdminService`) and one or more implementations in an `impl/` sub-package (e.g.,
-`AdminServiceImpl`). Use `@Qualifier` if multiple implementations exist (see `AuthenticationServiceImpl` vs
-`AuthenticationServiceV1Impl`).
+Each feature has an interface (e.g., `AdminService`) and one implementation in an `impl/` sub-package. Use `@Qualifier`
+if multiple implementations exist.
 
 ### BaseEntity
 

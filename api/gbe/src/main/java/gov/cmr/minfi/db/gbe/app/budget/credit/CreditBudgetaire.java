@@ -136,13 +136,13 @@ public class CreditBudgetaire extends BaseEntity
 
     // ── StatutTransitionable ──────────────────────────
 
-    // DISPONIBLE → ENGAGE
+    // DISPONIBLE → ENGAGE  (CANTONNE bloqué volontairement)
     @Override
     public void engager() {
         validerTransition(
                 Set.of(StatutCredit.DISPONIBLE),
                 StatutCredit.ENGAGE,
-                "Seul un crédit DISPONIBLE peut être engagé"
+                "Seul un crédit DISPONIBLE peut être engagé (un crédit CANTONNE doit d'abord être décantonné)"
         );
         this.statut = StatutCredit.ENGAGE;
     }
@@ -169,6 +169,28 @@ public class CreditBudgetaire extends BaseEntity
         this.statut = StatutCredit.DISPONIBLE;
     }
 
+    // DISPONIBLE → CANTONNE
+    @Override
+    public void cantonner() {
+        validerTransition(
+                Set.of(StatutCredit.DISPONIBLE),
+                StatutCredit.CANTONNE,
+                "Seul un crédit DISPONIBLE peut être cantonné"
+        );
+        this.statut = StatutCredit.CANTONNE;
+    }
+
+    // CANTONNE → DISPONIBLE
+    @Override
+    public void decantionner() {
+        validerTransition(
+                Set.of(StatutCredit.CANTONNE),
+                StatutCredit.DISPONIBLE,
+                "Seul un crédit CANTONNE peut être décantonné"
+        );
+        this.statut = StatutCredit.DISPONIBLE;
+    }
+
     // ENGAGE → SOLDE
     @Override
     public void solder() {
@@ -183,10 +205,12 @@ public class CreditBudgetaire extends BaseEntity
     // DISPONIBLE → ANNULE
     // ENGAGE     → ANNULE
     // SUSPENDU   → ANNULE
+    // CANTONNE   → ANNULE
     @Override
     public void annuler() {
         validerTransition(
-                Set.of(StatutCredit.DISPONIBLE, StatutCredit.ENGAGE, StatutCredit.SUSPENDU),
+                Set.of(StatutCredit.DISPONIBLE, StatutCredit.ENGAGE,
+                        StatutCredit.SUSPENDU, StatutCredit.CANTONNE),
                 StatutCredit.ANNULE,
                 "Un crédit SOLDÉ ne peut pas être annulé"
         );

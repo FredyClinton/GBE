@@ -39,8 +39,7 @@ public enum ErrorCode {
     INVALID_MFA_TOKEN("INVALID_MFA_TOKEN", "Invalid or expired MFA token", UNAUTHORIZED),
     MFA_TOKEN_EXPIRED("MFA_TOKEN_EXPIRED", "MFA token has expired, please login again", UNAUTHORIZED),
     CHAPITRE_CYCLE_DETECTED("CHAPITRE_CYCLE_DETECTED", "This requete may create a chapter cycle", BAD_REQUEST),
-    TRANSITION_STATUT_INVALIDE(
-            "TRANSITION_STATUT_INVALIDE",
+    TRANSITION_STATUT_INVALIDE("TRANSITION_STATUT_INVALIDE",
             "Transition invalide depuis le statut %s vers %s : %s",
             BAD_REQUEST
     ),
@@ -74,7 +73,19 @@ public enum ErrorCode {
             "Ce mandat est déjà inactif",
             BAD_REQUEST
     ),
-    USER_ALREADY_EXISTS_FOR_AGENT("USER_ALREADY_EXISTS_FOR_AGENT", "USER_ALREADY_EXISTS_FOR_AGENT", BAD_REQUEST);
+    USER_ALREADY_EXISTS_FOR_AGENT("USER_ALREADY_EXISTS_FOR_AGENT", "USER_ALREADY_EXISTS_FOR_AGENT", BAD_REQUEST),
+    ACCES_REFUSE_HORS_SCOPE(
+            "ACCES_REFUSE_HORS_SCOPE",
+            "Accès refusé : ce crédit n'est pas dans votre périmètre de mandat",
+            FORBIDDEN
+    ),
+    ACCES_REFUSE_AUCUN_MANDAT(
+            "ACCES_REFUSE_AUCUN_MANDAT",
+            "Accès refusé : aucun mandat actif trouvé pour cet utilisateur",
+            FORBIDDEN
+    ),
+
+    ;
 
     private final String code;
     private final String defaultMessage;

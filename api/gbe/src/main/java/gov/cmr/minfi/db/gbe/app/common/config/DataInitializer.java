@@ -10,10 +10,7 @@ import gov.cmr.minfi.db.gbe.app.iam.role.RoleRepository;
 import gov.cmr.minfi.db.gbe.app.iam.role.RoleSysteme;
 import gov.cmr.minfi.db.gbe.app.mandat.Mandat;
 import gov.cmr.minfi.db.gbe.app.mandat.MandatRepository;
-import gov.cmr.minfi.db.gbe.app.referentiel.administratif.ChapitreRepository;
-import gov.cmr.minfi.db.gbe.app.referentiel.administratif.Section;
-import gov.cmr.minfi.db.gbe.app.referentiel.administratif.SectionRepository;
-import gov.cmr.minfi.db.gbe.app.referentiel.administratif.TypeSection;
+import gov.cmr.minfi.db.gbe.app.referentiel.administratif.*;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.Action;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.ActionRepository;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.Programme;
@@ -49,7 +46,7 @@ public class DataInitializer {
 
     @Bean
     @Profile("!prod")
-    public CommandLineRunner init() {
+    public CommandLineRunner init(CategorieServiceRepository categorieServiceRepository) {
         return args -> {
 
             // ================================================
@@ -118,6 +115,71 @@ public class DataInitializer {
             );
             log.info("Sections créées : MINFI, MINESEC, MINSANTE");
 
+            // ================================================
+// ÉTAPE 3.5 — Catégories de service
+// ================================================
+
+// Administration centrale — code "31"
+            final CategorieService catAdminCentrale = categorieServiceRepository.save(
+                    CategorieService.builder()
+                            .code("31")
+                            .libelleFr("Direction centrale technique")
+                            .libelleEn("Central technical directorate")
+                            .typeAdministration(TypeAdministration.ADMINISTRATION_CENTRALE)
+                            .createdBy("SYSTEM")
+                            .build()
+            );
+
+            log.info("Catégorie de service créée : Administration centrale (31)");
+
+
+            // ================================================
+// ÉTAPE 3.6 — Chapitres (unités administratives)
+// ================================================
+
+// Chapitre MINFI — Direction centrale, service central (pas d'arrondissement)
+            final Chapitre chapitreMinfi = chapitreRepository.save(
+                    Chapitre.builder()
+                            .section(sectionMinfi)
+                            .categorieService(catAdminCentrale)
+                            .arrondissement(null)   // service central
+                            .numOrdre("01")
+                            // codeComplet calculé par @PrePersist : "31" + "0000" + "01" = "31000001"
+                            .libelleFr("Services centraux du Ministère des Finances")
+                            .libelleEn("Central services of the Ministry of Finance")
+                            .chapitreParent(null)
+                            .build()
+            );
+
+// Chapitre MINESEC
+            final Chapitre chapitreMinesec = chapitreRepository.save(
+                    Chapitre.builder()
+                            .section(sectionMinesec)
+                            .categorieService(catAdminCentrale)
+                            .arrondissement(null)
+                            .numOrdre("02")
+                            // codeComplet : "31000001"
+                            .libelleFr("Services centraux du Ministère des Enseignements Secondaires")
+                            .libelleEn("Central services of the Ministry of Secondary Education")
+                            .chapitreParent(null)
+                            .build()
+            );
+
+// Chapitre MINSANTE
+            final Chapitre chapitreMinsante = chapitreRepository.save(
+                    Chapitre.builder()
+                            .section(sectionMinsante)
+                            .categorieService(catAdminCentrale)
+                            .arrondissement(null)
+                            .numOrdre("03")
+                            // codeComplet : "31000001"
+                            .libelleFr("Services centraux du Ministère de la Santé Publique")
+                            .libelleEn("Central services of the Ministry of Public Health")
+                            .chapitreParent(null)
+                            .build()
+            );
+
+            log.info("Chapitres créés : MINFI, MINESEC, MINSANTE");
             // ================================================
             // ÉTAPE 4 — Programmes
             // ================================================
