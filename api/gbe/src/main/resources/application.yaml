@@ -10,13 +10,13 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
-  sql:
-    init:
-      mode: always
+  # sql:             # Décommenter + passer ddl-auto: create pour réinitialiser la base
+  #   init:
+  #     mode: always
   jpa:
     hibernate:
-      ddl-auto: create
-    defer-datasource-initialization: true
+      ddl-auto: update
+  # defer-datasource-initialization: true   # Utile uniquement avec ddl-auto: create
     database: postgresql
     show-sql: false
     properties:
