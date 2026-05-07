@@ -1,4 +1,4 @@
 package gov.cmr.minfi.db.gbe.app.referentiel.administratif.dto;
 
-public class SectionResponse {
+public record ChapitreResponse() {
 }
