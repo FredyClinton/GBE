@@ -1,8 +1,13 @@
 package gov.cmr.minfi.db.gbe.app.referentiel.fonctionnel;
 
 import gov.cmr.minfi.db.gbe.app.common.audit.BaseEntity;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
@@ -14,9 +19,7 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "CLASSE_FONCTIONNELLE")
 public class ClasseFonctionnelle extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "GROUPE_ID", nullable = false)
-    private GroupeFonctionnel groupe;
+
 
     // 1 caractère — ex: "1", "2"
     @Column(name = "CODE_CLASSE", nullable = false, length = 1)
@@ -32,11 +35,5 @@ public class ClasseFonctionnelle extends BaseEntity {
     @Column(name = "LIBELLE_EN", nullable = false)
     private String libelleEn;
 
-    @PrePersist
-    @PreUpdate
-    private void calculerCodeComplet() {
-        if (this.groupe != null && this.codeClasse != null) {
-            this.codeComplet = this.groupe.getCodeComplet() + this.codeClasse;
-        }
-    }
+
 }
