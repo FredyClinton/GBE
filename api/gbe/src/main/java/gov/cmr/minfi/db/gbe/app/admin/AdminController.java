@@ -20,7 +20,9 @@ import java.util.List;
 @PreAuthorize("hasAuthority('MANAGE_USERS')")
 @Tag(name = "Admin", description = "Admin API")
 public class AdminController {
+
     private final AdminService adminService;
+    private final AdminMapper adminMapper;
 
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
@@ -36,48 +38,31 @@ public class AdminController {
 
     @GetMapping("/users/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public UserSummaryResponse getUser(
-            @PathVariable String userId
-    ) {
+    public UserSummaryResponse getUser(@PathVariable String userId) {
         return adminService.getUser(userId);
     }
 
     @PatchMapping("/users/{userId}/activate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void activateUserAccount(
-            @PathVariable String userId
-    ) {
+    public void activateUserAccount(@PathVariable String userId) {
         adminService.activeUserAccount(userId);
     }
 
     @PatchMapping("/users/{userId}/deactivate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deactivateUserAccount(
-            @PathVariable String userId
-    ) {
+    public void deactivateUserAccount(@PathVariable String userId) {
         adminService.deactivateUserAccount(userId);
     }
 
     @DeleteMapping("/users/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUserAccount(
-            @PathVariable String userId
-    ) {
+    public void deleteUserAccount(@PathVariable String userId) {
         adminService.deleteUserAccount(userId);
     }
 
     @GetMapping("/users/roles")
     @ResponseStatus(HttpStatus.OK)
     public List<RoleResponse> getRoles() {
-        return Arrays.stream(RoleSysteme.values())
-                .map(role -> RoleResponse.builder()
-                        .code(role.name())
-                        .libelle(role.getLibelle())
-                        .defaultPermissions(role.getDefaultPermissions())
-                        .build()
-                )
-                .toList();
+        return Arrays.stream(RoleSysteme.values()).map(adminMapper::toRoleResponse).toList();
     }
-
-
 }

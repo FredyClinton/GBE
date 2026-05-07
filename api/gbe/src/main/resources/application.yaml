@@ -12,7 +12,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     database: postgresql
     show-sql: false
     properties:
@@ -25,4 +25,3 @@ app:
       access-token-expiration: 8640000 # For local testing
       refresh-token-expiration: 604800000
       mfa-token-expiration: 300000
-

@@ -1,6 +1,7 @@
 package gov.cmr.minfi.db.gbe.app.agent.impl;
 
 import gov.cmr.minfi.db.gbe.app.agent.Agent;
+import gov.cmr.minfi.db.gbe.app.agent.AgentMapper;
 import gov.cmr.minfi.db.gbe.app.agent.AgentRepository;
 import gov.cmr.minfi.db.gbe.app.agent.AgentService;
 import gov.cmr.minfi.db.gbe.app.agent.dto.AgentResponse;
@@ -18,7 +19,9 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class AgentServiceImpl implements AgentService {
+
     private final AgentRepository agentRepository;
+    private final AgentMapper agentMapper;
 
     @Override
     @Transactional
@@ -28,40 +31,24 @@ public class AgentServiceImpl implements AgentService {
         }
         if (agentRepository.existsByNumeroCniIgnoreCase(request.numeroCni())) {
             throw new BusinessException(ErrorCode.CNI_ALREADY_EXISTS);
-
         }
-
         if (agentRepository.existsByNuiIgnoreCase(request.nui())) {
             throw new BusinessException(ErrorCode.NUI_ALREADY_EXISTS);
         }
-        final Agent agent = Agent.builder()
-                .firstName(request.firstName())
-                .lastName(request.lastName())
-                .dateOfBirth(request.dateOfBirth())
-                .matricule(request.matricule())
-                .nui(request.nui())
-                .numeroCni(request.numeroCni())
-                .cniIssueDate(request.cniIssueDate())
-                .cniExpiryDate(request.cniExpiryDate())
-                .phoneNumber(request.phoneNumber())
-                .actif(true)
-                .build();
+        final Agent agent = agentMapper.toEntity(request);
         agentRepository.save(agent);
         log.info("Created agent {}", agent.getMatricule());
-        return toResponse(agent);
+        return agentMapper.toResponse(agent);
     }
 
     @Override
     public AgentResponse getAgent(String agentId) {
-        return toResponse(findAgent(agentId));
+        return agentMapper.toResponse(findAgent(agentId));
     }
 
     @Override
     public List<AgentResponse> getAllsAgents() {
-        return agentRepository.findAll()
-                .stream()
-                .map(this::toResponse)
-                .toList();
+        return agentRepository.findAll().stream().map(agentMapper::toResponse).toList();
     }
 
     @Override
@@ -76,7 +63,6 @@ public class AgentServiceImpl implements AgentService {
         log.info("Deactivated agent {}", agent.getMatricule());
     }
 
-
     @Override
     public void reactivateAgent(String agentId) {
         final Agent agent = findAgent(agentId);
@@ -86,29 +72,10 @@ public class AgentServiceImpl implements AgentService {
         agent.setActif(true);
         agentRepository.save(agent);
         log.info("Activated agent {}", agent.getMatricule());
-
     }
 
     private Agent findAgent(String agentId) {
         return agentRepository.findById(agentId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, agentId));
-    }
-
-    private AgentResponse toResponse(Agent agent) {
-        return AgentResponse.builder()
-                .id(agent.getId())
-                .firstName(agent.getFirstName())
-                .lastName(agent.getLastName())
-                .dateOfBirth(agent.getDateOfBirth())
-                .matricule(agent.getMatricule())
-                .nui(agent.getNui())
-                .phoneNumber(agent.getPhoneNumber())
-                .numeroCni(agent.getNui())
-                .cniIssueDate(agent.getCniIssueDate())
-                .cniExpiryDate(agent.getCniExpiryDate())
-                .actif(agent.isActif())
-                .userId(agent.getUser() != null ? agent.getUser().getId() : null)
-                .email(agent.getUser() != null ? agent.getUser().getEmail() : null)
-                .build();
     }
 }

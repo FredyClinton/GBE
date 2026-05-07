@@ -1,14 +1,14 @@
 package gov.cmr.minfi.db.gbe.app.referentiel;
 
 import gov.cmr.minfi.db.gbe.app.exercice.Exercice;
+import gov.cmr.minfi.db.gbe.app.exercice.ExerciceMapper;
 import gov.cmr.minfi.db.gbe.app.exercice.ExerciceRepository;
 import gov.cmr.minfi.db.gbe.app.exercice.ExerciceResponse;
-import gov.cmr.minfi.db.gbe.app.referentiel.administratif.Section;
+import gov.cmr.minfi.db.gbe.app.referentiel.administratif.ChapitreRepository;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.SectionRepository;
+import gov.cmr.minfi.db.gbe.app.referentiel.administratif.dto.ChapitreResponse;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.dto.SectionResponse;
-import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.Action;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.ActionRepository;
-import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.Programme;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.ProgrammeRepository;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.dto.ActionResponse;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.dto.ProgrammeResponse;
@@ -25,120 +25,75 @@ import java.util.List;
 @Tag(name = "Référentiel", description = "Endpoints de consultation du référentiel budgétaire")
 public class ReferentielController {
 
-    private final ExerciceRepository exerciceRepository;
-    private final ProgrammeRepository programmeRepository;
-    private final ActionRepository actionRepository;
-    private final SectionRepository sectionRepository;
+	private final ExerciceRepository exerciceRepository;
+	private final ProgrammeRepository programmeRepository;
+	private final ActionRepository actionRepository;
+	private final SectionRepository sectionRepository;
+	private final ChapitreRepository chapitreRepository;
+	private final ExerciceMapper exerciceMapper;
+	private final ReferentielMapper referentielMapper;
 
-    @GetMapping("/exercices")
-    @ResponseStatus(HttpStatus.OK)
-    public List<ExerciceResponse> getAllExercices() {
-        return exerciceRepository.findAll()
-                .stream()
-                .map(this::toExerciceResponse)
-                .toList();
-    }
+	// ── Exercices ────────────────────────────────────
 
-    @GetMapping("/sections")
-    @ResponseStatus(HttpStatus.OK)
-    public List<SectionResponse> getAllSections() {
-        return sectionRepository.findAll()
-                .stream()
-                .map(this::toSectionResponse)
-                .toList();
-    }
+	@GetMapping("/exercices")
+	@ResponseStatus(HttpStatus.OK)
+	public List<ExerciceResponse> getAllExercices() {
+		return exerciceRepository.findAll().stream().map(exerciceMapper::toResponse).toList();
+	}
 
-    @GetMapping("/sections/exercice/{exerciceId}")
-    @ResponseStatus(HttpStatus.OK)
-    public List<SectionResponse> getSectionsByExercice(
-            @PathVariable String exerciceId
-    ) {
-        return sectionRepository.findByExerciceId(exerciceId)
-                .stream()
-                .map(this::toSectionResponse)
-                .toList();
-    }
+	// ── Sections ─────────────────────────────────────
 
-    @GetMapping("/sections/{sectionId}/programmes")
-    @ResponseStatus(HttpStatus.OK)
-    public List<ProgrammeResponse> getProgrammesBySection(
-            @PathVariable String sectionId
-    ) {
-        return programmeRepository.findBySectionIdAndActifTrue(sectionId)
-                .stream()
-                .map(this::toProgrammeResponse)
-                .toList();
-    }
+	@GetMapping("/sections")
+	@ResponseStatus(HttpStatus.OK)
+	public List<SectionResponse> getAllSections() {
+		return sectionRepository.findAll().stream().map(referentielMapper::toSectionResponse).toList();
+	}
 
-    @GetMapping("/programmes")
-    @ResponseStatus(HttpStatus.OK)
-    public List<ProgrammeResponse> getAllProgrammes() {
-        return programmeRepository.findAll()
-                .stream()
-                .map(this::toProgrammeResponse)
-                .toList();
-    }
+	@GetMapping("/sections/exercice/{exerciceId}")
+	@ResponseStatus(HttpStatus.OK)
+	public List<SectionResponse> getSectionsByExercice(@PathVariable String exerciceId) {
+		return sectionRepository.findByExerciceId(exerciceId).stream().map(referentielMapper::toSectionResponse).toList();
+	}
 
-    @GetMapping("/programmes/{programmeId}/actions")
-    @ResponseStatus(HttpStatus.OK)
-    public List<ActionResponse> getActionsByProgramme(
-            @PathVariable String programmeId
-    ) {
-        return actionRepository.findByProgrammeId(programmeId)
-                .stream()
-                .map(this::toActionResponse)
-                .toList();
-    }
+	//  Programmes
 
+	@GetMapping("/programmes")
+	@ResponseStatus(HttpStatus.OK)
+	public List<ProgrammeResponse> getAllProgrammes() {
+		return programmeRepository.findAll().stream().map(referentielMapper::toProgrammeResponse).toList();
+	}
 
-    private ExerciceResponse toExerciceResponse(Exercice exercice) {
-        return ExerciceResponse.builder()
-                .id(exercice.getId())
-                .annee(exercice.getAnnee())
-                .codeExercice(exercice.getCodeExercice())
-                .libelleFr(exercice.getLibelleFr())
-                .libelleEn(exercice.getLibelleEn())
-                .actif(exercice.isActif())
-                .build();
-    }
+	@GetMapping("/sections/{sectionId}/programmes")
+	@ResponseStatus(HttpStatus.OK)
+	public List<ProgrammeResponse> getProgrammesBySection(@PathVariable String sectionId) {
+		return programmeRepository.findBySectionId(sectionId).stream().map(referentielMapper::toProgrammeResponse).toList();
+	}
 
-    private SectionResponse toSectionResponse(Section section) {
-        return SectionResponse.builder()
-                .id(section.getId())
-                .codeSection(section.getCodeSection())
-                .sigle(section.getSigle())
-                .libelleFr(section.getLibelleFr())
-                .libelleEn(section.getLibelleEn())
-                .typeSection(section.getTypeSection() != null
-                        ? section.getTypeSection().name()
-                        : null)
-                .build();
-    }
+	@GetMapping("/exercice/{exerciceId}/programmes")
+	@ResponseStatus(HttpStatus.OK)
+	public List<ProgrammeResponse> getProgrammesByExercice(@PathVariable String exerciceId) {
+		return programmeRepository.findByExerciceId(exerciceId).stream().map(referentielMapper::toProgrammeResponse).toList();
+	}
 
-    private ProgrammeResponse toProgrammeResponse(Programme programme) {
-        return ProgrammeResponse.builder()
-                .id(programme.getId())
-                .code(programme.getCode())
-                .autreCode(programme.getAutreCode())
-                .libelleFr(programme.getLibelleFr())
-                .libelleEn(programme.getLibelleEn())
-                .sectionId(programme.getSection().getId())
-                .sectionLibelle(programme.getSection().getLibelleFr())
-                .actif(programme.isActif())
-                .build();
-    }
+	// ── Actions ───────────────────────────────────────
 
-    private ActionResponse toActionResponse(Action action) {
-        return ActionResponse.builder()
-                .id(action.getId())
-                .codeAction(action.getCodeAction())
-                .autreCode(action.getAutreCode())
-                .libelleFr(action.getLibelleFr())
-                .libelleEn(action.getLibelleEn())
-                .programmeId(action.getProgramme().getId())
-                .programmeLibelle(action.getProgramme().getLibelleFr())
-                .build();
-    }
+	@GetMapping("/programmes/{programmeId}/actions")
+	@ResponseStatus(HttpStatus.OK)
+	public List<ActionResponse> getActionsByProgramme(@PathVariable String programmeId) {
+		return actionRepository.findByProgrammeId(programmeId).stream().map(referentielMapper::toActionResponse).toList();
+	}
 
+	// ── Chapitres ─────────────────────────────────────
 
+	@GetMapping("/sections/{sectionId}/chapitres")
+	@ResponseStatus(HttpStatus.OK)
+	public List<ChapitreResponse> getChapitresBySection(@PathVariable String sectionId) {
+		return chapitreRepository.findBySectionId(sectionId).stream().map(referentielMapper::toChapitreResponse).toList();
+	}
+
+	@GetMapping("/exercice/{exerciceId}/chapitres")
+	@ResponseStatus(HttpStatus.OK)
+	public List<ChapitreResponse> getChapitresByExercice(@PathVariable String exerciceId) {
+		return chapitreRepository.findByExerciceId(exerciceId).stream().map(referentielMapper::toChapitreResponse).toList();
+	}
 }

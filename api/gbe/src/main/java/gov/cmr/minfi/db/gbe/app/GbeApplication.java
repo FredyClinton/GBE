@@ -11,17 +11,5 @@ public class GbeApplication {
 
     }
 
-//    @Bean
-//    public CommandLineRunner commandLineRunner(final RoleRepository roleRepository) {
-//        return args -> {
-//            final Optional<Role> userRole = roleRepository.findByName("ROLE_USER");
-//            if (userRole.isEmpty()) {
-//                Role role = new Role();
-//                role.setName("ROLE_USER");
-//                role.setCreatedBy("APP");
-//                roleRepository.save(role);
-//            }
-//        };
-//    }
 
 }
