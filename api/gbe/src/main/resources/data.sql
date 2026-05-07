@@ -2,9 +2,6 @@
 -- GBE - Données référentielles (généré par transform_data.py)
 -- ============================================================
 
--- Désactive les contraintes FK temporairement
-SET session_replication_role = replica;
-
 INSERT INTO exercice (id, created_by, created_date, last_modified_date, last_midified_by, actif, annee, code_exercice, libelle_fr, libelle_en) VALUES ('1cf1800d-2747-4e41-acb8-d4606fcf9347', 'SYSTEM', '2026-04-02', NULL, NULL, 't', '2026', '60', NULL, NULL);
 INSERT INTO sections (id, created_date, created_by, last_modified_date, last_midified_by, code, code_exercice, sigle, libelle, libelle_en, exercice_id) VALUES ('afa15ae5-44fe-4710-8fc8-f42e26aafcae', '2026-04-02', 'SYSTEM', NULL, NULL, '01', NULL, 'PRC', 'PRESIDENCE DE LA REPUBLIQUE', 'PRESIDENCY OF THE REPUBLIC', '1cf1800d-2747-4e41-acb8-d4606fcf9347');
 INSERT INTO sections (id, created_date, created_by, last_modified_date, last_midified_by, code, code_exercice, sigle, libelle, libelle_en, exercice_id) VALUES ('a897ad9a-c0ee-4e45-9d2e-4f328ebcdbc9', '2026-04-02', 'SYSTEM', NULL, NULL, '03', NULL, 'AN', 'ASSEMBLEE NATIONALE', 'NATIONAL ASSEMBLY', '1cf1800d-2747-4e41-acb8-d4606fcf9347');
@@ -20329,5 +20326,3 @@ INSERT INTO natures_economiques (id, created_by, created_date, last_modified_dat
 INSERT INTO natures_economiques (id, created_by, created_date, last_modified_date, last_midified_by, code, code_titre, code_article, code_paragraphe, code_rubrique, libelle, libelle_en, code_exercice, exercice_id) VALUES ('21042266-dc8a-49a9-87a0-9c47d0ba8c92', 'SYSTEM', CURRENT_DATE, NULL, NULL, '665914', '6', '65', '659', '6591', 'Décharge de responsabilité et remise gracieuse sur déficit et débet', 'Décharge de responsabilité et remise gracieuse sur déficit et débet', NULL, NULL);
 INSERT INTO natures_economiques (id, created_by, created_date, last_modified_date, last_midified_by, code, code_titre, code_article, code_paragraphe, code_rubrique, libelle, libelle_en, code_exercice, exercice_id) VALUES ('7494887a-b79f-49d1-b663-5f62d340396c', 'SYSTEM', CURRENT_DATE, NULL, NULL, '665919', '6', '65', '659', '6591', 'Autres pertes', 'Autres pertes', NULL, NULL);
 
--- Réactive les contraintes
-SET session_replication_role = DEFAULT;
