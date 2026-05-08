@@ -52,6 +52,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		final String mfaToken = jwtService.generateMfaToken(user.getUsername());
 
 		if (user.isFirstLogin()) {
+			if (user.getSecret() == null) {
+				user.setSecret(tfaService.generateNewSecret());
+				userRepository.save(user);
+			}
 			return AuthenticationResponse
 				.builder()
 				.firstLogin(true)
