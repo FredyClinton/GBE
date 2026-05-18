@@ -13,6 +13,8 @@ public interface AgentService {
 
     List<AgentResponse> getAllsAgents();
 
+    List<AgentResponse> getAgentsWithoutAccount();
+
     void deactivateAgent(String agentId);
 
     void reactivateAgent(String agentId);

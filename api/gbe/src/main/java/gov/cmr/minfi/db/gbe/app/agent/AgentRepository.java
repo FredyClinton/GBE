@@ -2,6 +2,7 @@ package gov.cmr.minfi.db.gbe.app.agent;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface AgentRepository extends JpaRepository<Agent, String> {
@@ -14,4 +15,6 @@ public interface AgentRepository extends JpaRepository<Agent, String> {
     boolean existsByPhoneNumberIgnoreCase(String phoneNumber);
 
     Optional<Agent> findByMatriculeIgnoreCase(String matricule);
+
+    List<Agent> findByUserIsNull();
 }

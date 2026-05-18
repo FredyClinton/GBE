@@ -32,6 +32,12 @@ public class AgentController {
         return agentService.getAllsAgents();
     }
 
+    @GetMapping("/without-account")
+    @ResponseStatus(HttpStatus.OK)
+    public List<AgentResponse> getAgentsWithoutAccount() {
+        return agentService.getAgentsWithoutAccount();
+    }
+
     @GetMapping("/{agentId}")
     @ResponseStatus(HttpStatus.OK)
     public AgentResponse getAgent(@PathVariable String agentId) {

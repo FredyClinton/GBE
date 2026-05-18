@@ -52,6 +52,11 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
+    public List<AgentResponse> getAgentsWithoutAccount() {
+        return agentRepository.findByUserIsNull().stream().map(agentMapper::toResponse).toList();
+    }
+
+    @Override
     @Transactional
     public void deactivateAgent(String agentId) {
         final Agent agent = findAgent(agentId);
