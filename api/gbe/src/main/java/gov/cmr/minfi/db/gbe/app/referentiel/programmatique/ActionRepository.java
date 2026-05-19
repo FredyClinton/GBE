@@ -8,6 +8,8 @@ import java.util.Optional;
 public interface ActionRepository extends JpaRepository<Action, String> {
 	List<Action> findByProgrammeId(String programmeId);
 
+	List<Action> findByProgrammeIdAndExerciceId(String programmeId, String exerciceId);
+
 	List<Action> findBySectionId(String sectionId);
 
 	List<Action> findByExerciceId(String exerciceId);

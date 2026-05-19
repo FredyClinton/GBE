@@ -83,6 +83,15 @@ public class ReferentielController {
 		return actionRepository.findByProgrammeId(programmeId).stream().map(referentielMapper::toActionResponse).toList();
 	}
 
+	@GetMapping("/exercice/{exerciceId}/programmes/{programmeId}/actions")
+	@ResponseStatus(HttpStatus.OK)
+	public List<ActionResponse> getActionsByProgrammeAndExercice(
+			@PathVariable String exerciceId,
+			@PathVariable String programmeId) {
+		return actionRepository.findByProgrammeIdAndExerciceId(programmeId, exerciceId).stream()
+				.map(referentielMapper::toActionResponse).toList();
+	}
+
 	// ── Chapitres ─────────────────────────────────────
 
 	@GetMapping("/sections/{sectionId}/chapitres")
