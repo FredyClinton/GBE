@@ -86,6 +86,16 @@ public enum ErrorCode {
             "Accès refusé : aucun mandat actif trouvé pour cet utilisateur",
             FORBIDDEN
     ),
+    PREDICTION_SERVICE_UNAVAILABLE(
+            "PREDICTION_SERVICE_UNAVAILABLE",
+            "Le service de prédiction GBE+ est indisponible (modèle non chargé)",
+            SERVICE_UNAVAILABLE
+    ),
+    PREDICTION_SERVICE_ERROR(
+            "PREDICTION_SERVICE_ERROR",
+            "Erreur lors de l'appel au service de prédiction GBE+",
+            INTERNAL_SERVER_ERROR
+    ),
 
     ;
 

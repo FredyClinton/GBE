@@ -8,6 +8,8 @@ import gov.cmr.minfi.db.gbe.app.referentiel.administratif.ChapitreRepository;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.SectionRepository;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.dto.ChapitreResponse;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.dto.SectionResponse;
+import gov.cmr.minfi.db.gbe.app.referentiel.economique.NatureEconomiqueRepository;
+import gov.cmr.minfi.db.gbe.app.referentiel.economique.dto.NatureEconomiqueResponse;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.ActionRepository;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.ProgrammeRepository;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.dto.ActionResponse;
@@ -30,6 +32,7 @@ public class ReferentielController {
 	private final ActionRepository actionRepository;
 	private final SectionRepository sectionRepository;
 	private final ChapitreRepository chapitreRepository;
+	private final NatureEconomiqueRepository natureEconomiqueRepository;
 	private final ExerciceMapper exerciceMapper;
 	private final ReferentielMapper referentielMapper;
 
@@ -104,5 +107,23 @@ public class ReferentielController {
 	@ResponseStatus(HttpStatus.OK)
 	public List<ChapitreResponse> getChapitresByExercice(@PathVariable String exerciceId) {
 		return chapitreRepository.findByExerciceId(exerciceId).stream().map(referentielMapper::toChapitreResponse).toList();
+	}
+
+	// ── Natures économiques ───────────────────────────
+	// Nécessaire au formulaire de prédiction : le champ "rubrique" envoyé à
+	// GBE+ correspond à NatureEconomique.code.
+
+	@GetMapping("/natures-economiques")
+	@ResponseStatus(HttpStatus.OK)
+	public List<NatureEconomiqueResponse> getAllNaturesEconomiques() {
+		return natureEconomiqueRepository.findAll().stream()
+				.map(referentielMapper::toNatureEconomiqueResponse).toList();
+	}
+
+	@GetMapping("/exercice/{exerciceId}/natures-economiques")
+	@ResponseStatus(HttpStatus.OK)
+	public List<NatureEconomiqueResponse> getNaturesEconomiquesByExercice(@PathVariable String exerciceId) {
+		return natureEconomiqueRepository.findByExerciceId(exerciceId).stream()
+				.map(referentielMapper::toNatureEconomiqueResponse).toList();
 	}
 }

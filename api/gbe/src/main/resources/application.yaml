@@ -29,3 +29,6 @@ app:
       access-token-expiration: 8640000 # For local testing
       refresh-token-expiration: 604800000
       mfa-token-expiration: 300000
+
+gbe-plus:
+  base-url: ${GBE_PLUS_BASE_URL:http://localhost:8000}

@@ -4,6 +4,8 @@ import gov.cmr.minfi.db.gbe.app.referentiel.administratif.Chapitre;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.Section;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.dto.ChapitreResponse;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.dto.SectionResponse;
+import gov.cmr.minfi.db.gbe.app.referentiel.economique.NatureEconomique;
+import gov.cmr.minfi.db.gbe.app.referentiel.economique.dto.NatureEconomiqueResponse;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.Action;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.Programme;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.dto.ActionResponse;
@@ -15,6 +17,8 @@ import org.mapstruct.Mapping;
 public interface ReferentielMapper {
 
     SectionResponse toSectionResponse(Section section);
+
+    NatureEconomiqueResponse toNatureEconomiqueResponse(NatureEconomique natureEconomique);
 
     @Mapping(target = "sectionId", source = "section.id")
     @Mapping(target = "sectionLibelle", source = "section.libelleFr")
