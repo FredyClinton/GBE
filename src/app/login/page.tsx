@@ -15,6 +15,7 @@ import AuthLayout  from '@/components/auth/AuthLayout';
 import Input       from '@/components/ui/Input';
 import Button      from '@/components/ui/Button';
 import { loginUser } from '@/lib/authService';
+import { storeSession } from '@/lib/session';
 import { LoginPayload, FormErrors } from '@/types/auth';
 import { APP_ROUTES }  from '@/constants/auth';
 
@@ -31,13 +32,6 @@ const IconLock = () => (
     stroke="currentColor" strokeWidth="2">
     <rect x="3" y="11" width="18" height="11" rx="2"/>
     <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-  </svg>
-);
-const IconId = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="2">
-    <rect x="2" y="5" width="20" height="14" rx="2"/>
-    <path d="M16 10h2M16 14h2M6 10h4v4H6z"/>
   </svg>
 );
 const IconEye = () => (
@@ -84,10 +78,6 @@ function validate(values: LoginPayload): FormErrors {
     e.email = 'Adresse email invalide';
   }
 
-  if (!values.matricule.trim()) {
-    e.matricule = 'Le matricule est requis';
-  }
-
   if (!values.password) {
     e.password = 'Le mot de passe est requis';
   }
@@ -103,9 +93,8 @@ export default function LoginPage() {
 
   // ── État du formulaire ──
   const [values, setValues] = useState<LoginPayload>({
-    email:     '',
-    matricule: '',
-    password:  '',
+    email:    '',
+    password: '',
   });
   const [errors,      setErrors]      = useState<FormErrors>({});
   const [globalError, setGlobalError] = useState('');
@@ -137,17 +126,23 @@ export default function LoginPage() {
     try {
       const res = await loginUser(values);
 
-      if (res.success) {
-        if (res.data?.sessionToken) {
-          // Back-end demande une vérification 2FA
-          sessionStorage.setItem('gbe_session_token', res.data.sessionToken);
-          router.push(APP_ROUTES.TWO_FACTOR);
-        } else {
-          // Connexion directe (2FA désactivé)
-          router.push(APP_ROUTES.DASHBOARD);
-        }
+      if (res.accessToken) {
+        // Connexion complète (MFA désactivé ou déjà vérifié)
+        storeSession(res);
+        router.push(APP_ROUTES.DASHBOARD);
+      } else if (res.firstLogin && res.mfaToken) {
+        // Première connexion : enrôlement MFA requis (scan du QR code)
+        sessionStorage.setItem('gbe_mfa_token', res.mfaToken);
+        sessionStorage.setItem('gbe_mfa_email', values.email);
+        sessionStorage.setItem('gbe_mfa_qr', res.secretImageUri ?? '');
+        router.push(APP_ROUTES.MFA_SETUP);
+      } else if (res.mfaToken) {
+        // MFA déjà activé : vérification du code TOTP
+        sessionStorage.setItem('gbe_mfa_token', res.mfaToken);
+        sessionStorage.setItem('gbe_mfa_email', values.email);
+        router.push(APP_ROUTES.TWO_FACTOR);
       } else {
-        setGlobalError(res.message || 'Identifiants incorrects. Veuillez réessayer.');
+        setGlobalError('Identifiants incorrects. Veuillez réessayer.');
       }
     } catch (err) {
       setGlobalError(
@@ -185,19 +180,6 @@ export default function LoginPage() {
             icon={<IconMail />}
             autoComplete="email"
             autoFocus
-            disabled={isLoading}
-          />
-
-          {/* Matricule */}
-          <Input
-            id="matricule" name="matricule" type="text"
-            label="Matricule"
-            placeholder="Ex : 123456A"
-            value={values.matricule}
-            onChange={handleChange}
-            error={errors.matricule}
-            icon={<IconId />}
-            autoComplete="username"
             disabled={isLoading}
           />
 
@@ -244,12 +226,6 @@ export default function LoginPage() {
 
         </div>
       </form>
-
-      {/* Lien vers l'inscription */}
-      <p className="auth-switch">
-        Pas encore de compte ?{' '}
-        <Link href={APP_ROUTES.REGISTER}>Créer un compte</Link>
-      </p>
     </AuthLayout>
   );
 }

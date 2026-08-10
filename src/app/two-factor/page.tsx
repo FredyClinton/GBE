@@ -13,7 +13,8 @@ import Link        from 'next/link';
 import { useRouter } from 'next/navigation';
 import AuthLayout  from '@/components/auth/AuthLayout';
 import Button      from '@/components/ui/Button';
-import { verifyTwoFactor, resendTwoFactorCode } from '@/lib/authService';
+import { verifyMfa } from '@/lib/authService';
+import { storeSession } from '@/lib/session';
 import {
   APP_ROUTES,
   TWO_FACTOR_CODE_LENGTH,
@@ -31,12 +32,6 @@ const IconAlert = () => (
     <circle cx="12" cy="12" r="10"/>
     <line x1="12" y1="8"  x2="12" y2="12"/>
     <line x1="12" y1="16" x2="12.01" y2="16"/>
-  </svg>
-);
-const IconCheck = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="2" className="alert__icon">
-    <polyline points="20,6 9,17 4,12"/>
   </svg>
 );
 const IconArrowLeft = () => (
@@ -59,9 +54,7 @@ export default function TwoFactorPage() {
   );
   const [hasError,     setHasError]     = useState(false);
   const [errorMsg,     setErrorMsg]     = useState('');
-  const [resendMsg,    setResendMsg]    = useState('');
   const [isLoading,    setIsLoading]    = useState(false);
-  const [isResending,  setIsResending]  = useState(false);
   const [timeLeft,     setTimeLeft]     = useState(TWO_FACTOR_CODE_EXPIRY_SECONDS);
 
   // Références sur chaque input pour le focus automatique
@@ -80,8 +73,9 @@ export default function TwoFactorPage() {
   const codeIsFull  = otp.every(c => c !== '');
   const otpValue    = otp.join('');
 
-  // Récupérer le token de session stocké après le login
-  const getSessionToken = () => sessionStorage.getItem('gbe_session_token') ?? '';
+  // Récupérer le mfaToken et l'email stockés après le login
+  const getMfaToken = () => sessionStorage.getItem('gbe_mfa_token') ?? '';
+  const getEmail     = () => sessionStorage.getItem('gbe_mfa_email') ?? '';
 
   // ── Gestion de la saisie dans une case ──
   const handleInput = useCallback((index: number, raw: string) => {
@@ -135,17 +129,20 @@ export default function TwoFactorPage() {
     setHasError(false);
     setErrorMsg('');
     try {
-      const res = await verifyTwoFactor({
-        code:         otpValue,
-        sessionToken: getSessionToken(),
+      const res = await verifyMfa({
+        email:    getEmail(),
+        code:     otpValue,
+        mfaToken: getMfaToken(),
       });
 
-      if (res.success) {
-        sessionStorage.removeItem('gbe_session_token');
+      if (res.accessToken) {
+        sessionStorage.removeItem('gbe_mfa_token');
+        sessionStorage.removeItem('gbe_mfa_email');
+        storeSession(res);
         router.push(APP_ROUTES.DASHBOARD);
       } else {
         setHasError(true);
-        setErrorMsg(res.message || 'Code incorrect. Veuillez réessayer.');
+        setErrorMsg('Code incorrect. Veuillez réessayer.');
       }
     } catch (err) {
       setHasError(true);
@@ -155,42 +152,15 @@ export default function TwoFactorPage() {
     }
   };
 
-  // ── Renvoi d'un nouveau code ──
-  const handleResend = async () => {
-    if (isResending) return;
-    setIsResending(true);
-    setResendMsg('');
-    setErrorMsg('');
-    setHasError(false);
-    try {
-      await resendTwoFactorCode(getSessionToken());
-      setOtp(Array(TWO_FACTOR_CODE_LENGTH).fill(''));
-      setTimeLeft(TWO_FACTOR_CODE_EXPIRY_SECONDS);
-      setResendMsg('Un nouveau code vous a été envoyé.');
-      refs.current[0]?.focus();
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'Impossible de renvoyer le code.');
-    } finally {
-      setIsResending(false);
-    }
-  };
-
   return (
     <AuthLayout
       title="Vérification en deux étapes"
-      subtitle="Saisissez le code à 6 chiffres envoyé à votre email ou téléphone"
+      subtitle="Saisissez le code à 6 chiffres généré par votre application d'authentification"
     >
       {/* Erreur */}
       {errorMsg && (
         <div className="alert alert--error" role="alert">
           <IconAlert /> {errorMsg}
-        </div>
-      )}
-
-      {/* Succès renvoi */}
-      {resendMsg && (
-        <div className="alert alert--success" role="status">
-          <IconCheck /> {resendMsg}
         </div>
       )}
 
@@ -259,21 +229,6 @@ export default function TwoFactorPage() {
           >
             Vérifier le code
           </Button>
-
-          {/* Renvoi code */}
-          <div style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: '.82rem', color: 'var(--clr-gray-400)', marginBottom: '6px' }}>
-              Vous n&apos;avez pas reçu de code ?
-            </p>
-            <button
-              type="button"
-              className="resend-btn"
-              onClick={handleResend}
-              disabled={isResending || isLoading}
-            >
-              {isResending ? 'Envoi en cours…' : 'Renvoyer le code'}
-            </button>
-          </div>
 
           {/* Retour connexion */}
           <div style={{

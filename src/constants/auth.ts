@@ -19,14 +19,13 @@ export const API_BASE_URL =
  * Préfixés par API_BASE_URL pour construire l'URL complète.
  */
 export const AUTH_ENDPOINTS = {
-  LOGIN:             `${API_BASE_URL}/auth/login`,
-  REGISTER:          `${API_BASE_URL}/auth/register`,
-  TWO_FACTOR_VERIFY: `${API_BASE_URL}/auth/2fa/verify`,
-  TWO_FACTOR_RESEND: `${API_BASE_URL}/auth/2fa/resend`,
-  FORGOT_PASSWORD:   `${API_BASE_URL}/auth/forgot-password`,
-  RESET_PASSWORD:    `${API_BASE_URL}/auth/reset-password`,
-  LOGOUT:            `${API_BASE_URL}/auth/logout`,
-  REFRESH_TOKEN:     `${API_BASE_URL}/auth/refresh`,
+  LOGIN:          `${API_BASE_URL}/auth/login`,
+  VERIFY:         `${API_BASE_URL}/auth/verify`,     // Code TOTP à chaque connexion (MFA déjà activé)
+  SETUP_MFA:      `${API_BASE_URL}/auth/setup-mfa`,  // Enrôlement MFA (1ère connexion, scan du QR)
+  REFRESH_TOKEN:  `${API_BASE_URL}/auth/refresh`,
+  // ⚠️ Pas encore exposés par l'API (absents du openapi.json) :
+  FORGOT_PASSWORD: `${API_BASE_URL}/auth/forgot-password`,
+  RESET_PASSWORD:  `${API_BASE_URL}/auth/reset-password`,
 } as const;
 
 /**
@@ -36,14 +35,15 @@ export const AUTH_ENDPOINTS = {
  */
 export const APP_ROUTES = {
   LOGIN:           '/login',
-  REGISTER:        '/register',
   TWO_FACTOR:      '/two-factor',
+  MFA_SETUP:       '/mfa-setup',
   FORGOT_PASSWORD: '/forgot-password',
   DASHBOARD:       '/dashboard',
 } as const;
 
 /**
- * Durée de validité du code 2FA en secondes (5 minutes).
+ * Durée de validité du mfaToken en secondes (5 minutes,
+ * déduite du JWT renvoyé par le back-end : exp - iat = 300).
  */
 export const TWO_FACTOR_CODE_EXPIRY_SECONDS = 300;
 

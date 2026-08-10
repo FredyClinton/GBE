@@ -1,77 +1,79 @@
 // ============================================================
 // FICHIER  : src/types/auth.ts
-// RÔLE     : Définition de toutes les interfaces TypeScript
-//            utilisées dans les pages d'authentification.
-//            Centraliser ici facilite la maintenance et
-//            garantit la cohérence avec le back-end.
+// RÔLE     : Interfaces TypeScript alignées sur les schémas
+//            OpenAPI réels de l'API GBE (tags "Authentication").
 // ============================================================
 
 /**
  * Payload envoyé au back-end lors de la connexion.
  * Route : POST /auth/login
+ * Schéma back-end : AuthenticationRequest
  */
 export interface LoginPayload {
-  email:     string; // Adresse email de l'utilisateur
-  matricule: string; // Identifiant administratif unique
-  password:  string; // Mot de passe en clair (HTTPS obligatoire)
+  email:    string;
+  password: string;
 }
 
 /**
- * Payload envoyé au back-end lors de l'inscription.
- * Route : POST /auth/register
+ * Payload pour vérifier un code TOTP lors d'une connexion
+ * ultérieure (MFA déjà activé).
+ * Route : POST /auth/verify
+ * Schéma back-end : VerificationRequest
  */
-export interface RegisterPayload {
-  firstName:       string; // Prénom
-  lastName:        string; // Nom de famille
-  email:           string; // Adresse email
-  password:        string; // Mot de passe choisi
-  confirmPassword: string; // Confirmation (validé côté client seulement)
-  phoneNumber:     string; // Ex : +237655555555
-  dateOfBirth:     string; // Format ISO : "1990-01-25"
-  matricule:       string; // Matricule administratif
+export interface VerifyPayload {
+  email:    string;
+  code:     string;
+  mfaToken: string;
 }
 
 /**
- * Payload envoyé pour vérifier le code OTP 2FA.
- * Route : POST /auth/2fa/verify
+ * Payload pour enrôler le MFA (première connexion) après avoir
+ * scanné le QR code (`secretImageUri`) avec une app TOTP.
+ * Route : POST /auth/setup-mfa
+ * Schéma back-end : SetupMfaRequest
  */
-export interface TwoFactorPayload {
-  code:         string; // Code à 6 chiffres reçu par email/SMS
-  sessionToken: string; // Token temporaire retourné après login réussi
+export interface SetupMfaPayload {
+  email:    string;
+  code:     string;
+  mfaToken: string;
 }
 
 /**
- * Payload pour demander la réinitialisation du mot de passe.
- * Route : POST /auth/forgot-password
+ * Contexte utilisateur renvoyé après authentification complète.
+ * Schéma back-end : UserContext
  */
-export interface ForgotPasswordPayload {
-  email: string;
+export interface UserContext {
+  userId:    string;
+  firstName: string;
+  lastName:  string;
+  email:     string;
+  matricule: string;
+  nui?:      string;
+  cni?:      string;
+  role:      string;
+  mandats:   unknown[];
 }
 
 /**
- * Structure de réponse standard de l'API d'authentification.
- * Toutes les routes auth renvoient ce format.
+ * Réponse standard des routes d'authentification.
+ * Schéma back-end : AuthenticationResponse
+ *
+ * - `accessToken`/`refreshToken` présents  → authentification complète.
+ * - `firstLogin: true` + `secretImageUri`  → enrôlement MFA requis (scan QR).
+ * - `mfaToken` sans `accessToken`          → code TOTP à vérifier (/auth/verify).
  */
-export interface AuthApiResponse {
-  success: boolean;
-  message: string;
-  data?: {
-    accessToken?:  string; // JWT d'accès (connexion complète)
-    refreshToken?: string; // JWT de rafraîchissement
-    sessionToken?: string; // Token temporaire pour le flux 2FA
-    user?: {
-      id:        string;
-      firstName: string;
-      lastName:  string;
-      email:     string;
-      matricule: string;
-      role:      string;
-    };
-  };
+export interface AuthenticationResponse {
+  accessToken?:    string;
+  refreshToken?:   string;
+  tokenType?:      string;
+  mfaEnabled:      boolean;
+  firstLogin:      boolean;
+  secretImageUri?: string;
+  mfaToken?:       string;
+  userContext?:    UserContext;
 }
 
 /**
  * Dictionnaire d'erreurs de validation par champ.
- * Clé = nom du champ, valeur = message d'erreur ou undefined.
  */
 export type FormErrors = Record<string, string | undefined>;

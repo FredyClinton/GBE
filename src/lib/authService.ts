@@ -9,10 +9,9 @@
 
 import {
   LoginPayload,
-  RegisterPayload,
-  TwoFactorPayload,
-  ForgotPasswordPayload,
-  AuthApiResponse,
+  VerifyPayload,
+  SetupMfaPayload,
+  AuthenticationResponse,
 } from '@/types/auth';
 import { AUTH_ENDPOINTS } from '@/constants/auth';
 
@@ -28,9 +27,9 @@ const DEFAULT_HEADERS: HeadersInit = {
  *
  * @param url     - URL de l'endpoint
  * @param payload - Corps de la requête (sera sérialisé en JSON)
- * @returns Réponse JSON typée AuthApiResponse
+ * @returns Réponse JSON typée AuthenticationResponse
  */
-async function postJson<T>(url: string, payload: T): Promise<AuthApiResponse> {
+async function postJson<T>(url: string, payload: T): Promise<AuthenticationResponse> {
   const response = await fetch(url, {
     method:  'POST',
     headers: DEFAULT_HEADERS,
@@ -38,17 +37,16 @@ async function postJson<T>(url: string, payload: T): Promise<AuthApiResponse> {
   });
 
   // Lire le corps même en cas d'erreur pour récupérer le message du serveur
-  const data: AuthApiResponse = await response.json().catch(() => ({
-    success: false,
-    message: 'Erreur réseau ou réponse invalide du serveur.',
-  }));
+  const data = await response.json().catch(() => null);
 
   if (!response.ok) {
-    // Lever une erreur avec le message renvoyé par l'API
-    throw new Error(data.message || `Erreur HTTP ${response.status}`);
+    const message =
+      (data && typeof data === 'object' && 'message' in data && String(data.message)) ||
+      `Erreur HTTP ${response.status}`;
+    throw new Error(message);
   }
 
-  return data;
+  return data as AuthenticationResponse;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -56,53 +54,45 @@ async function postJson<T>(url: string, payload: T): Promise<AuthApiResponse> {
 // ─────────────────────────────────────────────────────────────
 
 /**
- * Connecte un utilisateur avec email, matricule et mot de passe.
- * Si le 2FA est activé, la réponse contient un `sessionToken`
- * et non un `accessToken`.
+ * Connecte un utilisateur avec email et mot de passe.
+ * Selon la réponse :
+ * - `accessToken` présent      → connexion complète.
+ * - `firstLogin` + `mfaToken`  → enrôlement MFA requis (/auth/setup-mfa).
+ * - `mfaToken` seul            → code TOTP à vérifier (/auth/verify).
  */
 export async function loginUser(
   payload: LoginPayload
-): Promise<AuthApiResponse> {
+): Promise<AuthenticationResponse> {
   return postJson(AUTH_ENDPOINTS.LOGIN, payload);
 }
 
 /**
- * Inscrit un nouvel utilisateur.
- * Le back-end doit valider l'unicité de l'email et du matricule.
+ * Vérifie le code TOTP lors d'une connexion (MFA déjà activé).
  */
-export async function registerUser(
-  payload: RegisterPayload
-): Promise<AuthApiResponse> {
-  return postJson(AUTH_ENDPOINTS.REGISTER, payload);
+export async function verifyMfa(
+  payload: VerifyPayload
+): Promise<AuthenticationResponse> {
+  return postJson(AUTH_ENDPOINTS.VERIFY, payload);
 }
 
 /**
- * Vérifie le code OTP reçu par email ou SMS.
- * Retourne un `accessToken` si le code est correct.
+ * Enrôle le MFA lors de la première connexion, après que
+ * l'utilisateur a scanné le QR code (`secretImageUri`) et
+ * saisi le code généré par son application TOTP.
  */
-export async function verifyTwoFactor(
-  payload: TwoFactorPayload
-): Promise<AuthApiResponse> {
-  return postJson(AUTH_ENDPOINTS.TWO_FACTOR_VERIFY, payload);
+export async function setupMfa(
+  payload: SetupMfaPayload
+): Promise<AuthenticationResponse> {
+  return postJson(AUTH_ENDPOINTS.SETUP_MFA, payload);
 }
 
 /**
- * Demande le renvoi d'un nouveau code OTP.
- * Nécessite le `sessionToken` de la session en cours.
- */
-export async function resendTwoFactorCode(
-  sessionToken: string
-): Promise<AuthApiResponse> {
-  return postJson(AUTH_ENDPOINTS.TWO_FACTOR_RESEND, { sessionToken });
-}
-
-/**
- * Envoie un email de réinitialisation de mot de passe.
- * Toujours retourner un succès côté UI (sécurité : ne pas
- * révéler si l'email existe dans la base).
+ * Demande le renvoi d'un lien de réinitialisation de mot de passe.
+ * ⚠️ Endpoint absent du openapi.json actuel du back-end — à activer
+ * côté serveur avant que cette fonction puisse fonctionner.
  */
 export async function forgotPassword(
-  payload: ForgotPasswordPayload
-): Promise<AuthApiResponse> {
+  payload: { email: string }
+): Promise<AuthenticationResponse> {
   return postJson(AUTH_ENDPOINTS.FORGOT_PASSWORD, payload);
 }
