@@ -38,13 +38,15 @@ export default function ApercuPage() {
 
     return (
         <div className="dash-container">
-            <div className="page-eyebrow">MINFI — Direction Générale du Budget</div>
-            <h1 className="page-title text-[26px] mb-1.5">
-                Vue d&apos;ensemble
-            </h1>
-            <p className="page-subtitle text-sm mb-10">
-                Plateforme de gestion budgétaire
-            </p>
+            <div className="page-header">
+                <div className="page-eyebrow">MINFI - Direction Générale du Budget</div>
+                <h1 className="page-title text-[28px] sm:text-[30px]">
+                    Vue d&apos;ensemble
+                </h1>
+                <p className="page-subtitle text-sm mt-2">
+                    Plateforme de gestion budgétaire
+                </p>
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
                 <MetricCard label="Chapitres référencés" value={nbSections} hint="ministères et institutions"/>

@@ -1028,26 +1028,48 @@ button {
     margin: 0 auto;
 }
 
+/* Bloc d'en-tête de page : eyebrow + titre + sous-titre, avec
+   séparateur en bas pour ancrer visuellement le contenu qui suit. */
+.page-header {
+    padding-bottom: var(--sp-5);
+    margin-bottom: var(--sp-8);
+    border-bottom: 1px solid var(--clr-gray-100);
+}
+
 /* Petit label institutionnel au-dessus des titres de page */
 .page-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
     font-size: .72rem;
     font-weight: 700;
     letter-spacing: .14em;
     text-transform: uppercase;
     color: var(--clr-gold);
-    margin-bottom: var(--sp-2);
+    margin-bottom: var(--sp-3);
+}
+
+.page-eyebrow::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: var(--radius-full);
+    background: var(--clr-gold);
+    flex-shrink: 0;
 }
 
 .page-title {
     font-family: var(--font-display);
-    font-weight: 700;
+    font-weight: 800;
     color: var(--clr-navy);
-    letter-spacing: -.01em;
+    letter-spacing: -.02em;
+    line-height: 1.15;
 }
 
 .page-subtitle {
     color: var(--clr-gray-400);
-    line-height: 1.5;
+    line-height: 1.55;
+    max-width: 46ch;
 }
 
 .metric-card {
