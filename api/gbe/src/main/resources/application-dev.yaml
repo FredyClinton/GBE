@@ -1,0 +1,11 @@
+# Profil de développement local.
+app:
+  security:
+    jwt:
+      # Clés de développement versionnées dans le dépôt : NE JAMAIS les utiliser en production.
+      private-key: classpath:keys/local-only/private_key.pem
+      public-key: classpath:keys/local-only/public_key.pem
+  cors:
+    allowed-origins: >-
+      http://localhost:3000,
+      https://minfi-application-de-genstion-du-bu.vercel.app

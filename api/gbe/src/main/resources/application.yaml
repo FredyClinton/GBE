@@ -1,8 +1,10 @@
+# Configuration commune à tous les profils.
+# Les valeurs spécifiques sont dans application-dev.yaml / application-prod.yaml.
 spring:
   application:
     name: gbe
   profiles:
-    active: dev
+    active: dev            # surchargé par la variable d'environnement SPRING_PROFILES_ACTIVE
   config:
     import: optional:file:.env[.properties]
   datasource:
@@ -10,13 +12,9 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
-  # sql:             # Décommenter + passer ddl-auto: create pour réinitialiser la base
-  #   init:
-  #     mode: always
   jpa:
     hibernate:
       ddl-auto: update
-  # defer-datasource-initialization: true   # Utile uniquement avec ddl-auto: create
     database: postgresql
     show-sql: false
     properties:
@@ -26,6 +24,6 @@ spring:
 app:
   security:
     jwt:
-      access-token-expiration: 8640000 # For local testing
-      refresh-token-expiration: 604800000
+      access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:8640000}
+      refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:604800000}
       mfa-token-expiration: 300000

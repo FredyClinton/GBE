@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.security.PrivateKey;
@@ -34,9 +35,11 @@ public class JwtService {
     private long mfaTokenExpiration;
 
 
-    public JwtService() throws Exception {
-        this.privateKey = KeyUtils.loadPrivateKey("/keys/local-only/private_key.pem");
-        this.publicKey = KeyUtils.loadPublicKey("/keys/local-only/public_key.pem");
+    public JwtService(
+            @Value("${app.security.jwt.private-key}") final Resource privateKey,
+            @Value("${app.security.jwt.public-key}") final Resource publicKey) throws Exception {
+        this.privateKey = KeyUtils.loadPrivateKey(privateKey);
+        this.publicKey = KeyUtils.loadPublicKey(publicKey);
     }
 
     public String generateAccessToken(final String username) {

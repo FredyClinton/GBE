@@ -1,6 +1,7 @@
 package gov.cmr.minfi.db.gbe.app.common.config;
 
 import gov.cmr.minfi.db.gbe.app.common.audit.ApplicatorAuditoreAware;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -9,8 +10,8 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
 import java.util.List;
@@ -30,12 +31,12 @@ public class BeansConfig {
 
 
     @Bean
-    public CorsFilter corsFilter() {
+    public CorsConfigurationSource corsConfigurationSource(@Value("${app.cors.allowed-origins}") final String[] allowedOrigins) {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         final CorsConfiguration config = new CorsConfiguration();
 
-        // 1. Autoriser les origines spécifiques (Frontend, Swagger, etc.)
-        config.setAllowedOrigins(List.of("http://localhost:3000", "https://minfi-application-de-genstion-du-bu.vercel.app/"));
+        // 1. Autoriser les origines spécifiques (app.cors.allowed-origins, sans "/" final)
+        config.setAllowedOrigins(List.of(allowedOrigins));
 
         // 2. Autoriser les headers
         config.setAllowedHeaders(Arrays.asList(
@@ -69,7 +70,7 @@ public class BeansConfig {
 
         // Appliquer cette configuration à toutes les routes
         source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
+        return source;
     }
 
     @Bean
