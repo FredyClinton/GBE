@@ -17,6 +17,8 @@ import gov.cmr.minfi.db.gbe.app.referentiel.administratif.Chapitre;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.ChapitreRepository;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.Section;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.SectionRepository;
+import gov.cmr.minfi.db.gbe.app.referentiel.economique.NatureEconomique;
+import gov.cmr.minfi.db.gbe.app.referentiel.economique.NatureEconomiqueRepository;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.Action;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.ActionRepository;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.Programme;
@@ -40,6 +42,7 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
 	private final ProgrammeRepository programmeRepository;
 	private final SectionRepository sectionRepository;
 	private final ExerciceRepository exerciceRepository;
+	private final NatureEconomiqueRepository natureEconomiqueRepository;
 	private final CreditBudgetaireRepository creditBudgetaireRepository;
 	private final MandatScopeValidator mandatScopeValidator;
 	private final CreditBudgetaireMapper creditBudgetaireMapper;
@@ -52,9 +55,11 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
 		final Programme programme = findProgramme(request.programmeId());
 		final Action action = findAction(request.actionId());
 		final Chapitre chapitre = findChapitre(request.chapitreId());
+		final NatureEconomique natureEconomique = findNatureEconomique(request.natureEconomiqueId());
 
 		validateProgrammeBelongsToSection(programme, section);
 		validateActionBelongsToProgramme(action, programme);
+		validateNatureEconomiqueBelongsToExercice(natureEconomique, exercice);
 		validateImputationUniqueness(request);
 
 		CreditBudgetaire creditParent = null;
@@ -66,7 +71,7 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
 			validateNoCreditCycle(request.creditParentId());
 		}
 
-		final String codeImputation = buildImputationCode(exercice, section, programme, action, chapitre);
+		final String codeImputation = buildImputationCode(exercice, section, programme, action, chapitre, natureEconomique);
 
 		final CreditBudgetaire credit = CreditBudgetaire
 			.builder()
@@ -75,6 +80,7 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
 			.programme(programme)
 			.action(action)
 			.chapitre(chapitre)
+			.natureEconomique(natureEconomique)
 			.codeImputation(codeImputation)
 			.montantAE(request.montantAE())
 			.montantCP(request.montantCP())
@@ -224,14 +230,21 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
 		}
 	}
 
+	private void validateNatureEconomiqueBelongsToExercice(NatureEconomique natureEconomique, Exercice exercice) {
+		if (natureEconomique.getExercice() != null && !natureEconomique.getExercice().getId().equals(exercice.getId())) {
+			throw new BusinessException(ErrorCode.NATURE_ECONOMIQUE_NOT_IN_EXERCICE, natureEconomique.getCode());
+		}
+	}
+
 	private void validateImputationUniqueness(CreateCreditRequest request) {
 		if (
-			creditBudgetaireRepository.existsByExerciceIdAndSectionIdAndProgrammeIdAndActionIdAndChapitreId(
+			creditBudgetaireRepository.existsByExerciceIdAndSectionIdAndProgrammeIdAndActionIdAndChapitreIdAndNatureEconomiqueId(
 				request.exerciceId(),
 				request.sectionId(),
 				request.programmeId(),
 				request.actionId(),
-				request.chapitreId()
+				request.chapitreId(),
+				request.natureEconomiqueId()
 			)
 		) {
 			throw new BusinessException(ErrorCode.CREDIT_ALREADY_EXISTS);
@@ -280,6 +293,12 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
 		return actionRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, id));
 	}
 
+	private NatureEconomique findNatureEconomique(String id) {
+		return natureEconomiqueRepository
+			.findById(id)
+			.orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, id));
+	}
+
 	private Chapitre findChapitre(String id) {
 		return chapitreRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, id));
 	}
@@ -311,14 +330,16 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
 		Section section,
 		Programme programme,
 		Action action,
-		Chapitre chapitre
+		Chapitre chapitre,
+		NatureEconomique natureEconomique
 	) {
 		return (
 			exercice.getCodeExercice() +
 			section.getCodeSection() +
 			programme.getCode() +
 			action.getCodeAction() +
-			chapitre.getCodeComplet()
+			chapitre.getCodeComplet() +
+			natureEconomique.getCode()
 		);
 	}
 }

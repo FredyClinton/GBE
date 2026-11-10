@@ -39,12 +39,13 @@ public interface CreditBudgetaireRepository extends JpaRepository<CreditBudgetai
 
 
     // Vérification d'unicité de l'imputation  avant création
-    boolean existsByExerciceIdAndSectionIdAndProgrammeIdAndActionIdAndChapitreId(
+    boolean existsByExerciceIdAndSectionIdAndProgrammeIdAndActionIdAndChapitreIdAndNatureEconomiqueId(
             String exerciceId,
             String sectionId,
             String programmeId,
             String actionId,
-            String chapitreId
+            String chapitreId,
+            String natureEconomiqueId
     );
 
 

@@ -57,7 +57,7 @@ class GbeApplicationTests {
     }
 
     @Test
-    void contrainteUniciteImputationCredit_presenteSurLes5Colonnes() {
+    void contrainteUniciteImputationCredit_inclutLaNatureEconomique() {
         final List<String> colonnes = jdbcTemplate.queryForList("""
                 SELECT a.attname
                 FROM pg_constraint c
@@ -65,7 +65,7 @@ class GbeApplicationTests {
                 WHERE c.conname = 'uk_credit_imputation' AND c.contype = 'u'
                 """, String.class);
         assertThat(colonnes).containsExactlyInAnyOrder(
-                "exercice_id", "section_id", "programme_id", "action_id", "chapitre_id");
+                "exercice_id", "section_id", "programme_id", "action_id", "chapitre_id", "nature_economique_id");
     }
 
     @Test

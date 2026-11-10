@@ -1,5 +1,6 @@
 package gov.cmr.minfi.db.gbe.app.budget.credit;
 
+import gov.cmr.minfi.db.gbe.app.referentiel.economique.NatureEconomique;
 import gov.cmr.minfi.db.gbe.app.common.audit.BaseEntity;
 import gov.cmr.minfi.db.gbe.app.common.exception.BusinessException;
 import gov.cmr.minfi.db.gbe.app.common.exception.ErrorCode;
@@ -26,10 +27,10 @@ import java.util.Set;
         uniqueConstraints = @UniqueConstraint(
                 name = "uk_credit_imputation",
                 // Doit rester aligné sur CreditBudgetaireServiceImpl.validateImputationUniqueness
-                // et sur la migration V4__contrainte_unicite_imputation_credit.sql
+                // et sur la migration V5__nature_economique_credit.sql (NULLS NOT DISTINCT en base)
                 columnNames = {
                         "EXERCICE_ID", "SECTION_ID", "PROGRAMME_ID",
-                        "ACTION_ID", "CHAPITRE_ID"
+                        "ACTION_ID", "CHAPITRE_ID", "NATURE_ECONOMIQUE_ID"
                 }
         )
 )
@@ -56,6 +57,13 @@ public class CreditBudgetaire extends BaseEntity
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CHAPITRE_ID", nullable = false)
     private Chapitre chapitre;
+
+    // ── Classification économique ─────────────────────
+    // Obligatoire à la création ; NULL uniquement pour les crédits créés avant V5.
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "NATURE_ECONOMIQUE_ID",
+            foreignKey = @ForeignKey(name = "fk_credit_nature_economique"))
+    private NatureEconomique natureEconomique;
 
     @Column(name = "CODE_IMPUTATION", nullable = false, unique = true, length = 50)
     private String codeImputation;

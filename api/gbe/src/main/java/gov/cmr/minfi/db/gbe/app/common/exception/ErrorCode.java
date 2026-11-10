@@ -33,6 +33,8 @@ public enum ErrorCode {
     ACTION_NOT_FOUND("ACTION_NOT_FOUND", "Action not found with id %s", NOT_FOUND),
     ACTION_ALREADY_EXISTS("ACTION_ALREADY_EXISTS", "An action with code %s already exists in this programme", BAD_REQUEST),
     PROGRAMME_NOT_IN_SECTION("PROGRAMME_NOT_IN_SECTION", "This programme does not belong to the specified section", BAD_REQUEST),
+    NATURE_ECONOMIQUE_NOT_IN_EXERCICE("NATURE_ECONOMIQUE_NOT_IN_EXERCICE",
+            "La nature économique %s n'appartient pas à l'exercice du crédit", BAD_REQUEST),
     CREDIT_ALREADY_EXISTS("CREDIT_ALREADY_EXISTS", " this credit was already created", BAD_REQUEST),
     NEW_AE_AMOUNT_LESS_THAN_CONSOMME("NEW_AE_AMOUNT_LESS_THAN_CONSOMME",
             "New AE amount cannot be less than already consumed amount", BAD_REQUEST),

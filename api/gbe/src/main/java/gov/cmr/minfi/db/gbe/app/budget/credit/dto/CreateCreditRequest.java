@@ -24,6 +24,9 @@ public record CreateCreditRequest(
         @NotBlank(message = "VALIDATION.CREDIT.CHAPITRE.NOT_BLANK")
         String chapitreId,
 
+        @NotBlank(message = "VALIDATION.CREDIT.NATURE_ECONOMIQUE.NOT_BLANK")
+        String natureEconomiqueId,
+
         @NotNull(message = "VALIDATION.CREDIT.MONTANT_AE.NOT_NULL")
         @DecimalMin(value = "0.00", message = "VALIDATION.CREDIT.MONTANT_AE.MIN")
         BigDecimal montantAE,

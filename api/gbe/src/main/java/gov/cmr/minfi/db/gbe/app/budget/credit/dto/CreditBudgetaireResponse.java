@@ -27,6 +27,11 @@ public record CreditBudgetaireResponse(
         String chapitreId,
         String chapitreLibelle,
 
+        // Classification économique (null pour les crédits antérieurs à son introduction)
+        String natureEconomiqueId,
+        String natureEconomiqueCode,
+        String natureEconomiqueLibelle,
+
         // Tutelle du chapitre (null si chapitre racine)
         String chapitreTutelleId,
         String chapitreTutelleLibelle,
