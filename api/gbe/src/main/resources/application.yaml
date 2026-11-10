@@ -14,12 +14,21 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      # Le schéma est géré par Flyway (src/main/resources/db/migration) ;
+      # Hibernate vérifie seulement que les entités correspondent aux tables.
+      ddl-auto: validate
     database: postgresql
     show-sql: false
     properties:
       hibernate:
         format_sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    # Bases déjà créées par l'ancien ddl-auto=update : elles sont marquées en V2
+    # (schéma + référentiel présents) et seule V3 (idempotente) leur est appliquée.
+    baseline-on-migrate: true
+    baseline-version: 2
 
 app:
   security:
