@@ -3,7 +3,7 @@ package gov.cmr.minfi.db.gbe.app.admin;
 import gov.cmr.minfi.db.gbe.app.admin.dto.CreateUserRequest;
 import gov.cmr.minfi.db.gbe.app.admin.dto.RoleResponse;
 import gov.cmr.minfi.db.gbe.app.admin.dto.UserSummaryResponse;
-import gov.cmr.minfi.db.gbe.app.iam.role.RoleSysteme;
+import gov.cmr.minfi.db.gbe.app.identite.iam.role.RoleSysteme;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

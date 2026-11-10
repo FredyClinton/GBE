@@ -2,8 +2,8 @@ package gov.cmr.minfi.db.gbe.app.referentiel.programmatique.impl;
 
 import gov.cmr.minfi.db.gbe.app.common.exception.BusinessException;
 import gov.cmr.minfi.db.gbe.app.common.exception.ErrorCode;
-import gov.cmr.minfi.db.gbe.app.exercice.Exercice;
-import gov.cmr.minfi.db.gbe.app.exercice.ExerciceRepository;
+import gov.cmr.minfi.db.gbe.app.referentiel.exercice.Exercice;
+import gov.cmr.minfi.db.gbe.app.referentiel.exercice.ExerciceRepository;
 import gov.cmr.minfi.db.gbe.app.referentiel.ReferentielMapper;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.Section;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.SectionRepository;

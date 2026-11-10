@@ -1,7 +1,7 @@
 package gov.cmr.minfi.db.gbe.app.referentiel.programmatique;
 
 import gov.cmr.minfi.db.gbe.app.common.audit.BaseEntity;
-import gov.cmr.minfi.db.gbe.app.exercice.Exercice;
+import gov.cmr.minfi.db.gbe.app.referentiel.exercice.Exercice;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.Section;
 import jakarta.persistence.*;
 import lombok.*;

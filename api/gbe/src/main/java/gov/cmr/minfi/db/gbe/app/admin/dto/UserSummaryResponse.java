@@ -1,8 +1,8 @@
 package gov.cmr.minfi.db.gbe.app.admin.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import gov.cmr.minfi.db.gbe.app.iam.role.RoleSysteme;
-import gov.cmr.minfi.db.gbe.app.mandat.dto.MandatSummary;
+import gov.cmr.minfi.db.gbe.app.identite.iam.role.RoleSysteme;
+import gov.cmr.minfi.db.gbe.app.identite.mandat.dto.MandatSummary;
 import lombok.Builder;
 
 import java.time.LocalDate;

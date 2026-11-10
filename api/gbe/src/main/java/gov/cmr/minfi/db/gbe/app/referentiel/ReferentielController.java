@@ -1,9 +1,9 @@
 package gov.cmr.minfi.db.gbe.app.referentiel;
 
-import gov.cmr.minfi.db.gbe.app.exercice.Exercice;
-import gov.cmr.minfi.db.gbe.app.exercice.ExerciceMapper;
-import gov.cmr.minfi.db.gbe.app.exercice.ExerciceRepository;
-import gov.cmr.minfi.db.gbe.app.exercice.ExerciceResponse;
+import gov.cmr.minfi.db.gbe.app.referentiel.exercice.Exercice;
+import gov.cmr.minfi.db.gbe.app.referentiel.exercice.ExerciceMapper;
+import gov.cmr.minfi.db.gbe.app.referentiel.exercice.ExerciceRepository;
+import gov.cmr.minfi.db.gbe.app.referentiel.exercice.dto.ExerciceResponse;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.ChapitreRepository;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.SectionRepository;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.dto.ChapitreResponse;

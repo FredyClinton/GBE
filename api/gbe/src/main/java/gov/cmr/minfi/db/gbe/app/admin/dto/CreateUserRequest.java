@@ -1,6 +1,6 @@
 package gov.cmr.minfi.db.gbe.app.admin.dto;
 
-import gov.cmr.minfi.db.gbe.app.iam.role.RoleSysteme;
+import gov.cmr.minfi.db.gbe.app.identite.iam.role.RoleSysteme;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 

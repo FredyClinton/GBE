@@ -1,6 +1,6 @@
 package gov.cmr.minfi.db.gbe.app.common.audit;
 
-import gov.cmr.minfi.db.gbe.app.user.User;
+import gov.cmr.minfi.db.gbe.app.identite.user.User;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
