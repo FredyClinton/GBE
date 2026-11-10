@@ -25,9 +25,11 @@ import java.util.Set;
         name = "CREDIT_BUDGETAIRE",
         uniqueConstraints = @UniqueConstraint(
                 name = "uk_credit_imputation",
+                // Doit rester aligné sur CreditBudgetaireServiceImpl.validateImputationUniqueness
+                // et sur la migration V4__contrainte_unicite_imputation_credit.sql
                 columnNames = {
                         "EXERCICE_ID", "SECTION_ID", "PROGRAMME_ID",
-                        "ACTION_ID", "CHAPITRE_ID", "NATURE_ECONOMIQUE_ID"
+                        "ACTION_ID", "CHAPITRE_ID"
                 }
         )
 )

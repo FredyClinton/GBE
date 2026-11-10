@@ -104,6 +104,8 @@ The schema is owned by Flyway (`src/main/resources/db/migration`); Hibernate onl
 - `V1__schema_initial.sql`: schema; `V2__donnees_referentiel_2026.sql`: 2026 reference data;
   `V3__roles_et_admin_initial.sql`: the 7 `ROLE_*` roles plus the initial super-admin `admin@gbe.cm` / `Admin@1234`
   (`first_login = true`). It is idempotent.
+  `V4__contrainte_unicite_imputation_credit.sql`: unique constraint `uk_credit_imputation` on
+  (exercice, section, programme, action, chapitre).
 - Any entity change needs a new `V<n>__description.sql`. Never edit an applied migration.
 - Pre-Flyway databases get a baseline at version 2 (`baseline-on-migrate`), so only V3+ run on them.
 

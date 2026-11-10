@@ -8,10 +8,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -43,11 +46,26 @@ class GbeApplicationTests {
     @Autowired
     private RoleRepository roleRepository;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     @Test
     void migrationsAppliquees_referentielEtRolesCharges() {
         assertThat(sectionRepository.count()).isGreaterThan(1);
         assertThat(roleRepository.findByName("ROLE_ADMIN")).isPresent();
         assertThat(roleRepository.count()).isEqualTo(7);
+    }
+
+    @Test
+    void contrainteUniciteImputationCredit_presenteSurLes5Colonnes() {
+        final List<String> colonnes = jdbcTemplate.queryForList("""
+                SELECT a.attname
+                FROM pg_constraint c
+                JOIN pg_attribute a ON a.attrelid = c.conrelid AND a.attnum = ANY (c.conkey)
+                WHERE c.conname = 'uk_credit_imputation' AND c.contype = 'u'
+                """, String.class);
+        assertThat(colonnes).containsExactlyInAnyOrder(
+                "exercice_id", "section_id", "programme_id", "action_id", "chapitre_id");
     }
 
     @Test
