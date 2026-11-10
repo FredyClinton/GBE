@@ -33,3 +33,17 @@ build/
 .vscode/
 
 .env
+
+CLAUDE.md
+
+### LaTeX (artefacts de compilation) ###
+docs/**/*.aux
+docs/**/*.log
+docs/**/*.out
+docs/**/*.toc
+docs/**/*.synctex.gz
+docs/**/*.fdb_latexmk
+docs/**/*.fls
+docs/**/*.xdv
+docs/**/rapport/log/
+docs/**/rapport/out/

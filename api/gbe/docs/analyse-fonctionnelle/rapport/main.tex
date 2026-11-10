@@ -1,0 +1,192 @@
+\documentclass[11pt,a4paper]{article}
+
+% ============================================================================
+% ENCODAGE, LANGUE ET TYPOGRAPHIE (Compatible XeLaTeX & LuaLaTeX)
+% ============================================================================
+\usepackage{fontspec}
+\usepackage[french]{babel}
+\frenchsetup{ThinSpaceInFrenchNumbers=true}
+
+% Polices professionnelles disponibles sous Linux / TeX Live
+\IfFontExistsTF{TeX Gyre Termes}{
+  \setmainfont{TeX Gyre Termes}
+}{
+  \setmainfont{Latin Modern Roman}
+}
+\IfFontExistsTF{TeX Gyre Heros}{
+  \setsansfont{TeX Gyre Heros}[Scale=MatchLowercase]
+}{
+  \setsansfont{Latin Modern Sans}[Scale=MatchLowercase]
+}
+\IfFontExistsTF{TeX Gyre Cursor}{
+  \setmonofont{TeX Gyre Cursor}[Scale=MatchLowercase]
+}{
+  \setmonofont{Latin Modern Mono}[Scale=MatchLowercase]
+}
+
+% ============================================================================
+% MISE EN PAGE ET GÉOMÉTRIE (Format A4, marges équilibrées)
+% ============================================================================
+\usepackage[
+  a4paper,
+  top=2.5cm,
+  bottom=2.5cm,
+  left=2.5cm,
+  right=2.5cm,
+  headheight=22pt
+]{geometry}
+
+\usepackage{setspace}
+\setstretch{1.12}
+\setlength{\parskip}{0.45em}
+\setlength{\parindent}{0pt}
+
+% ============================================================================
+% COULEURS ET ÉLÉMENTS GRAPHIQUES
+% ============================================================================
+\usepackage[table]{xcolor}
+\definecolor{BleuInstitutionnel}{HTML}{1F3A5F}
+\definecolor{BleuSecondaire}{HTML}{2E5B88}
+\definecolor{GrisFonce}{HTML}{2C3E50}
+\definecolor{GrisClair}{HTML}{F4F6F9}
+\definecolor{GrisBordure}{HTML}{D0D7DE}
+
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{pdflscape}
+\usepackage{caption}
+\captionsetup{
+  font=small,
+  labelfont={bf,color=BleuInstitutionnel},
+  textfont={it},
+  skip=8pt
+}
+
+% ============================================================================
+% TABLEAUX
+% ============================================================================
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+\renewcommand{\arraystretch}{1.35}
+
+% ============================================================================
+% LISTES ET TITRES DE SECTIONS
+% ============================================================================
+\usepackage{enumitem}
+\setlist[itemize]{topsep=3pt, itemsep=2pt, leftmargin=1.5em, label=\textcolor{BleuInstitutionnel}{\textbullet}}
+\setlist[enumerate]{topsep=3pt, itemsep=3pt, leftmargin=1.8em}
+
+\usepackage{titlesec}
+\titleformat{\section}
+  {\normalfont\Large\bfseries\sffamily\color{BleuInstitutionnel}}
+  {\thesection.}{0.6em}{}
+  [\vspace{2pt}\titlerule]
+
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\sffamily\color{BleuSecondaire}}
+  {\thesubsection.}{0.5em}{}
+
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\bfseries\sffamily\color{GrisFonce}}
+  {\thesubsubsection.}{0.5em}{}
+
+\titlespacing*{\section}{0pt}{1.8ex plus 0.5ex minus .2ex}{1.2ex plus .2ex}
+\titlespacing*{\subsection}{0pt}{1.4ex plus 0.4ex minus .2ex}{0.8ex plus .2ex}
+\titlespacing*{\subsubsection}{0pt}{1.1ex plus 0.3ex minus .1ex}{0.5ex plus .1ex}
+
+% ============================================================================
+% EN-TÊTES ET PIEDS DE PAGE DISCRETS
+% ============================================================================
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\footnotesize\sffamily\textcolor{GrisFonce}{Analyse fonctionnelle préliminaire — Suivi des dépenses budgétaires}}
+\fancyhead[R]{\footnotesize\sffamily\textcolor{GrisFonce}{Document de travail — V1.0}}
+\fancyfoot[L]{\footnotesize\sffamily\textcolor{GrisFonce}{Système d'information de gestion administrative et financière}}
+\fancyfoot[R]{\footnotesize\sffamily\textcolor{GrisFonce}{Page \thepage\ sur \pageref*{LastPage}}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{GrisBordure}\leaders\hrule height \headrulewidth\hfill}}
+\renewcommand{\footrule}{\hbox to\headwidth{\color{GrisBordure}\leaders\hrule height \footrulewidth\hfill}}
+
+% ============================================================================
+% ENCADRÉS MÉTHODOLOGIQUES SOBRES
+% ============================================================================
+\usepackage{tcolorbox}
+\newtcolorbox{encadre}[1]{
+  colback=GrisClair,
+  colframe=BleuInstitutionnel,
+  boxrule=0.6pt,
+  leftrule=3pt,
+  arc=1.5pt,
+  fonttitle=\bfseries\sffamily\small,
+  coltitle=white,
+  colbacktitle=BleuInstitutionnel,
+  title=#1,
+  top=6pt,
+  bottom=6pt,
+  left=8pt,
+  right=8pt
+}
+
+% ============================================================================
+% HYPERLIENS
+% ============================================================================
+\usepackage[
+  colorlinks=true,
+  linkcolor=BleuInstitutionnel,
+  urlcolor=BleuSecondaire,
+  citecolor=BleuInstitutionnel,
+  pdftitle={Analyse fonctionnelle preliminaire - Application de suivi des depenses budgetaires},
+  pdfauthor={Architecture des Systemes d'Information}
+]{hyperref}
+
+% ============================================================================
+% CORPS DU DOCUMENT
+% ============================================================================
+\begin{document}
+
+% 1. Page de garde
+\input{sections/01_page_de_garde}
+
+% Table des matières
+\thispagestyle{fancy}
+\tableofcontents
+\newpage
+
+% 2. Introduction
+\input{sections/02_introduction}
+
+% 3. Contexte et objectifs du projet
+\input{sections/03_contexte_objectifs}
+
+% 4. Présentation du processus métier
+\input{sections/04_processus_metier}
+
+% 5. Identification des acteurs
+\input{sections/05_identification_acteurs}
+
+% 6. Description des responsabilités
+\input{sections/06_description_responsabilites}
+
+% 7. Présentation des principaux cas d'utilisation
+\input{sections/07_cas_utilisation}
+
+% 8. Diagramme général des cas d'utilisation UML
+\input{sections/08_diagramme_uml}
+
+% 9. Points à clarifier avec le responsable métier
+\input{sections/09_points_a_clarifier}
+
+% 10. Conclusion
+\input{sections/10_conclusion}
+
+\end{document}

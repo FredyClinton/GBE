@@ -37,7 +37,7 @@ public class AgentServiceImpl implements AgentService {
         }
         final Agent agent = agentMapper.toEntity(request);
         agentRepository.save(agent);
-        log.info("Created agent {}", agent.getMatricule());
+        log.info("Created agent with matricule {}", agent.getMatricule());
         return agentMapper.toResponse(agent);
     }
 
@@ -65,7 +65,7 @@ public class AgentServiceImpl implements AgentService {
         }
         agent.setActif(false);
         agentRepository.save(agent);
-        log.info("Deactivated agent {}", agent.getMatricule());
+        log.info("Deactivated agent with matricule {}", agent.getMatricule());
     }
 
     @Override

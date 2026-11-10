@@ -67,7 +67,7 @@ public class AdminServiceImpl implements AdminService {
 
 		final Role role = roleRepository
 			.findByName("ROLE_" + request.roleSysteme().name())
-			.orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, request.roleSysteme().name()));
+			.orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, "name"+request.roleSysteme().name()));
 
 		final User user = User
 			.builder()
@@ -95,32 +95,46 @@ public class AdminServiceImpl implements AdminService {
 		userRepository.save(user);
 		log.info("User créé : {} → agent {}", user.getEmail(), agent.getMatricule());
 
-		final List<Mandat> mandats = request
-			.programmeIds()
-			.stream()
-			.map(programmeId -> {
-				final Programme programme = programmeRepository
-					.findById(programmeId)
-					.orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, programmeId));
+		final List<Mandat> mandats;
+		if (request.programmeIds() == null || request.programmeIds().isEmpty()) {
+			final Mandat mandat = Mandat
+				.builder()
+				.user(user)
+				.section(section)
+				.roleSysteme(request.roleSysteme())
+				.dateDebut(LocalDate.now())
+				.actif(true)
+				.build();
+			mandat.initialiserPermissionsDepuisRole();
+			mandats = List.of(mandat);
+		} else {
+			mandats = request
+				.programmeIds()
+				.stream()
+				.map(programmeId -> {
+					final Programme programme = programmeRepository
+						.findById(programmeId)
+						.orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, programmeId));
 
-				if (!programme.getSection().getId().equals(section.getId())) {
-					throw new BusinessException(ErrorCode.PROGRAMME_NOT_IN_SECTION);
-				}
+					if (!programme.getSection().getId().equals(section.getId())) {
+						throw new BusinessException(ErrorCode.PROGRAMME_NOT_IN_SECTION);
+					}
 
-				final Mandat mandat = Mandat
-					.builder()
-					.user(user)
-					.section(section)
-					.programme(programme)
-					.roleSysteme(request.roleSysteme())
-					.dateDebut(LocalDate.now())
-					.actif(true)
-					.build();
+					final Mandat mandat = Mandat
+						.builder()
+						.user(user)
+						.section(section)
+						.programme(programme)
+						.roleSysteme(request.roleSysteme())
+						.dateDebut(LocalDate.now())
+						.actif(true)
+						.build();
 
-				mandat.initialiserPermissionsDepuisRole();
-				return mandat;
-			})
-			.toList();
+					mandat.initialiserPermissionsDepuisRole();
+					return mandat;
+				})
+				.toList();
+		}
 
 		mandatRepository.saveAll(mandats);
 		log.info("{} mandat(s) créé(s) pour {}", mandats.size(), user.getEmail());

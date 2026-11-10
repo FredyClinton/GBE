@@ -1,0 +1,212 @@
+<mxfile host="app.diagrams.net" modified="2026-11-02T15:10:00.000Z" agent="Antigravity" version="24.7.0" type="device">
+  <diagram id="diagramme-general-reordonne-pur" name="Cas d'utilisation général unifié">
+    <mxGraphModel dx="1400" dy="2100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1350" pageHeight="2050" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- FRONTIERE DU SYSTEME : HAUTEUR FORTEMENT AUGMENTEE SANS DIVISIONS -->
+        <mxCell id="sys_boundary" value="Système de suivi des dépenses budgétaires" style="shape=rect;html=1;verticalAlign=top;fontStyle=1;whiteSpace=wrap;align=center;fillColor=#FAFCFE;strokeColor=#1F3A5F;strokeWidth=2.5;fontSize=18;fontColor=#1F3A5F;spacingTop=20;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="270" y="25" width="1030" height="1980" as="geometry" />
+        </mxCell>
+
+        <!-- ======================================================== -->
+        <!-- ACTEURS ALIGNES A GAUCHE AVEC LEURS COULEURS PROPRES -->
+        <!-- ======================================================== -->
+        <!-- 1. Ordonnateur (Bleu Roi) -->
+        <mxCell id="act_ord" value="Ordonnateur" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#D9E6F7;strokeColor=#1F3A5F;strokeWidth=2;fontStyle=1;fontSize=14;fontColor=#1F3A5F;" vertex="1" parent="1">
+          <mxGeometry x="70" y="340" width="60" height="115" as="geometry" />
+        </mxCell>
+
+        <!-- 2. Fournisseur (Vert Émeraude) -->
+        <mxCell id="act_frs" value="Fournisseur" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#D8F3DC;strokeColor=#1E6B4A;strokeWidth=2;fontStyle=1;fontSize=14;fontColor=#1E6B4A;" vertex="1" parent="1">
+          <mxGeometry x="70" y="860" width="60" height="115" as="geometry" />
+        </mxCell>
+
+        <!-- 3. Comptable matière (Pourpre / Violet) -->
+        <mxCell id="act_cm" value="Comptable matière" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#EEDEFB;strokeColor=#6B3BA7;strokeWidth=2;fontStyle=1;fontSize=14;fontColor=#6B3BA7;" vertex="1" parent="1">
+          <mxGeometry x="70" y="1215" width="60" height="115" as="geometry" />
+        </mxCell>
+
+        <!-- 4. Contrôleur financier (Terracotta / Ambre) -->
+        <mxCell id="act_cf" value="Contrôleur financier" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#FDEBD0;strokeColor=#B85D19;strokeWidth=2;fontStyle=1;fontSize=14;fontColor=#B85D19;" vertex="1" parent="1">
+          <mxGeometry x="70" y="1575" width="60" height="115" as="geometry" />
+        </mxCell>
+
+        <!-- 5. Comptable public (Bleu Canard / Sarcelle) -->
+        <mxCell id="act_cp" value="Comptable public" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#CEF0F2;strokeColor=#0A6C74;strokeWidth=2;fontStyle=1;fontSize=14;fontColor=#0A6C74;" vertex="1" parent="1">
+          <mxGeometry x="70" y="1815" width="60" height="115" as="geometry" />
+        </mxCell>
+
+        <!-- ======================================================== -->
+        <!-- COLONNE 1 : CAS DIRECTS (SANS LES PREFIXES UCXX) -->
+        <!-- ======================================================== -->
+
+        <!-- BLOC 1 : ORDONNATEUR -->
+        <mxCell id="uc01" value="Exprimer un besoin" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1F3A5F;strokeWidth=2;fontSize=13;fontColor=#1F3A5F;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="75" width="350" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc04" value="Préparer et soumettre&#xa;le projet d'acte juridique" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1F3A5F;strokeWidth=2;fontSize=13;fontColor=#1F3A5F;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="180" width="350" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc05" value="Signer l'acte juridique" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1F3A5F;strokeWidth=2;fontSize=13;fontColor=#1F3A5F;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="285" width="350" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc15" value="Enregistrer et&#xa;valider les factures" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1F3A5F;strokeWidth=2;fontSize=13;fontColor=#1F3A5F;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="390" width="350" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc16" value="Procéder à la liquidation" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1F3A5F;strokeWidth=2;fontSize=13;fontColor=#1F3A5F;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="495" width="350" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc17" value="Générer, signer et transmettre&#xa;le projet d'ordonnancement" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1F3A5F;strokeWidth=2;fontSize=13;fontColor=#1F3A5F;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="600" width="350" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- BLOC 2 : FOURNISSEUR -->
+        <mxCell id="uc02" value="Consulter les expressions&#xa;de besoin ouvertes" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1E6B4A;strokeWidth=2;fontSize=13;fontColor=#1E6B4A;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="740" width="350" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc14" value="Suivre l'évolution&#xa;de ses demandes" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1E6B4A;strokeWidth=2;fontSize=13;fontColor=#1E6B4A;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="855" width="350" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc12" value="Introduire une&#xa;demande de paiement" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1E6B4A;strokeWidth=2;fontSize=13;fontColor=#1E6B4A;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="970" width="350" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- BLOC 3 : COMPTABLE MATIÈRE -->
+        <mxCell id="uc09" value="Prendre en charge et&#xa;constater les produits livrés" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6B3BA7;strokeWidth=2;fontSize=13;fontColor=#6B3BA7;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="1110" width="350" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc10" value="Établir et délivrer le&#xa;procès-verbal de réception" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6B3BA7;strokeWidth=2;fontSize=13;fontColor=#6B3BA7;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="1225" width="350" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc11" value="Informer l'ordonnateur&#xa;des livraisons" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6B3BA7;strokeWidth=2;fontSize=13;fontColor=#6B3BA7;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="1340" width="350" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- BLOC 4 : CONTRÔLEUR FINANCIER ET COMPTABLE PUBLIC -->
+        <mxCell id="uc06" value="Examiner et viser le&#xa;projet d'acte juridique" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B85D19;strokeWidth=2;fontSize=13;fontColor=#B85D19;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="1510" width="350" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc18" value="Signer et transmettre le&#xa;dossier d'ordonnancement" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B85D19;strokeWidth=2;fontSize=13;fontColor=#B85D19;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="1775" width="350" height="75" as="geometry" />
+        </mxCell>
+
+        <!-- ======================================================== -->
+        <!-- COLONNE 2 : CAS INCLUS ET ÉTENDUS (SANS PREFIXES UCXX) -->
+        <!-- ======================================================== -->
+        <mxCell id="uc03" value="Soumissionner à une&#xa;expression de besoin" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1E6B4A;strokeWidth=2;fontSize=13;fontColor=#1E6B4A;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="880" y="740" width="350" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc13" value="Soumettre les factures&#xa;et pièces justificatives" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1E6B4A;strokeWidth=2;fontSize=13;fontColor=#1E6B4A;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="880" y="970" width="350" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc07" value="Réserver les crédits" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B85D19;strokeWidth=2;fontSize=13;fontColor=#B85D19;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="880" y="1460" width="350" height="65" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc08" value="Donner le quitus sur le&#xa;classement en nature économique" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B85D19;strokeWidth=2;fontSize=13;fontColor=#B85D19;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="880" y="1560" width="350" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc19" value="Contrôler le projet&#xa;d'ordonnancement" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B85D19;strokeWidth=2;fontSize=13;fontColor=#B85D19;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="880" y="1780" width="350" height="65" as="geometry" />
+        </mxCell>
+
+        <!-- ======================================================== -->
+        <!-- RELATIONS UML HORIZONTALES (AUCUN CROISEMENT) -->
+        <!-- ======================================================== -->
+        <mxCell id="rel_extend_uc03_uc02" value="«extend»" style="html=1;verticalAlign=bottom;labelBackgroundColor=none;endArrow=open;endSize=9;dashed=1;strokeColor=#1E6B4A;strokeWidth=1.8;fontSize=12;fontColor=#1E6B4A;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="uc03" target="uc02">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="rel_inc_uc12_uc13" value="«include»" style="html=1;verticalAlign=bottom;labelBackgroundColor=none;endArrow=open;endSize=9;dashed=1;strokeColor=#1E6B4A;strokeWidth=1.8;fontSize=12;fontColor=#1E6B4A;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="uc12" target="uc13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="rel_inc_uc06_uc07" value="«include»" style="html=1;verticalAlign=bottom;labelBackgroundColor=none;endArrow=open;endSize=9;dashed=1;strokeColor=#B85D19;strokeWidth=1.8;fontSize=12;fontColor=#B85D19;exitX=1;exitY=0.35;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="uc06" target="uc07">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="rel_inc_uc06_uc08" value="«include»" style="html=1;verticalAlign=bottom;labelBackgroundColor=none;endArrow=open;endSize=9;dashed=1;strokeColor=#B85D19;strokeWidth=1.8;fontSize=12;fontColor=#B85D19;exitX=1;exitY=0.65;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="uc06" target="uc08">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="rel_inc_uc18_uc19" value="«include»" style="html=1;verticalAlign=bottom;labelBackgroundColor=none;endArrow=open;endSize=9;dashed=1;strokeColor=#B85D19;strokeWidth=1.8;fontSize=12;fontColor=#B85D19;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="uc18" target="uc19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ======================================================== -->
+        <!-- ASSOCIATIONS ACTEURS -> CAS (ZERO CROISEMENT) -->
+        <!-- ======================================================== -->
+        <!-- 1. Ordonnateur (Bleu Roi) -->
+        <mxCell id="a_ord_uc01" style="endArrow=none;html=1;strokeColor=#1F3A5F;strokeWidth=2;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_ord" target="uc01">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_ord_uc04" style="endArrow=none;html=1;strokeColor=#1F3A5F;strokeWidth=2;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_ord" target="uc04">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_ord_uc05" style="endArrow=none;html=1;strokeColor=#1F3A5F;strokeWidth=2;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_ord" target="uc05">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_ord_uc15" style="endArrow=none;html=1;strokeColor=#1F3A5F;strokeWidth=2;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_ord" target="uc15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_ord_uc16" style="endArrow=none;html=1;strokeColor=#1F3A5F;strokeWidth=2;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_ord" target="uc16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_ord_uc17" style="endArrow=none;html=1;strokeColor=#1F3A5F;strokeWidth=2;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_ord" target="uc17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 2. Fournisseur (Vert Émeraude) -->
+        <mxCell id="a_frs_uc02" style="endArrow=none;html=1;strokeColor=#1E6B4A;strokeWidth=2;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_frs" target="uc02">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_frs_uc14" style="endArrow=none;html=1;strokeColor=#1E6B4A;strokeWidth=2;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_frs" target="uc14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_frs_uc12" style="endArrow=none;html=1;strokeColor=#1E6B4A;strokeWidth=2;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_frs" target="uc12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 3. Comptable matière (Pourpre) -->
+        <mxCell id="a_cm_uc09" style="endArrow=none;html=1;strokeColor=#6B3BA7;strokeWidth=2;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_cm" target="uc09">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_cm_uc10" style="endArrow=none;html=1;strokeColor=#6B3BA7;strokeWidth=2;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_cm" target="uc10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_cm_uc11" style="endArrow=none;html=1;strokeColor=#6B3BA7;strokeWidth=2;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_cm" target="uc11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 4. Contrôleur financier (Terracotta) -->
+        <mxCell id="a_cf_uc06" style="endArrow=none;html=1;strokeColor=#B85D19;strokeWidth=2;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_cf" target="uc06">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_cf_uc18" style="endArrow=none;html=1;strokeColor=#B85D19;strokeWidth=2;entryX=0;entryY=0.35;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_cf" target="uc18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 5. Comptable public (Bleu Canard) -->
+        <mxCell id="a_cp_uc18" style="endArrow=none;html=1;strokeColor=#0A6C74;strokeWidth=2;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_cp" target="uc18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

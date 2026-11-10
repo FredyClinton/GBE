@@ -31,16 +31,16 @@ public class NatureEconomique extends BaseEntity {
 	@Column(name = "code")
 	private String code;
 
-	@Column(name = "code_titre", length = 1)
+//	@Column(name = "code_titre", length = 1)
 	private String codeTitre;
 
-	@Column(name = "code_article", length = 2)
+//	@Column(name = "code_article", length = 2)
 	private String codeArticle;
 
-	@Column(name = "code_paragraphe", length = 3)
+//	@Column(name = "code_paragraphe", length = 3)
 	private String codeParagraphe;
 
-	@Column(name = "code_rubrique", length = 10)
+//	@Column(name = "code_rubrique", length = 10)
 	private String codeRubrique;
 
 	@Column(name = "libelle", nullable = false, columnDefinition = "TEXT")

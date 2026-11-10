@@ -1,0 +1,148 @@
+<mxfile host="app.diagrams.net" modified="2026-11-02T13:00:00.000Z" agent="Antigravity" version="24.7.0" type="device">
+  <diagram id="diag-phase2" name="Phase 2 - Reception et Ordonnancement">
+    <mxGraphModel dx="1400" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1050" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- FRONTIERE DU SYSTEME SANS DIVISIONS -->
+        <mxCell id="sys_boundary" value="Système de suivi des dépenses budgétaires (Phase de réception matière, liquidation et ordonnancement)" style="shape=rect;html=1;verticalAlign=top;fontStyle=1;whiteSpace=wrap;align=center;fillColor=#FAFAFA;strokeColor=#1F3A5F;strokeWidth=2;fontSize=14;fontColor=#1F3A5F;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="250" y="40" width="1050" height="960" as="geometry" />
+        </mxCell>
+
+        <!-- ACTEURS TOUS A GAUCHE -->
+        <mxCell id="act_frs" value="Fournisseur" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#DAE8FC;strokeColor=#2E6B4E;fontStyle=1;fontSize=12;fontColor=#2E6B4E;" vertex="1" parent="1">
+          <mxGeometry x="70" y="130" width="45" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="act_cm" value="Comptable matière" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#DAE8FC;strokeColor=#5B3E85;fontStyle=1;fontSize=12;fontColor=#5B3E85;" vertex="1" parent="1">
+          <mxGeometry x="70" y="320" width="45" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="act_ord" value="Ordonnateur" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#DAE8FC;strokeColor=#1F3A5F;fontStyle=1;fontSize=12;fontColor=#1F3A5F;" vertex="1" parent="1">
+          <mxGeometry x="70" y="520" width="45" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="act_cf" value="Contrôleur financier" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#DAE8FC;strokeColor=#8C4A27;fontStyle=1;fontSize=12;fontColor=#8C4A27;" vertex="1" parent="1">
+          <mxGeometry x="70" y="720" width="45" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="act_cp" value="Comptable public" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#DAE8FC;strokeColor=#1F3A5F;fontStyle=1;fontSize=12;fontColor=#1F3A5F;" vertex="1" parent="1">
+          <mxGeometry x="70" y="870" width="45" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- CAS D'UTILISATION -->
+        <!-- Réception et livraisons -->
+        <mxCell id="uc09" value="Prendre en charge et constater&#xa;les produits livrés" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1F3A5F;strokeWidth=1.5;fontSize=11;fontColor=#1A1A1A;" vertex="1" parent="1">
+          <mxGeometry x="320" y="90" width="250" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc10" value="Établir et délivrer le procès-verbal&#xa;de réception" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1F3A5F;strokeWidth=1.5;fontSize=11;fontColor=#1A1A1A;" vertex="1" parent="1">
+          <mxGeometry x="320" y="165" width="250" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc11" value="Informer l'ordonnateur&#xa;des livraisons" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1F3A5F;strokeWidth=1.5;fontSize=11;fontColor=#1A1A1A;" vertex="1" parent="1">
+          <mxGeometry x="320" y="240" width="250" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- Facturation & Demande de paiement -->
+        <mxCell id="uc12" value="Introduire une demande&#xa;de paiement" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1F3A5F;strokeWidth=1.5;fontSize=11;fontColor=#1A1A1A;" vertex="1" parent="1">
+          <mxGeometry x="320" y="340" width="250" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc13" value="Soumettre les factures et&#xa;pièces justificatives" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1F3A5F;strokeWidth=1.5;fontSize=11;fontColor=#1A1A1A;" vertex="1" parent="1">
+          <mxGeometry x="720" y="340" width="250" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc14" value="Suivre l'évolution de&#xa;ses demandes" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1F3A5F;strokeWidth=1.5;fontSize=11;fontColor=#1A1A1A;" vertex="1" parent="1">
+          <mxGeometry x="320" y="415" width="250" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- Liquidation & Ordonnancement -->
+        <mxCell id="uc15" value="Enregistrer et valider&#xa;les factures" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1F3A5F;strokeWidth=1.5;fontSize=11;fontColor=#1A1A1A;" vertex="1" parent="1">
+          <mxGeometry x="320" y="515" width="250" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc16" value="Procéder à la liquidation" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1F3A5F;strokeWidth=1.5;fontSize=11;fontColor=#1A1A1A;" vertex="1" parent="1">
+          <mxGeometry x="320" y="590" width="250" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc17" value="Générer, signer et transmettre&#xa;le projet d'ordonnancement" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1F3A5F;strokeWidth=1.5;fontSize=11;fontColor=#1A1A1A;" vertex="1" parent="1">
+          <mxGeometry x="320" y="665" width="260" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Contrôle financier & Transmission comptable public -->
+        <mxCell id="uc18" value="Signer et transmettre le dossier&#xa;d'ordonnancement" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1F3A5F;strokeWidth=1.5;fontSize=11;fontColor=#1A1A1A;" vertex="1" parent="1">
+          <mxGeometry x="320" y="785" width="260" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc19" value="Contrôler le projet&#xa;d'ordonnancement" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1F3A5F;strokeWidth=1.5;fontSize=11;fontColor=#1A1A1A;" vertex="1" parent="1">
+          <mxGeometry x="720" y="785" width="250" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- ASSOCIATIONS ACTEURS -> UC -->
+        <!-- Fournisseur -->
+        <mxCell id="a_frs_uc09" style="endArrow=none;html=1;strokeColor=#2E6B4E;strokeWidth=1.3;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_frs" target="uc09">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_frs_uc10" style="endArrow=none;html=1;strokeColor=#2E6B4E;strokeWidth=1.3;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_frs" target="uc10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_frs_uc12" style="endArrow=none;html=1;strokeColor=#2E6B4E;strokeWidth=1.3;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_frs" target="uc12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_frs_uc14" style="endArrow=none;html=1;strokeColor=#2E6B4E;strokeWidth=1.3;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_frs" target="uc14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Comptable matière -->
+        <mxCell id="a_cm_uc09" style="endArrow=none;html=1;strokeColor=#5B3E85;strokeWidth=1.3;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_cm" target="uc09">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_cm_uc10" style="endArrow=none;html=1;strokeColor=#5B3E85;strokeWidth=1.3;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_cm" target="uc10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_cm_uc11" style="endArrow=none;html=1;strokeColor=#5B3E85;strokeWidth=1.3;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_cm" target="uc11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Ordonnateur -->
+        <mxCell id="a_ord_uc11" style="endArrow=none;html=1;strokeColor=#1F3A5F;strokeWidth=1.3;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_ord" target="uc11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_ord_uc15" style="endArrow=none;html=1;strokeColor=#1F3A5F;strokeWidth=1.3;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_ord" target="uc15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_ord_uc16" style="endArrow=none;html=1;strokeColor=#1F3A5F;strokeWidth=1.3;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_ord" target="uc16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_ord_uc17" style="endArrow=none;html=1;strokeColor=#1F3A5F;strokeWidth=1.3;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_ord" target="uc17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Contrôleur financier -->
+        <mxCell id="a_cf_uc17" style="endArrow=none;html=1;strokeColor=#8C4A27;strokeWidth=1.3;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_cf" target="uc17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a_cf_uc18" style="endArrow=none;html=1;strokeColor=#8C4A27;strokeWidth=1.3;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_cf" target="uc18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Comptable public -->
+        <mxCell id="a_cp_uc18" style="endArrow=none;html=1;strokeColor=#1F3A5F;strokeWidth=1.3;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="act_cp" target="uc18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- RELATIONS UML INCLUDES -->
+        <mxCell id="rel_inc_uc12_uc13" value="«include»" style="html=1;verticalAlign=bottom;labelBackgroundColor=none;endArrow=open;endSize=8;dashed=1;strokeColor=#1F3A5F;strokeWidth=1.2;fontSize=10;fontColor=#1F3A5F;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="uc12" target="uc13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="rel_inc_uc18_uc19" value="«include»" style="html=1;verticalAlign=bottom;labelBackgroundColor=none;endArrow=open;endSize=8;dashed=1;strokeColor=#1F3A5F;strokeWidth=1.2;fontSize=10;fontColor=#1F3A5F;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="uc18" target="uc19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -26,8 +26,8 @@ import java.util.Set;
         uniqueConstraints = @UniqueConstraint(
                 name = "uk_credit_imputation",
                 columnNames = {
-                        "EXERCICE_ID", "SECTION_ID",
-                        "PROGRAMME_ID", "ACTION_ID", "CHAPITRE_ID"
+                        "EXERCICE_ID", "SECTION_ID", "PROGRAMME_ID",
+                        "ACTION_ID", "CHAPITRE_ID", "NATURE_ECONOMIQUE_ID"
                 }
         )
 )

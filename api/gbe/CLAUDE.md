@@ -5,77 +5,93 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Overview
 
 **GBE** (Gestion Budgétaire Électronique) is the backend API for the electronic budget management system of the
-Ministère des Finances (MINFI) of Cameroon. It manages budget credits, user mandates, and financial workflows across
-administrative sections and programs.
+Ministère des Finances (MINFI) of Cameroon. It manages budget credits (AE/CP), user mandates, and financial workflows
+across administrative sections and programmes. Code, comments, enums and error messages are in French.
 
 ## Commands
 
 ```bash
-# Build
-./mvnw clean package             # Full build with tests
+docker-compose up -d             # PostgreSQL 17 on host port 5433 (db gbe_db, user/pass: username/password)
+./mvnw spring-boot:run           # Start dev server on :8080 (profile "dev")
 ./mvnw clean package -DskipTests # Build without tests
-
-# Run
-./mvnw spring-boot:run           # Start dev server (requires PostgreSQL)
-docker-compose up -d             # Start PostgreSQL dependency
-
-# Test
 ./mvnw test                      # All tests
 ./mvnw test -Dtest=ClassName     # Single test class
+./mvnw test -Dtest=ClassName#method
 ```
 
-Environment variables required: `DB_URL`, `DB_PORT`, `DB_NAME`, `DB_USERNAME`, `DB_PASSWORD` (see `.env.example`).
+DB settings come from env vars `DB_URL`, `DB_PORT`, `DB_NAME`, `DB_USERNAME`, `DB_PASSWORD`. `application.yaml` imports
+them from a local `.env` file (`spring.config.import: optional:file:.env[.properties]`); see `.env.example`.
+The only test is `GbeApplicationTests` (context load), which needs a reachable database.
 
-API docs available at `http://localhost:8080/swagger-ui.html` when running.
+Swagger UI: `http://localhost:8080/swagger-ui.html`.
 
 ## Architecture
 
-**Stack:** Spring Boot 4.0.3 · Java 17 · PostgreSQL · Spring Security + JWT (RSA) · Spring Data JPA · Lombok · SpringDoc
-OpenAPI
+**Stack:** Spring Boot 4.0.3 · Java 17 · PostgreSQL · Spring Security + JWT (jjwt, RSA) · Spring Data JPA · Lombok ·
+MapStruct · SpringDoc OpenAPI · TOTP (`dev.samstevens.totp`)
 
 **Package root:** `gov.cmr.minfi.db.gbe.app`
 
-### Module Layout
+### Modules
 
-| Module           | Purpose                                                                                            |
-|------------------|----------------------------------------------------------------------------------------------------|
-| `auth/`          | Login, JWT issuance, TOTP-based MFA                                                                |
-| `security/`      | `JwtService`, `JwtFilter`, RSA key loading                                                         |
-| `iam/`           | `RoleSysteme` enum, `Permission` entities                                                          |
-| `user/`          | User entity (implements `UserDetails`)                                                             |
-| `agent/`         | Government agent records                                                                           |
-| `mandat/`        | User ↔ Section/Programme assignments with scoped permissions                                       |
-| `budget/credit/` | `CreditBudgetaire` — core budget entity                                                            |
-| `referentiel/`   | Master data: `Section`, `Programme`, `Action`, `Chapitre`, `NatureEconomique`, `Exercice`          |
-| `admin/`         | Admin-only endpoints (role listing, etc.)                                                          |
-| `common/`        | `BaseEntity` (auditing), `BusinessException`/`ErrorCode`, global exception handler, Spring configs |
+| Module           | Purpose                                                                                   |
+|------------------|-------------------------------------------------------------------------------------------|
+| `auth/`          | Login, JWT issuance, TOTP MFA (`auth/tfa`)                                                |
+| `security/`      | `SecurityConfig`, `JwtService`, `JwtFilter`, `KeyUtils` (RSA PEM loading)                 |
+| `iam/`           | `RoleSysteme` enum (with default permissions), `Permission` enum, `Role` entity           |
+| `user/`          | `User` entity (implements `UserDetails`)                                                  |
+| `agent/`         | Government agent records                                                                  |
+| `mandat/`        | User ↔ Section/Programme assignments with scoped permissions; `MandatScopeValidator`      |
+| `budget/credit/` | `CreditBudgetaire` — core budget entity and its state machine                             |
+| `exercice/`      | Fiscal year (`Exercice`)                                                                  |
+| `referentiel/`   | Master data: `administratif` (Section, Chapitre), `programmatique` (Programme, Action), `economique` (NatureEconomique), `fonctionnel` |
+| `admin/`         | Admin-only endpoints                                                                      |
+| `common/`        | `BaseEntity` auditing, `BusinessException`/`ErrorCode`, `ApplicationExceptionHandler`, configs (CORS in `BeansConfig`) |
 
-### Key Architectural Patterns
+### Key Patterns
 
-**Layered structure per module:** `Controller → Service (interface + impl) → Repository → Entity/DTO`
+**Layering:** `Controller → Service (interface + impl/ subpackage) → Repository`; DTOs in `dto/`, entity↔DTO mapping via
+MapStruct `*Mapper` interfaces.
 
-**Authorization model:** A `Mandat` links a `User` to a `Section` (and optionally a `Programme`) with a `RoleSysteme`
-and a set of fine-grained `Permission`s. The `MandatScopeValidator` enforces that operations stay within the user's
-mandated scope.
+**Two-level authorization:**
+1. *Coarse, endpoint-level* — `@EnableMethodSecurity` + `@PreAuthorize("hasAuthority('<PERMISSION>')")` on controllers.
+   Authorities come from `User.getAuthorities()`: the user's `Role` name plus `User.grantedPermissions` (names of
+   `Permission` enum values).
+2. *Fine, data-scope level* — a `Mandat` links a `User` to a `Section` (optionally a `Programme`) with a `RoleSysteme`
+   and an `@ElementCollection` of `Permission`s (initialised from `RoleSysteme.getDefaultPermissions()`). Services call
+   `MandatScopeValidator.checkAccessCredit(...)` / `checkAccessCreditWithPermission(...)` /
+   `getProgrammeIdsAutorises(...)` to restrict operations to the current user's valid mandates.
 
-**Budget state machine:** `CreditBudgetaire` implements `StatutTransitionable`, `AEManageable`, and `CPManageable`.
-Status transitions: `DISPONIBLE → ENGAGE → ORDONNANCE → PAYEE` or `CANTONNE` (locked). Business rules are enforced in
-`CreditBudgetaireServiceImpl`.
+**Budget state machine:** Lives in the `CreditBudgetaire` entity itself (implements `StatutTransitionable`,
+`AEManageable`, `CPManageable`); each transition method calls `validerTransition(...)` and throws `BusinessException` on
+illegal moves. `StatutCredit`: `DISPONIBLE, CANTONNE, ENGAGE, SUSPENDU, SOLDE, ANNULE`.
+- `DISPONIBLE ⇄ CANTONNE` (cantonner / decantionner) — a CANTONNE credit cannot be engaged
+- `DISPONIBLE → ENGAGE → SOLDE`, `ENGAGE → SUSPENDU → DISPONIBLE` (debloquer)
+- AE/CP consumption (`consommerAE/CP`, `libererAE/CP`) updates consumed/available amounts and rejects overdrafts.
 
-**Exception handling:** Throw `BusinessException(ErrorCode.XXX)` from service layer; `ApplicationExceptionHandler`
-translates to HTTP responses.
+**Errors:** Throw `BusinessException(ErrorCode.XXX)` from services; add new codes to `ErrorCode`.
+`ApplicationExceptionHandler` maps them to `ErrorResponse`.
 
-**Auditing:** All entities extend `BaseEntity` which provides `createdAt`, `createdBy`, `updatedAt`, `updatedBy` via
-Spring Data JPA auditing.
+**Auditing:** Entities extend `BaseEntity` (`createdAt/By`, `updatedAt/By`), populated through `JpaConfig` +
+`ApplicatorAuditoreAware`.
 
-**Authentication flow:** Password login → if MFA enabled, issue short-lived MFA token → TOTP verification → issue
-access + refresh tokens. First-login flag triggers password change flow.
+**Auth flow:** Password login → if MFA enabled, short-lived MFA token → TOTP verification → access + refresh tokens.
+A first-login flag forces a password change. Token lifetimes are in `app.security.jwt.*` in `application.yaml`.
 
 ### Security Config
 
-- Stateless JWT sessions; RSA key pair loaded via `KeyUtils`
-- Public routes: `/api/v1/auth/**`, Swagger endpoints
-- CORS: `localhost:3000` and `*.vercel.app`
-- Protected routes require `Authorization: Bearer <token>`
+- Stateless JWT; CSRF disabled. RSA keys loaded from classpath `/keys/local-only/{private,public}_key.pem` (hardcoded in
+  `JwtService`).
+- Public routes: `/api/v1/auth/**` and Swagger paths (`PUBLIC_URLS` in `SecurityConfig`); everything else requires
+  `Authorization: Bearer <token>`.
+- CORS origins are an explicit list in `BeansConfig.corsFilter()` (localhost:3000 + the Vercel frontend).
 
-### Data Initialization
+### Database
+
+Schema is managed by Hibernate with `ddl-auto: update` — there are no migrations and no seed scripts. To reset, switch
+to `create` and uncomment the `spring.sql.init` block in `application.yaml`.
+
+### Docs
+
+Functional analysis (LaTeX report, UML use-case diagrams in draw.io) is in `docs/analyse-fonctionnelle/`;
+domain model/lifecycle diagram in `docs/modele-metier-et-cycle-de-vie.drawio`.

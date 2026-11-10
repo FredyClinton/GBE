@@ -1,0 +1,36 @@
+\section{Identification des acteurs}
+
+\subsection{Recensement des acteurs du périmètre}
+
+L'analyse des notes de cadrage permet d'identifier cinq acteurs intervenant directement dans le système de suivi des dépenses budgétaires :
+
+\begin{enumerate}
+  \item \textbf{L'Ordonnateur} (acteur interne) : autorité administrative à l'initiative de la dépense, responsable de l'engagement juridique, de la liquidation et de l'ordonnancement.
+  \item \textbf{Le Fournisseur} (acteur externe) : opérateur économique qui répond aux expressions de besoin, exécute les livraisons et sollicite le règlement de ses prestations.
+  \item \textbf{Le Contrôleur financier} (acteur interne ou organe de contrôle budgétaire) : autorité chargée du contrôle a priori de la régularité budgétaire, de la disponibilité des crédits et de la conformité de l'imputation économique, tant au stade de l'engagement qu'au stade de l'ordonnancement.
+  \item \textbf{Le Comptable matière} (acteur interne) : agent chargé de la réception physique des biens livrés, de la constatation qualitative et quantitative des produits et de la certification de l'entrée en matière.
+  \item \textbf{Le Comptable public} (acteur interne / Trésor) : destinataire final du dossier d'ordonnancement validé et signé par le contrôleur financier dans le périmètre actuel de l'application.
+\end{enumerate}
+
+\subsection{Distinction entre responsabilités métier et droits d'accès applicatifs}
+
+Dans la conception d'un système d'information administratif et financier, il est essentiel de ne pas confondre la \textbf{responsabilité métier} d'un acteur avec les \textbf{droits d'accès techniques} (profils d'habilitation) qui seront configurés dans l'application.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Distinction entre responsabilité métier et profil d'accès applicatif}
+\label{tab:distinction_metier_acces}
+\begin{tabularx}{\linewidth}{L{3.5cm} Y Y}
+\toprule
+\textbf{\sffamily Dimension} & \textbf{\sffamily Responsabilité métier} & \textbf{\sffamily Droit d'accès à l'application} \\
+\midrule
+\textbf{Définition} & Attribution juridique, administrative ou comptable conférée à une fonction par la réglementation (ex. engager l'organisme, accorder un quitus, certifier le service fait, signer un ordonnancement). & Permission technique accordée à un compte utilisateur pour consulter un écran, saisir un formulaire, téléverser un document ou déclencher une transition d'état. \\
+\textbf{Portée de l'engagement} & Engage la responsabilité personnelle et fonctionnelle du titulaire du rôle (signature d'un acte juridique, visa financier, procès-verbal de réception). & Permet l'exécution matérielle d'une tâche dans le logiciel, éventuellement par délégation ou préparation de dossier. \\
+\textbf{Modélisation UML} & Représentée par l'\textbf{Acteur} (rôle fonctionnel externe interagissant avec le système pour atteindre un objectif métier à valeur ajoutée). & Représentée ultérieurement dans la matrice de sécurité et de contrôle d'accès (gestion des comptes, profils de saisie, profils de validation). \\
+\textbf{Exemple concret dans le projet} & L'\textbf{Ordonnateur} porte la responsabilité de préparer et signer l'acte juridique ainsi que le projet d'ordonnancement. & En pratique, des agents des services gestionnaires pourront disposer d'un droit de \emph{préparation/saisie}, tandis que le droit de \emph{signature/validation} sera restreint à l'ordonnateur habilité. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Dans la suite de ce document et dans le diagramme des cas d'utilisation UML, chaque acteur représente un \textbf{rôle métier cohérent} au sens de la réglementation budgétaire, indépendamment du découpage organisationnel interne des services qui sera précisé lors des ateliers détaillés.

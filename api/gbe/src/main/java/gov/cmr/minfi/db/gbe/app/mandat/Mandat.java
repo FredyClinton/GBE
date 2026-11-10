@@ -96,6 +96,6 @@ public class Mandat extends BaseEntity {
     }
 
     public boolean isSectionOnly() {
-        return this.section == null;
+        return this.programme == null;
     }
 }

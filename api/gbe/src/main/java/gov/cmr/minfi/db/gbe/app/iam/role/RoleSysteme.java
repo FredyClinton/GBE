@@ -30,8 +30,7 @@ public enum RoleSysteme {
         }
     },
 
-    // ── Nouveau : vue section entière ─────────────────
-    // Art. 66 al.2 — chef de département ministériel
+    // ── Nouveau : vue section entière
     MINISTRE("Ministre") {
         @Override
         public Set<Permission> getDefaultPermissions() {
