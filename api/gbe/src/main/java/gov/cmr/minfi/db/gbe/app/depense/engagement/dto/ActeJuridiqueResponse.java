@@ -49,6 +49,8 @@ public record ActeJuridiqueResponse(
         String natureEconomiqueCode,
         String natureEconomiqueLibelle,
         String creditBudgetaireId,
+        String reservationNumero,
+        BigDecimal montantReserve,
         // Fournisseur
         String fournisseurId,
         String fournisseurNiu,

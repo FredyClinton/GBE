@@ -245,7 +245,7 @@ rapport, section 9 ; drawio, onglets 1, 2, 3 et 4 (deux copies).
 |---|---|---|---|
 | **2a** (**livré**) | **Attribution** : saisie du résultat de la commission (Q4), `EN_EVALUATION → ATTRIBUEE` (`retenirSoumission`) ou `→ INFRUCTUEUSE` (`infructueux()`, « déclarer sans suite ») ; offre retenue `RETENUE`, les autres `NON_RETENUE` ; consultation des offres par l'ordonnateur | onglet 2, onglet 3 (« Évaluer les offres », « Offre valide ? »), Q4 | 1e |
 | **2b** (**livré**) | **Projet d'acte** (UC04) : `ActeJuridique` créé par `ActeJuridiqueFactory` à partir du besoin et de l'offre retenue ; `TypeActe` et une `FormeActeStrategie` par type (BCA, LC, marché, bail) ; forme minimale proposée, forme inférieure refusée (Q3) ; table des seuils (vide → choix libre) ; `PROJET` modifiable → `SOUMIS_CONTROLE` (plus modifiable) | UC04, onglet 4 (factory, stratégies), onglet 1 (`type : TypeActe`), §9 « forme de l'acte » | 2a |
-| **2c** | **Contrôle CF** (UC06 « include » UC07, UC08) : une seule décision transactionnelle (Q1) ; `Visa` (`ENGAGEMENT_JURIDIQUE`) ; si favorable : quitus + `ReservationCredit` + `consommerAE` sur la ligne + acte `VISE_CF` ; sinon rien n'est réservé (Q2) et le dossier revient à l'ordonnateur | UC06–UC08, onglet 2 (`viser`, `rejeter(motif)`), onglet 3 (« refus / rejet » → préparer le projet d'acte), onglet 4 (`Visa`, `ReservationCredit`) | 2b |
+| **2c** (**livré**) | **Contrôle CF** (UC06 « include » UC07, UC08) : une seule décision transactionnelle (Q1) ; `Visa` (`ENGAGEMENT_JURIDIQUE`) ; si favorable : quitus + `ReservationCredit` + `consommerAE` sur la ligne + acte `VISE_CF` ; sinon rien n'est réservé (Q2) et le dossier revient à l'ordonnateur | UC06–UC08, onglet 2 (`viser`, `rejeter(motif)`), onglet 3 (« refus / rejet » → préparer le projet d'acte), onglet 4 (`Visa`, `ReservationCredit`) | 2b |
 | **2d** | **Signature et notification** (UC05) : `VISE_CF → SIGNE_ORDONNATEUR` (validation tracée : signataire, date, Q6) puis `NOTIFIE_PRESTATAIRE` ; le fournisseur voit l'acte dans son espace ; annulation d'un acte visé ou signé avec `libererAE` (Q2) | UC05, onglet 2 (`signer`, `notifierFournisseur`), onglet 3 (« Notifier le BCA signé ») | 2c |
 
 **2a livré (V17) :**
@@ -278,6 +278,21 @@ rapport, section 9 ; drawio, onglets 1, 2, 3 et 4 (deux copies).
   - `PUT /{id}` : modification de l'objet et du délai ;
   - `PATCH /{id}/soumettre` : envoi au CF.
 - **Bénéficiaire (Q27) :** pas encore ajouté, en attente de vérification.
+
+**2c livré (V20) :**
+- **`Visa`** (package `depense/controle`, onglet 4) : numéro, `typeVisa = ENGAGEMENT_JURIDIQUE`, date de réception (envoi au CF), date du visa, décision (`StatutVisa`), observations, référence du quitus et acte. Le CF auteur est tracé par `createdBy`.
+- **`ReservationCredit`** (`depense/engagement`) : numéro, montant, date, statut (`ACTIVE` / `ANNULEE`), acte (un seul) et **ligne de crédit** (lien ajouté, absent des diagrammes).
+- **Une seule décision transactionnelle** (Q1), `POST /api/v1/actes/{id}/visas` :
+  - `FAVORABLE` :
+    - permissions `VISA_CFI`, `RESERVER_CREDIT` et `QUITUS_NATURE` sur le périmètre du besoin ;
+    - `consommerAE(TTC)` sur la ligne, refusé si la ligne est bloquée ou si les AE sont insuffisantes : le CF rejette alors l'acte ;
+    - réservation enregistrée ;
+    - quitus porté par le visa (Q19) ;
+    - acte au statut `VISE_CF`.
+  - `DEFAVORABLE_REJET` : motif obligatoire, l'acte revient en `PROJET` (ligne de crédit effacée, de nouveau déduite au prochain envoi), rien n'est réservé (Q2, Q18).
+  - `SUSPENDU_RESERVES` : motif obligatoire, l'acte reste `SOUMIS_CONTROLE` (Q18).
+- **Historique :** `GET /api/v1/actes/{id}/visas`. L'acte affiche le numéro et le montant de sa réservation.
+- **Numérotation provisoire** (à confirmer, §7) : `VISA-<année>-00001`, `RES-<année>-00001`. Référence du quitus générée : `QUI-<année>-00001`.
 
 **Mise en œuvre prévue de la notification (Q20, étape 2d) :**
 - **Signature :** `signer` fait passer l'acte à `SIGNE_ORDONNATEUR` (signataire, `dateSignature`), puis à `NOTIFIE_PRESTATAIRE` (`dateNotification`) dans la même transaction.
@@ -355,6 +370,7 @@ Elles bloquent les lots 1 et 2. Les hypothèses s'appliquent tant qu'il n'y a pa
 | Q27 | Bénéficiaire (11000020 - MINFI) : de quoi s'agit-il, d'où vient-il ? | — | **À vérifier par l'utilisateur** : probablement `<CODE CHAPITRE>-<SIGLE SECTION>` (ex. `11000020 - MINFI`). Ce n'est pas le chapitre du besoin (structure émettrice 33000035), d'où vient-il ? |
 | Q28 | Imputation : sens de « 60 » et origine de « 0112 » (classe fonctionnelle, table vide) | sert seulement à l'impression, peut attendre | **Décidé (2026-11-11)** : `60` = code de l'exercice (2026), `0112` = classification fonctionnelle. Reste : d'où vient la classification fonctionnelle (table `classe_fonctionnelle` vide). Reporté avec l'impression (§7). |
 | Q29 | « Fait à » : lieu saisi sur l'acte ou fixé par structure ? | sert à l'impression, peut attendre | Reporté avec l'impression (§7). |
+| Q30 | Périmètre du CF : aujourd'hui, seul un mandat MINISTRE sans programme couvre toute la section ; un CF ne voit et ne vise que les actes de son programme. Le CF doit-il couvrir toute une section (ou une « zone de compétence », attribut `zoneCompetence` de la classe `ControleurFinancier`) ? | — | — |
 
 Autres questions du rapport (section 9), pour les lots 3 et 4 : livraisons partielles et paiements partiels, procédure en cas de non-conformité, liste des pièces justificatives obligatoires, rôle exact du comptable public (prise en charge, rejet, statut de paiement), limite du suivi fournisseur.
 
@@ -393,6 +409,7 @@ Ce qui a été volontairement laissé de côté, avec sa source et le moment pr�
 - Montant réservé et net à payer (Q17) : décision provisoire « TTC », à revoir ; le BCA montre que NAP = HT − IR.
 
 ### Numérotation et référentiel
+- Numéros du visa (`VISA-<année>-00001`), de la réservation (`RES-…`) et du quitus (`QUI-…`) : provisoires, à aligner sur les formats réels.
 - Numéro du BCA (Q24) : à vérifier que le numéro d'ordre repart bien par exercice seul (toutes sections confondues, compteur `BCA-A<code exercice>`), et que le premier numéro est 00001.
 - Bénéficiaire (Q27) : à vérifier par l'utilisateur (`<CODE CHAPITRE>-<SIGLE SECTION>` ?).
 
@@ -418,7 +435,7 @@ Ce qui a été volontairement laissé de côté, avec sa source et le moment pr�
 - Tags Swagger renommés, ce qui compte si le client est généré à partir des tags. Le passage à `ResponseEntity` ne change rien à l'API.
 - Jeton de rafraîchissement invalide : 401 `REFRESH_TOKEN_INVALIDE` au lieu de 500.
 - Nouveaux champs (ajouts) dans `SoumissionResponse` et `ExpressionBesoinResponse`.
-- Nouvelles routes `/api/v1/actes` (projet d'acte BCA).
+- Nouvelles routes `/api/v1/actes` (projet d'acte BCA) et `/api/v1/actes/{id}/visas` (décision du CF).
 - Offre : le fournisseur ne saisit plus `montantProposeTTC` (ignoré s'il est envoyé). La réponse donne `tauxTva`, `montantTva`, `tauxIr`, `montantIr` et `montantNetAPayer`. Le code d'erreur `MONTANT_TTC_INVALIDE` disparaît.
 
 ---
@@ -454,3 +471,4 @@ Ce qui a été volontairement laissé de côté, avec sa source et le moment pr�
 | 2026-11-11 | Q23, Q24 et Q28 (« 60 » = code de l'exercice) décidées. **2b, partie taxes** (V18) : table `taxes` (TVA 19,25 %, IR 5,5 %), `CalculTaxe` → `TvaEtIrParametres`, l'offre porte TVA, IR, TTC et NAP calculés par le serveur. |
 | 2026-11-11 | **2b livré** (V19) : projet d'acte BCA (fabrique et stratégie BCA, numéro `BCA-A<exercice><section><ordre>`, montants de l'offre retenue, TTC en lettres), modification en `PROJET`, envoi au CF avec ligne de crédit déduite du besoin. Q24 précisée (ordre par exercice, à vérifier). |
 | 2026-11-11 | Les taxes dépendent du type d'acte : seules les règles du BCA sont connues, on fait avec. Évolution notée en §4.4 et §7 (taux par type, recalcul à l'acte, TTC indicatif sur l'offre). |
+| 2026-11-11 | **2c livré** (V20) : visa du CF en une décision (favorable : quitus + réservation des AE + `VISE_CF` ; rejet : retour en `PROJET` ; réserves : reste soumis). Question Q30 ouverte (périmètre du CF). |

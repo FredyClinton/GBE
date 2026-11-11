@@ -136,6 +136,7 @@ public enum ErrorCode {
     CREDIT_IMPUTATION_INTROUVABLE("CREDIT_IMPUTATION_INTROUVABLE",
             "Aucune ligne de crédit pour l'imputation du besoin %s (exercice, section, programme, action, chapitre, nature)",
             BAD_REQUEST),
+    VISA_MOTIF_OBLIGATOIRE("VISA_MOTIF_OBLIGATOIRE", "Le motif est obligatoire pour une décision %s", BAD_REQUEST),
     TAXE_NON_PARAMETREE("TAXE_NON_PARAMETREE", "Taxe non paramétrée : %s", NOT_FOUND),
     TAUX_TAXE_INVALIDE("TAUX_TAXE_INVALIDE", "Taux de taxe invalide : %s (attendu entre 0 et 100)", BAD_REQUEST),
     RIB_UTILISE("RIB_UTILISE", "Le RIB %s est utilisé par une soumission : il ne peut pas être retiré", BAD_REQUEST),

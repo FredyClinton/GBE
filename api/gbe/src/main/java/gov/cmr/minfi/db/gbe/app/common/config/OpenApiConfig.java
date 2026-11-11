@@ -56,6 +56,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
                 @Tag(name = OpenApiTags.DEPENSE_BESOINS_OUVERTS, description = "Consultation sans compte des besoins ouverts aux soumissions (UC02)."),
                 @Tag(name = OpenApiTags.DEPENSE_SOUMISSIONS, description = "Dépôt et suivi de ses offres par le fournisseur connecté (UC03, `SOUMISSIONNER`)."),
                 @Tag(name = OpenApiTags.DEPENSE_ACTES, description = "Projet d'acte juridique préparé par l'ordonnateur à partir de l'offre retenue (UC04), seule la forme BCA pour l'instant ; contrôle du CF et signature à venir."),
+                @Tag(name = OpenApiTags.DEPENSE_CONTROLE_CF, description = "Décision du contrôleur financier sur l'acte soumis (UC06, incluant la réservation des crédits UC07 et le quitus UC08) : visa favorable, rejet ou réserves."),
                 @Tag(name = OpenApiTags.ESPACE_FOURNISSEUR, description = "Routes du fournisseur connecté (`ROLE_FOURNISSEUR`).")
         },
         security = {

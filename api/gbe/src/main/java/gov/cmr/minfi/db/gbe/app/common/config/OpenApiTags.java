@@ -29,6 +29,7 @@ public final class OpenApiTags {
     public static final String DEPENSE_BESOINS_OUVERTS = "Dépense · Besoins ouverts (public)";
     public static final String DEPENSE_SOUMISSIONS = "Dépense · Soumissions";
     public static final String DEPENSE_ACTES = "Dépense · Actes juridiques";
+    public static final String DEPENSE_CONTROLE_CF = "Dépense · Contrôle du CF";
 
     public static final String ESPACE_FOURNISSEUR = "Espace fournisseur";
 

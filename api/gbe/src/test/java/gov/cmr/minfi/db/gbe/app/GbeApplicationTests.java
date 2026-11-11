@@ -291,6 +291,32 @@ class GbeApplicationTests {
         return "Bearer " + jwtService.generateAccessToken(email);
     }
 
+    /**
+     * Contrôleur financier mandaté sur un programme : hors MINISTRE, un mandat sans programme ne couvre rien
+     * (règle de MandatScopeValidator ; périmètre du CF à confirmer, plan Q30).
+     */
+    private String controleurFinancier(String email, String telephone, String sectionId, String programmeId) {
+        final String userId = UUID.randomUUID().toString();
+        final String mandatId = UUID.randomUUID().toString();
+        jdbcTemplate.update("""
+                INSERT INTO users (id, created_date, first_name, last_name, email, phone_number, password, role_id,
+                                   is_enabled, is_account_locked, credentials_expired, is_email_verified,
+                                   phone_verified, first_login, mfa_enabled)
+                VALUES (?, CURRENT_DATE, 'Test', 'CF', ?, ?, 'x',
+                        (SELECT id FROM roles WHERE name = 'ROLE_CONTROLEUR_FINANCIER'),
+                        true, false, false, false, false, false, false)
+                """, userId, email, telephone);
+        jdbcTemplate.update("""
+                INSERT INTO mandat (id, created_by, created_date, actif, start_mandat, role_systeme,
+                                    section_id, programme_id, user_id)
+                VALUES (?, 'TEST', CURRENT_DATE, true, CURRENT_DATE, 'CONTROLEUR_FINANCIER', ?, ?, ?)
+                """, mandatId, sectionId, programmeId, userId);
+        for (String permission : List.of("VISA_CFI", "RESERVER_CREDIT", "QUITUS_NATURE")) {
+            jdbcTemplate.update("INSERT INTO mandat_permissions (mandat_id, permission) VALUES (?, ?)", mandatId, permission);
+        }
+        return "Bearer " + jwtService.generateAccessToken(email);
+    }
+
     private static String champ(MvcResult resultat, String chemin) throws Exception {
         return JsonPath.read(resultat.getResponse().getContentAsString(), chemin);
     }
@@ -669,6 +695,58 @@ class GbeApplicationTests {
                         .content("{\"objet\":\"Autre\",\"delaiLivraisonMois\":3}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("ACTE_NON_MODIFIABLE"));
+
+        // Lot 2c — décision du CF (une seule validation, Q1)
+        final String cf = controleurFinancier("cf.soumission@minfi.cm", "+237670000012",
+                (String) imputation.get("section_id"), (String) imputation.get("programme_id"));
+        final String visas = "/api/v1/actes/{id}/visas";
+        mockMvc.perform(post(visas, acteId).header("Authorization", ordo).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"decision\":\"FAVORABLE\"}"))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(post(visas, acteId).header("Authorization", cf).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"decision\":\"SUSPENDU_RESERVES\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VISA_MOTIF_OBLIGATOIRE"));
+        mockMvc.perform(post(visas, acteId).header("Authorization", cf).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"decision\":\"SUSPENDU_RESERVES\",\"observations\":\"Joindre le devis\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.acteStatut").value("SOUMIS_CONTROLE"));
+        // Rejet : retour en PROJET, rien de réservé ; l'ordonnateur corrige et soumet à nouveau
+        mockMvc.perform(post(visas, acteId).header("Authorization", cf).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"decision\":\"DEFAVORABLE_REJET\",\"observations\":\"Délai irréaliste\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.acteStatut").value("PROJET"));
+        mockMvc.perform(put("/api/v1/actes/{id}", acteId).header("Authorization", ordo).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"objet\":\"Fournitures de bureau 2026\",\"delaiLivraisonMois\":3}"))
+                .andExpect(status().isOk());
+        mockMvc.perform(patch("/api/v1/actes/{id}/soumettre", acteId).header("Authorization", ordo))
+                .andExpect(status().isOk());
+        // Visa favorable : quitus + réservation des AE pour le TTC (42 334,94) + acte VISE_CF
+        mockMvc.perform(post(visas, acteId).header("Authorization", cf).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"decision\":\"FAVORABLE\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.decision").value("FAVORABLE"))
+                .andExpect(jsonPath("$.typeVisa").value("ENGAGEMENT_JURIDIQUE"))
+                .andExpect(jsonPath("$.referenceQuitus").value(org.hamcrest.Matchers.startsWith("QUI-2026-")))
+                .andExpect(jsonPath("$.acteStatut").value("VISE_CF"));
+        final Map<String, Object> ae = jdbcTemplate.queryForMap(
+                "SELECT montant_ae_consomme AS consomme, montant_ae_disponible AS disponible FROM credit_budgetaire WHERE id = ?",
+                creditId);
+        assertThat((java.math.BigDecimal) ae.get("consomme")).isEqualByComparingTo("42334.94");
+        assertThat((java.math.BigDecimal) ae.get("disponible")).isEqualByComparingTo("957665.06");
+        mockMvc.perform(get("/api/v1/actes/{id}", acteId).header("Authorization", cf))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.statut").value("VISE_CF"))
+                .andExpect(jsonPath("$.montantReserve").value(42334.94))
+                .andExpect(jsonPath("$.reservationNumero").value(org.hamcrest.Matchers.startsWith("RES-2026-")));
+        mockMvc.perform(get(visas, acteId).header("Authorization", ordo))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(3))
+                .andExpect(jsonPath("$[2].decision").value("FAVORABLE"));
+        mockMvc.perform(post(visas, acteId).header("Authorization", cf).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"decision\":\"FAVORABLE\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("TRANSITION_STATUT_INVALIDE"));
     }
 
     @Test

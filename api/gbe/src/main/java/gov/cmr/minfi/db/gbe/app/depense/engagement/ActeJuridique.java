@@ -97,6 +97,10 @@ public class ActeJuridique extends BaseEntity {
     @JoinColumn(name = "credit_budgetaire_id", foreignKey = @ForeignKey(name = "fk_acte_credit"))
     private CreditBudgetaire creditBudgetaire;
 
+    /** Réservation des AE créée par le visa favorable (« bloque crédits » 0..1). */
+    @OneToOne(mappedBy = "acteJuridique", fetch = FetchType.LAZY)
+    private ReservationCredit reservation;
+
     // ── Cycle de vie ──────────────────────────────────
 
     /** Le projet reste modifiable par l'ordonnateur tant qu'il n'est pas soumis au CF (UC04). */
@@ -118,6 +122,30 @@ public class ActeJuridique extends BaseEntity {
         this.creditBudgetaire = credit;
         this.statut = StatutActe.SOUMIS_CONTROLE;
         this.dateSoumissionControle = maintenant;
+    }
+
+    /** SOUMIS_CONTROLE → VISE_CF (viser(ACCORDE) de l'onglet 2 : quitus et crédits accordés). */
+    public void viser() {
+        validerTransition(Set.of(StatutActe.SOUMIS_CONTROLE), StatutActe.VISE_CF,
+                "Seul un acte soumis au contrôle peut être visé");
+        this.statut = StatutActe.VISE_CF;
+    }
+
+    /**
+     * SOUMIS_CONTROLE → PROJET (rejeter(motif) de l'onglet 2, « refus / rejet » de l'onglet 3, Q18) : le dossier revient
+     * à l'ordonnateur pour correction ; la ligne de crédit sera de nouveau déduite au prochain envoi.
+     */
+    public void renvoyerEnProjet() {
+        validerTransition(Set.of(StatutActe.SOUMIS_CONTROLE), StatutActe.PROJET,
+                "Seul un acte soumis au contrôle peut être rejeté");
+        this.statut = StatutActe.PROJET;
+        this.creditBudgetaire = null;
+    }
+
+    /** Réserves du CF (Q18) : l'acte reste soumis au contrôle, en attente de compléments. */
+    public void verifierSoumisAuControle() {
+        validerTransition(Set.of(StatutActe.SOUMIS_CONTROLE), StatutActe.SOUMIS_CONTROLE,
+                "Seul un acte soumis au contrôle peut recevoir une décision du CF");
     }
 
     private void validerTransition(Set<StatutActe> autorises, StatutActe cible, String message) {

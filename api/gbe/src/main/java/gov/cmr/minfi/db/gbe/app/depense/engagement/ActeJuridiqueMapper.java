@@ -28,6 +28,8 @@ public interface ActeJuridiqueMapper {
     @Mapping(target = "natureEconomiqueCode", source = "expressionBesoin.natureEconomique.code")
     @Mapping(target = "natureEconomiqueLibelle", source = "expressionBesoin.natureEconomique.libelleFr")
     @Mapping(target = "creditBudgetaireId", source = "creditBudgetaire.id")
+    @Mapping(target = "reservationNumero", source = "reservation.numero")
+    @Mapping(target = "montantReserve", source = "reservation.montant")
     @Mapping(target = "fournisseurId", source = "soumission.fournisseur.id")
     @Mapping(target = "fournisseurNiu", source = "soumission.fournisseur.niu")
     @Mapping(target = "fournisseurRaisonSociale", source = "soumission.fournisseur.raisonSociale")
