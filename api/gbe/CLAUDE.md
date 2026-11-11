@@ -42,6 +42,7 @@ Lombok · MapStruct · SpringDoc OpenAPI · TOTP (`dev.samstevens.totp`) · Test
 | `identite/auth/`        | Login, JWT issuance, TOTP MFA (`tfa/`)                                                  |
 | `identite/user/`        | `User` entity (implements `UserDetails`)                                                |
 | `identite/agent/`       | Government agent records                                                                |
+| `identite/fournisseur/` | `Fournisseur` (external supplier, linked 1-1 to a `User` with `ROLE_FOURNISSEUR`, no Agent, no Mandat) and its `CoordonneeBancaire` (RIB only, 23 chars). Created by admin under `/api/v1/admin/fournisseurs`; the supplier reads `/api/v1/fournisseurs/moi` |
 | `identite/mandat/`      | User ↔ Section/Programme assignments; `MandatScopeValidator`                            |
 | `identite/iam/`         | `RoleSysteme` enum (with default permissions), `Permission` enum, `Role` entity         |
 | `referentiel/`          | Master data, one sub-package per domain: `exercice`, `administratif` (Section, Chapitre), `programmatique` (Programme → Action → Activite → Tache; an activité/tâche copies programme, section and exercice from its parent, never from the request; a parent with children cannot be deleted), `economique` (NatureEconomique), `matiere` (plain catalogue: reference + libelle, deliberately not linked to NatureEconomique; read under `/api/v1/referentiel/matieres`, CRUD under `/api/v1/admin/matieres`), `fonctionnel`. `ReferentielMapper` is shared. |
@@ -68,6 +69,12 @@ same for `/api/v1/admin/activites`, `/api/v1/admin/taches` and `/api/v1/admin/ma
    of `Permission`s (initialised from `RoleSysteme.getDefaultPermissions()`). Services call `MandatScopeValidator`
    (`checkAccessCredit`, `checkAccessCreditWithPermission`, `checkSectionAccess`, `getProgrammeIdsAutorises`).
    Rule: a MINISTRE mandate without a programme covers the whole section; every other mandate covers only its programme.
+3. *External roles* (`RoleSysteme.isExterne()`, today only `FOURNISSEUR`) never hold a mandate
+   (`Mandat.initialiserPermissionsDepuisRole` refuses them, `/admin/users` too): `UserServiceImpl.loadUserByUsername`
+   grants them the role's default permissions directly.
+
+A `@PreAuthorize` refusal returns **403** `ACCES_REFUSE_PERMISSION` (handled in `ApplicationExceptionHandler`; before,
+the generic handler turned it into a 500).
 
 ### Budget state machine
 
@@ -124,6 +131,8 @@ The schema is owned by Flyway (`src/main/resources/db/migration`); Hibernate onl
   `V10__retirer_statuts_engage_solde_credit.sql`: `ENGAGE`/`SOLDE` credits become `DISPONIBLE`; rebuilds
   `credit_budgetaire_statut_check` (same rule as above: a `StatutCredit` change needs a migration).
   `V11__referentiel_activites_taches.sql`: tables `activites` and `taches` (code unique within the parent).
+  `V12__liquidation_par_ordonnateur.sql`: `LIQUIDER_DEPENSE` moves from COMPTABLE to ORDONNATEUR/MINISTRE mandates.
+  `V13__fournisseurs.sql`: tables `fournisseurs` (NIU unique, `user_id` unique) and `coordonnees_bancaires`.
 - Any entity change needs a new `V<n>__description.sql`. Never edit an applied migration.
 - Pre-Flyway databases get a baseline at version 2 (`baseline-on-migrate`), so only V3+ run on them.
 
@@ -132,7 +141,8 @@ The schema is owned by Flyway (`src/main/resources/db/migration`); Hibernate onl
 - `CreditBudgetaireTest`, `MandatScopeValidatorTest`, `CreditBudgetaireServiceImplTest`, `ActiviteTacheServiceImplTest`:
   plain unit tests (Mockito, no Spring context). Surefire reports `@Nested` classes under their `@DisplayName` / `$Inner` name.
 - `GbeApplicationTests`: full context on a Testcontainers `postgres:17.9`. It checks the migrations, auth on protected
-  routes, CORS preflight and the initial admin login.
+  routes, CORS preflight and the initial admin login. To call a protected route, build a token with
+  `jwtService.generateAccessToken(email)` (no TOTP needed), e.g. the supplier end-to-end test.
 
 ### Docs
 

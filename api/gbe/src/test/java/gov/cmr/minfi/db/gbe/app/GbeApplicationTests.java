@@ -5,6 +5,7 @@ import gov.cmr.minfi.db.gbe.app.identite.iam.permission.Permission;
 import gov.cmr.minfi.db.gbe.app.identite.iam.role.RoleRepository;
 import gov.cmr.minfi.db.gbe.app.identite.iam.role.RoleSysteme;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.SectionRepository;
+import gov.cmr.minfi.db.gbe.app.security.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -52,6 +53,9 @@ class GbeApplicationTests {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private JwtService jwtService;
 
     @Test
     void migrationsAppliquees_referentielEtRolesCharges() {
@@ -118,6 +122,55 @@ class GbeApplicationTests {
                 """, String.class);
         assertThat(colonnes).containsExactlyInAnyOrder(
                 "exercice_id", "section_id", "programme_id", "action_id", "chapitre_id", "nature_economique_id");
+    }
+
+    @Test
+    void fournisseur_creeParLAdmin_seConnecteSansMandat() throws Exception {
+        final String admin = "Bearer " + jwtService.generateAccessToken("admin@gbe.cm");
+        mockMvc.perform(post("/api/v1/admin/fournisseurs")
+                        .header("Authorization", admin)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"raisonSociale":"SARL Test","niu":"M000000000001T","nomRepresentant":"Essomba",
+                                 "prenomRepresentant":"Marie","email":"fournisseur.test@exemple.cm",
+                                 "telephone":"+237690000001","password":"Temp@1234",
+                                 "ribs":["10005 00001 01234567890 12"]}
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.ribs[0].rib").value("10005000010123456789012"))
+                .andExpect(jsonPath("$.ribs[0].id").isNotEmpty());
+
+        final String fournisseur = "Bearer " + jwtService.generateAccessToken("fournisseur.test@exemple.cm");
+        mockMvc.perform(get("/api/v1/fournisseurs/moi").header("Authorization", fournisseur))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.raisonSociale").value("SARL Test"))
+                .andExpect(jsonPath("$.actif").value(true));
+        // Pas d'accès aux routes d'administration
+        mockMvc.perform(get("/api/v1/admin/fournisseurs").header("Authorization", fournisseur))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("ACCES_REFUSE_PERMISSION"));
+        // Un agent n'a pas d'espace fournisseur
+        mockMvc.perform(get("/api/v1/fournisseurs/moi").header("Authorization", admin))
+                .andExpect(status().isForbidden());
+
+        final Integer mandats = jdbcTemplate.queryForObject("""
+                SELECT count(*) FROM mandat m JOIN users u ON u.id = m.user_id
+                WHERE u.email = 'fournisseur.test@exemple.cm'
+                """, Integer.class);
+        assertThat(mandats).isZero();
+    }
+
+    @Test
+    void creationUtilisateur_avecRoleFournisseur_refusee() throws Exception {
+        mockMvc.perform(post("/api/v1/admin/users")
+                        .header("Authorization", "Bearer " + jwtService.generateAccessToken("admin@gbe.cm"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"agentId":"inconnu","email":"x@exemple.cm","password":"Temp@1234",
+                                 "roleSysteme":"FOURNISSEUR","sectionId":"inconnue"}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("ROLE_EXTERNE_SANS_MANDAT"));
     }
 
     @Test

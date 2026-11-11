@@ -77,6 +77,16 @@ public enum ErrorCode {
             "Annulation impossible : %s d'AE et %s de CP sont consommés sur ce crédit",
             BAD_REQUEST
     ),
+    FOURNISSEUR_NOT_FOUND("FOURNISSEUR_NOT_FOUND", "Fournisseur introuvable : %s", NOT_FOUND),
+    FOURNISSEUR_LIE_AU_COMPTE("FOURNISSEUR_LIE_AU_COMPTE",
+            "Ce compte est celui d'un fournisseur : désactivez-le au lieu de le supprimer", BAD_REQUEST),
+    RIB_INVALIDE("RIB_INVALIDE",
+            "RIB invalide : %s (23 caractères attendus : banque 5 chiffres, guichet 5 chiffres, compte 11, clé 2 chiffres)",
+            BAD_REQUEST),
+    RIB_ALREADY_EXISTS("RIB_ALREADY_EXISTS", "Le RIB %s est déjà enregistré pour ce fournisseur", BAD_REQUEST),
+    RIB_NOT_FOUND("RIB_NOT_FOUND", "RIB introuvable pour ce fournisseur : %s", NOT_FOUND),
+    ROLE_EXTERNE_SANS_MANDAT("ROLE_EXTERNE_SANS_MANDAT",
+            "Le rôle %s est externe : il ne peut pas porter de mandat", BAD_REQUEST),
     ACTION_A_DES_ACTIVITES("ACTION_A_DES_ACTIVITES",
             "L'action %s contient des activités : supprimez-les ou déplacez-les d'abord", BAD_REQUEST),
     ACTIVITE_NOT_FOUND("ACTIVITE_NOT_FOUND", "Activité introuvable : %s", NOT_FOUND),
@@ -111,6 +121,11 @@ public enum ErrorCode {
     ACCES_REFUSE_HORS_SCOPE(
             "ACCES_REFUSE_HORS_SCOPE",
             "Accès refusé : ce crédit n'est pas dans votre périmètre de mandat",
+            FORBIDDEN
+    ),
+    ACCES_REFUSE_PERMISSION(
+            "ACCES_REFUSE_PERMISSION",
+            "Accès refusé : vous n'avez pas la permission requise pour cette opération",
             FORBIDDEN
     ),
     ACCES_REFUSE_AUCUN_MANDAT(

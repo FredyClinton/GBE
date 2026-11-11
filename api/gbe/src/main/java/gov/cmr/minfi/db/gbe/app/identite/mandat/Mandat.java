@@ -1,6 +1,8 @@
 package gov.cmr.minfi.db.gbe.app.identite.mandat;
 
 import gov.cmr.minfi.db.gbe.app.common.audit.BaseEntity;
+import gov.cmr.minfi.db.gbe.app.common.exception.BusinessException;
+import gov.cmr.minfi.db.gbe.app.common.exception.ErrorCode;
 import gov.cmr.minfi.db.gbe.app.identite.iam.permission.Permission;
 import gov.cmr.minfi.db.gbe.app.identite.iam.role.RoleSysteme;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.Section;
@@ -73,6 +75,9 @@ public class Mandat extends BaseEntity {
 
     // Appelée par AdminService à la création
     public void initialiserPermissionsDepuisRole() {
+        if (this.roleSysteme.isExterne()) {
+            throw new BusinessException(ErrorCode.ROLE_EXTERNE_SANS_MANDAT, this.roleSysteme);
+        }
         this.permissions = new HashSet<>(this.roleSysteme.getDefaultPermissions());
     }
 

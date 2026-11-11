@@ -85,7 +85,7 @@ Chaque lot comprend sa migration, ses tests et ses routes, et peut être livré 
 | Lot | Contenu | UC | État |
 |---|---|---|---|
 | **0** | Rôles `FOURNISSEUR` et `COMPTABLE_MATIERE`, nouvelles permissions, référentiel `Matiere`, refonte du statut des crédits (§2.1), rattachement des natures à l'exercice, permissions par défaut du mandat MINISTRE | — | **livré** (2026-11-11, voir §4.1) |
-| **1** | (découpage en §4.2) Référentiels `Activite` et `Tache` (CRUD admin + consultation, migration V11), fournisseurs (création, RIB), expression de besoin rattachée à une tâche, un chapitre, un exercice et une nature économique (brouillon → publiée → clôturée), consultation des besoins ouverts, soumissions | UC01–UC03 | en cours (1a livré) |
+| **1** | (découpage en §4.2) Référentiels `Activite` et `Tache` (CRUD admin + consultation, migration V11), fournisseurs (création, RIB), expression de besoin rattachée à une tâche, un chapitre, un exercice et une nature économique (brouillon → publiée → clôturée), consultation des besoins ouverts, soumissions | UC01–UC03 | en cours (1a, 1b livrés) |
 | **2** | Évaluation et attribution, projet d'acte et formes, contrôle CF (réservation des AE, quitus, visa ou rejet), signature | UC04–UC08 | à faire |
 | **3** | Stockage de fichiers, livraisons, PV conforme ou non conforme, information de l'ordonnateur | UC09–UC11 | à faire |
 | **4** | Demande de paiement, factures et pièces, validation, liquidation, ordonnancement, visa CF, transmission au Trésor, suivi fournisseur | UC12–UC19 | à faire |
@@ -110,10 +110,10 @@ Chaque étape est commitée séparément, avec sa migration et ses tests.
 | Étape | Contenu | Dépend de | État |
 |---|---|---|---|
 | **1a** | Référentiels `Activite` et `Tache` (V11) | — | **livré** (2026-11-11) |
-| **1b** | `Fournisseur` et `CoordonneeBancaire` (V12) : création par l'admin avec un compte `ROLE_FOURNISSEUR`, RIB, permissions par défaut du rôle sans mandat | lot 0 | à faire |
-| **1c** | `ExpressionBesoin` et `LigneBesoin` (V13), UC01 : brouillon, lignes (matière, quantité, spécifications), rattachement tâche / chapitre / exercice / nature, publication, annulation, périmètre du mandat | 1a | à faire |
+| **1b** | `Fournisseur` et `CoordonneeBancaire` (V12–V13) : création par l'admin avec un compte `ROLE_FOURNISSEUR`, RIB, permissions par défaut du rôle sans mandat | lot 0 | **livré** (2026-11-11) |
+| **1c** | `ExpressionBesoin` et `LigneBesoin` (V14), UC01 : brouillon, lignes (matière, quantité, spécifications), rattachement tâche / chapitre / exercice / nature, publication, annulation, périmètre du mandat | 1a | à faire |
 | **1d** | Consultation des besoins ouverts (UC02) : besoins publiés non échus, filtres, détail | 1c | à faire |
-| **1e** | `Soumission` et `LigneSoumission` (V14), UC03 : offre totale, choix du RIB, dépôt verrouillé à la date limite, offre non modifiable une fois déposée, récépissé horodaté | 1b, 1d | à faire |
+| **1e** | `Soumission` et `LigneSoumission` (V15), UC03 : offre totale, choix du RIB, dépôt verrouillé à la date limite, offre non modifiable une fois déposée, récépissé horodaté | 1b, 1d | à faire |
 
 **1a livré :**
 - **Tables `activites` et `taches` :** `code` (unique dans le parent), `sigle`, `libelle`, plus le parent (`action_id` ou `activite_id`). Programme, section et exercice sont recopiés du parent par l'API, et jamais saisis.
@@ -125,12 +125,22 @@ Chaque étape est commitée séparément, avec sa migration et ses tests.
   - déplacer une activité vers une autre action met à jour ses tâches ;
   - suppression refusée pour une activité qui contient des tâches (`ACTIVITE_A_DES_TACHES`) et pour une action qui contient des activités (`ACTION_A_DES_ACTIVITES`, contrôle ajouté à `ActionServiceImpl`).
 
+**1b livré :**
+- **Fournisseur :** `raisonSociale`, `niu` (unique), `rccm`, `adresse`. Il est lié à un compte `User` créé en même temps : rôle `FOURNISSEUR`, nom et prénom du représentant, email, téléphone, mot de passe provisoire, `firstLogin`. Pas d'agent, pas de mandat.
+- **Coordonnées bancaires :** **seul le RIB** est stocké (décision 2026-11-11) : 23 caractères, banque 5 chiffres, guichet 5 chiffres, compte 11 caractères, clé 2 chiffres. Les espaces et tirets sont retirés, et un fournisseur peut avoir plusieurs RIB (choix au dépôt, onglet 3). La clé RIB n'est pas recalculée.
+- **Routes admin** (`MANAGE_USERS`) : `POST`/`GET`/`GET {id}`/`PUT {id}` sous `/api/v1/admin/fournisseurs`, `POST {id}/ribs`, `DELETE {id}/ribs/{ribId}`. Activation du compte : routes `/api/v1/admin/users/{userId}/activate|deactivate` existantes. La suppression d'un compte fournisseur est refusée (`FOURNISSEUR_LIE_AU_COMPTE`).
+- **Espace fournisseur :** `GET /api/v1/fournisseurs/moi` (`ROLE_FOURNISSEUR`).
+- **Sécurité :** `RoleSysteme.isExterne()`. Un rôle externe ne peut pas porter de mandat (`ROLE_EXTERNE_SANS_MANDAT`), y compris via `/admin/users`, et reçoit directement les permissions par défaut de son rôle.
+- **Point 5 (V12) :** `LIQUIDER_DEPENSE` passe de COMPTABLE à ORDONNATEUR et MINISTRE (décision 2026-11-11). L'écart du §4.3 est corrigé.
+- **Bug corrigé :** un refus de `@PreAuthorize` renvoyait **500** sur toutes les routes, au lieu de 403. Il renvoie maintenant **403 `ACCES_REFUSE_PERMISSION`**. **À signaler au front.**
+- **Reste :** le fournisseur ne gère pas lui-même ses RIB (l'admin le fait). Retirer un RIB déjà utilisé par une soumission devra être refusé (1e).
+
 **Questions avant 1c–1e** (hypothèse par défaut entre parenthèses) :
 
 | # | Question | Hypothèse | Décision |
 |---|---|---|---|
 | Q7 | Validation du besoin avant publication (fiche objet : Brouillon → Validée → Publiée) ? | non : l'onglet 3 montre une publication directe par l'ordonnateur | — |
-| Q8 | `montantEstime` sur le besoin ? L'onglet 3 parle d'« Estimation », alors que la règle actée dit « aucun prix ». | — | — |
+| Q8 | `montantEstime` sur le besoin ? L'onglet 3 parle d'« Estimation », alors que la règle actée dit « aucun prix ». | — | **Décidé (2026-11-11)** : pas de montant estimé. |
 | Q9 | Consultation des besoins ouverts : publique sans compte (« portail public ») ou fournisseurs connectés ? | fournisseurs connectés | — |
 | Q10 | Pièces justificatives de l'offre au lot 1, ou au lot 3 avec le stockage de fichiers ? | lot 3 | — |
 | Q11 | Une seule offre par fournisseur et par besoin ? Retrait possible avant la date limite ? | oui / oui | — |
@@ -144,7 +154,7 @@ Lu le 2026-11-11. Il complète le rapport sur plusieurs points :
 - **Évaluation :** l'ordonnateur retient une offre. Si aucune n'est valide, le besoin est **déclaré sans suite** (`INFRUCTUEUSE`), ce qui clôt le dossier sans engagement.
 - **Contrôle CF :** quitus (classement matière / nature) → réservation des AE → décision. En cas de **refus, le dossier revient à la préparation du projet d'acte**, il n'est pas abandonné. Cohérent avec Q1 et Q2 : validation unique, rien de réservé si refus.
 - **Non-conformité :** PV de non-conformité, puis **reprise de la livraison** (boucle). Cela répond à une question du lot 3.
-- **Liquidation :** faite par **l'ordonnateur** (« vérification pièces & service fait »). Or `LIQUIDER_DEPENSE` est aujourd'hui une permission par défaut du rôle `COMPTABLE`. **Écart à corriger avant le lot 4.**
+- **Liquidation :** faite par **l'ordonnateur** (« vérification pièces & service fait »). `LIQUIDER_DEPENSE` était une permission par défaut du rôle `COMPTABLE`. **Corrigé en 1b (V12).**
 - **Visa d'ordonnancement :** le CF contrôle la liquidation et les retenues fiscales (IR), puis transmet au Trésor.
 - **Comptable public :** prise en charge du mandat (contrôle de régularité), virement sur le RIB, puis le fournisseur constate le règlement.
 
@@ -180,3 +190,4 @@ Point à part : le mandat MINISTRE (section MINFI) n'a aucune permission en base
 | 2026-11-11 | Lecture de l'onglet 4 du diagramme : `Activite`/`Tache` (Action → Activité → Tâche, `exercice_id` comme `Action`) ajoutées au lot 1 ; le besoin se rattache à une tâche. Pas de lien matière ↔ nature, confirmé. |
 | 2026-11-11 | Lot 0 commité (`2d14474`). Puis : annulation d'un crédit bloquée tant que des AE/CP sont consommés ; `engager`/`solder` et les statuts `ENGAGE`/`SOLDE` retirés (V10). |
 | 2026-11-11 | Lot 1 découpé en 1a–1e. **1a livré** : activités et tâches (V11). Lecture de l'onglet 3 (§4.3) : publication directe, RIB au dépôt, refus du CF renvoyé à la préparation de l'acte, liquidation par l'ordonnateur (écart avec `LIQUIDER_DEPENSE` sur `COMPTABLE`). Questions Q7–Q12 ouvertes. |
+| 2026-11-11 | **1b livré** : fournisseurs et RIB (V13), rôle externe sans mandat, `LIQUIDER_DEPENSE` déplacée vers l'ordonnateur (V12), refus d'autorisation en 403 au lieu de 500. Q8 : pas de montant estimé. |

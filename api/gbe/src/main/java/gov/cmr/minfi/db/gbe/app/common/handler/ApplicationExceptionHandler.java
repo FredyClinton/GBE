@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -105,6 +106,20 @@ public class ApplicationExceptionHandler {
                 .code(ErrorCode.USERNAME_NOT_FOUND.getCode())
                 .build();
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Refus de @PreAuthorize (permission manquante). Sans ce gestionnaire, le gestionnaire
+     * générique ci-dessous transformait le refus en erreur 500.
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException ex) {
+        log.debug(ex.getMessage(), ex);
+        final ErrorResponse body = ErrorResponse.builder()
+                .code(ErrorCode.ACCES_REFUSE_PERMISSION.getCode())
+                .message(ErrorCode.ACCES_REFUSE_PERMISSION.getDefaultMessage())
+                .build();
+        return ResponseEntity.status(ErrorCode.ACCES_REFUSE_PERMISSION.getHttpStatus()).body(body);
     }
 
     @ExceptionHandler(Exception.class)

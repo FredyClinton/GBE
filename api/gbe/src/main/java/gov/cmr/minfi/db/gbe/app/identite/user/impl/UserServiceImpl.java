@@ -3,6 +3,7 @@ package gov.cmr.minfi.db.gbe.app.identite.user.impl;
 import gov.cmr.minfi.db.gbe.app.common.exception.BusinessException;
 import gov.cmr.minfi.db.gbe.app.common.exception.ErrorCode;
 import gov.cmr.minfi.db.gbe.app.identite.iam.permission.Permission;
+import gov.cmr.minfi.db.gbe.app.identite.iam.role.RoleSysteme;
 import gov.cmr.minfi.db.gbe.app.identite.mandat.MandatRepository;
 import gov.cmr.minfi.db.gbe.app.identite.user.User;
 import gov.cmr.minfi.db.gbe.app.identite.user.UserMapper;
@@ -18,6 +19,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -43,12 +46,28 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 .findMandatsValidesParUser(user.getId())
                 .stream()
                 .flatMap(affectation -> affectation.getPermissions().stream())
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(HashSet::new));
+
+        // Rôle externe (fournisseur) : pas de mandat, permissions par défaut du rôle
+        roleSystemeDe(user)
+                .filter(RoleSysteme::isExterne)
+                .ifPresent(role -> permissions.addAll(role.getDefaultPermissions()));
 
         user.setGrantedPermissions(permissions);
         log.debug("User {} loaded with {} permission(s)", userEmail, permissions.size());
 
         return user;
+    }
+
+    private static Optional<RoleSysteme> roleSystemeDe(User user) {
+        if (user.getRole() == null || !user.getRole().getName().startsWith("ROLE_")) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(RoleSysteme.valueOf(user.getRole().getName().substring("ROLE_".length())));
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
+        }
     }
 
     @Override

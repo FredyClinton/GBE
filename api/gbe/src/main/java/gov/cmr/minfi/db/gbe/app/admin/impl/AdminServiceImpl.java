@@ -1,6 +1,7 @@
 package gov.cmr.minfi.db.gbe.app.admin.impl;
 
 import gov.cmr.minfi.db.gbe.app.admin.AdminService;
+import gov.cmr.minfi.db.gbe.app.identite.fournisseur.FournisseurRepository;
 import gov.cmr.minfi.db.gbe.app.admin.dto.CreateUserRequest;
 import gov.cmr.minfi.db.gbe.app.admin.dto.UserSummaryResponse;
 import gov.cmr.minfi.db.gbe.app.identite.agent.Agent;
@@ -45,10 +46,15 @@ public class AdminServiceImpl implements AdminService {
 	private final TwoFactorAuthenticationService tfaService;
 	private final PasswordEncoder passwordEncoder;
 	private final MandatMapper mandatMapper;
+	private final FournisseurRepository fournisseurRepository;
 
 	@Override
 	@Transactional
 	public UserSummaryResponse createUser(CreateUserRequest request) {
+		if (request.roleSysteme().isExterne()) {
+			// Un fournisseur se crée par /api/v1/admin/fournisseurs (compte sans agent ni mandat)
+			throw new BusinessException(ErrorCode.ROLE_EXTERNE_SANS_MANDAT, request.roleSysteme());
+		}
 		final Agent agent = agentRepository
 			.findById(request.agentId())
 			.orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, request.agentId()));
@@ -187,6 +193,9 @@ public class AdminServiceImpl implements AdminService {
 		final User user = userRepository
 			.findById(userId)
 			.orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, userId));
+		if (fournisseurRepository.existsByUserId(userId)) {
+			throw new BusinessException(ErrorCode.FOURNISSEUR_LIE_AU_COMPTE);
+		}
 		mandatRepository.deleteAll(mandatRepository.findByUserId(userId));
 		userRepository.delete(user);
 		log.debug("Utilisateur supprimé : {}", user.getEmail());

@@ -27,6 +27,7 @@ public enum RoleSysteme {
                     Permission.REVISER_AE,
                     Permission.REVISER_CP,
                     Permission.EXPRIMER_BESOIN,
+                    Permission.LIQUIDER_DEPENSE,
                     Permission.ORDONNANCER
             );
         }
@@ -44,6 +45,7 @@ public enum RoleSysteme {
                     Permission.MANAGE_USERS,
                     Permission.MANAGE_AFFECTATIONS,
                     Permission.EXPRIMER_BESOIN,
+                    Permission.LIQUIDER_DEPENSE,
                     Permission.ORDONNANCER
             );
         }
@@ -65,11 +67,12 @@ public enum RoleSysteme {
     },
 
     // ── Comptable public ──────────────────────────────
+    // Prise en charge du mandat et paiement. La liquidation relève de l'ordonnateur
+    // (diagramme d'activité, décision 2026-11-11).
     COMPTABLE("Comptable") {
         @Override
         public Set<Permission> getDefaultPermissions() {
             return Set.of(
-                    Permission.LIQUIDER_DEPENSE,
                     Permission.PAYER_DEPENSE
             );
         }
@@ -96,6 +99,11 @@ public enum RoleSysteme {
             return Set.of(
                     Permission.SOUMISSIONNER
             );
+        }
+
+        @Override
+        public boolean isExterne() {
+            return true;
         }
     },
 
@@ -136,4 +144,12 @@ public enum RoleSysteme {
     }
 
     public abstract Set<Permission> getDefaultPermissions();
+
+    /**
+     * Rôle externe à l'administration : jamais de mandat ; l'utilisateur reçoit directement
+     * les permissions par défaut du rôle (voir UserServiceImpl.loadUserByUsername).
+     */
+    public boolean isExterne() {
+        return false;
+    }
 }
