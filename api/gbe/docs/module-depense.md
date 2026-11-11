@@ -195,13 +195,22 @@ Lu le 2026-11-11. Il complète le rapport sur plusieurs points :
 **Méthodes de calcul des taxes selon le type de besoin** (demandé le 2026-11-11, à faire plus tard)
 
 - **Besoin :** le calcul des taxes (TVA et autres retenues) dépendra du **type de besoin**. Les méthodes de calcul seront introduites plus tard.
-- **Ce que dit la conception :** elle ne le prévoit pas encore. Le modèle a `montantProposeHT` et `montantProposeTTC` sur `Soumission` (onglets 1 et 4), et `montantHT`, `montantTVA`, `montantTTC` sur `Facture` (fiche objet). Mais il n'a ni taux, ni méthode de calcul, ni **type de besoin** sur `ExpressionBesoin`. L'onglet 3 mentionne en plus les « retenues fiscales (IR) » contrôlées par le CF au visa d'ordonnancement.
+- **Ce que dit la conception** (vérifié le 2026-11-11 : drawio, tous onglets, deux copies, et rapport) :
+  - **pas de champ « type de besoin »** ;
+  - montants : `montantProposeHT` et `montantProposeTTC` sur `Soumission` (onglets 1 et 4), `montantHT`, `montantTVA` et `montantTTC` sur `Facture` (fiche objet) ;
+  - UC15 : l'ordonnateur vérifie « les taux de taxes » sur la facture ;
+  - UC16 : retenues de garantie et pénalités à la liquidation (`tauxRetenueGarantie` sur `StrategieMarchePublic`) ;
+  - onglet 3 : « retenues fiscales (IR) » contrôlées par le CF au visa d'ordonnancement ;
+  - aucune règle ne relie un taux à un type de besoin.
+- **Ce qui peut servir de « type » dans la conception :**
+  - la **nature économique du besoin** (`ExpressionBesoin` → `NatureEconomique`, « consomme », déjà en place en 1c ; UC02 parle de « famille de prestations ») ;
+  - à défaut, le **`TypeActe`** de l'acte juridique (lot 2).
 - **À définir :**
   - la liste des types de besoin ;
   - pour chaque type, la ou les taxes, leur taux ou leur règle, et les exonérations éventuelles ;
   - les objets concernés : TTC de la soumission, TVA de la facture (lot 4), retenues à l'ordonnancement.
-- **Conception à compléter :** un `TypeBesoin` sur `ExpressionBesoin`, et une **stratégie de calcul** par type (même principe que les formes d'acte, `FormeActeStrategie`), avec des paramètres en table plutôt que dans le code. À reporter dans le drawio quand les règles seront connues.
-- **Préparation dès 1e :** le calcul du TTC d'une offre passe par une seule interface (`CalculTaxe`), pour pouvoir brancher plus tard une méthode par type de besoin sans toucher au reste du code. En attendant, le comportement provisoire est celui du modèle : le fournisseur saisit le TTC, et le serveur vérifie seulement que TTC ≥ HT.
+- **Proposition :** **ne pas ajouter de champ** ; s'appuyer d'abord sur la nature économique du besoin. N'introduire un vrai « type de besoin » que si elle ne suffit pas, et **d'abord dans le drawio**. Calcul par **stratégie** (même principe que `FormeActeStrategie`), avec des paramètres en table plutôt que dans le code.
+- **Préparation dès 1e :** le calcul du TTC d'une offre passe par une seule interface (`CalculTaxe`), qui reçoit le besoin (donc sa nature), pour pouvoir brancher plus tard une méthode par type de besoin sans toucher au reste du code. En attendant, le comportement provisoire est celui du modèle : le fournisseur saisit le TTC, et le serveur vérifie seulement que TTC ≥ HT.
 
 ---
 
@@ -241,3 +250,4 @@ Point à part : le mandat MINISTRE (section MINFI) n'a aucune permission en base
 | 2026-11-11 | **1d livré** : consultation publique des besoins ouverts (Q9 : public, connexion pour soumissionner). Pagination `PageResponse` sur les listes de besoins, périmètre filtré en base. |
 | 2026-11-11 | Q11 : offre modifiable jusqu'à la date limite. Q10 : écart entre la fiche UC03 (justificatifs) et le diagramme de classes (aucun document sur `Soumission`). Restent avant 1e : Q10, retrait de l'offre, calcul HT/TTC (TVA), délai unique sur l'offre. |
 | 2026-11-11 | Évolution notée (§4.4) : méthodes de calcul des taxes selon le type de besoin, à introduire plus tard. Le TTC de la soumission passera par une interface `CalculTaxe` dès 1e (provisoire : TTC saisi par le fournisseur, TTC ≥ HT). |
+| 2026-11-11 | §4.4 corrigé : la conception n'a pas de « type de besoin ». Le calcul des taxes s'appuiera d'abord sur la nature économique du besoin (ou le `TypeActe`). Pas de nouveau champ sans passer d'abord par le drawio. |
