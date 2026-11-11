@@ -178,7 +178,7 @@ Chaque étape est commitée séparément, avec sa migration et ses tests.
   - **pas de retrait** et **pas de pièce jointe** (décisions 2026-11-11, conformes au diagramme de classes).
 - **TTC :** calculé via l'interface **`CalculTaxe`** (§4.4). Méthode provisoire `TtcSaisiParFournisseur` : TTC saisi, au moins égal au HT.
 - **Compléments à la classe `Soumission`, issus de la conception :**
-  - **RIB** choisi au dépôt parmi ceux du fournisseur (onglet 3 : « offre financière, prix unitaire & RIB ») ;
+  - **lien vers la `CoordonneeBancaire` choisie au dépôt** parmi celles du fournisseur (onglet 3 : « offre financière, prix unitaire & RIB »). Le RIB reste un attribut de `CoordonneeBancaire` (onglet 4 : `rib`) : la soumission ne le recopie pas, elle référence la coordonnée (`coordonnee_bancaire_id`). Seule l'association `Soumission → CoordonneeBancaire` est ajoutée : l'onglet 4 ne relie `CoordonneeBancaire` qu'au `Fournisseur` (« possède ») ;
   - **empreinte** SHA-256 recalculée à chaque modification (fiche UC03 : « récépissé scellé et horodaté »).
 - **Écart volontaire :** UC03 dit que l'offre est « enregistrée de façon inaltérable ». La décision Q11 la rend modifiable jusqu'à la date limite. Chaque version est horodatée et scellée.
 - **Contrôles branchés ailleurs :**
@@ -274,3 +274,4 @@ Point à part : le mandat MINISTRE (section MINFI) n'a aucune permission en base
 | 2026-11-11 | Évolution notée (§4.4) : méthodes de calcul des taxes selon le type de besoin, à introduire plus tard. Le TTC de la soumission passera par une interface `CalculTaxe` dès 1e (provisoire : TTC saisi par le fournisseur, TTC ≥ HT). |
 | 2026-11-11 | §4.4 corrigé : la conception n'a pas de « type de besoin ». Le calcul des taxes s'appuiera d'abord sur la nature économique du besoin (ou le `TypeActe`). Pas de nouveau champ sans passer d'abord par le drawio. |
 | 2026-11-11 | **1e livré, lot 1 terminé** : soumissions (V16), offre totale, HT calculé, TTC via `CalculTaxe` (provisoire : saisi, ≥ HT), une offre par fournisseur et par besoin, modifiable jusqu'à la date limite, RIB choisi, récépissé scellé. Q10 : pas de pièce jointe. Pas de retrait. Délai unique sur l'offre. |
+| 2026-11-11 | Précision : le RIB est un attribut de `CoordonneeBancaire` ; la soumission référence la coordonnée choisie (association absente de l'onglet 4, déduite de l'onglet 3). |
