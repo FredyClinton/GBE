@@ -3,7 +3,9 @@ package gov.cmr.minfi.db.gbe.app.identite.fournisseur.impl;
 import gov.cmr.minfi.db.gbe.app.common.exception.BusinessException;
 import gov.cmr.minfi.db.gbe.app.common.exception.ErrorCode;
 import gov.cmr.minfi.db.gbe.app.identite.auth.tfa.TwoFactorAuthenticationService;
+import gov.cmr.minfi.db.gbe.app.depense.soumission.SoumissionRepository;
 import gov.cmr.minfi.db.gbe.app.identite.fournisseur.CoordonneeBancaire;
+import gov.cmr.minfi.db.gbe.app.identite.fournisseur.FournisseurConnecte;
 import gov.cmr.minfi.db.gbe.app.identite.fournisseur.Fournisseur;
 import gov.cmr.minfi.db.gbe.app.identite.fournisseur.FournisseurMapper;
 import gov.cmr.minfi.db.gbe.app.identite.fournisseur.FournisseurRepository;
@@ -19,8 +21,6 @@ import gov.cmr.minfi.db.gbe.app.identite.user.User;
 import gov.cmr.minfi.db.gbe.app.identite.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +39,8 @@ public class FournisseurServiceImpl implements FournisseurService {
     private final PasswordEncoder passwordEncoder;
     private final TwoFactorAuthenticationService tfaService;
     private final FournisseurMapper fournisseurMapper;
+    private final FournisseurConnecte fournisseurConnecte;
+    private final SoumissionRepository soumissionRepository;
 
     @Override
     @Transactional
@@ -135,19 +137,16 @@ public class FournisseurServiceImpl implements FournisseurService {
     @Transactional
     public FournisseurResponse retirerRib(String fournisseurId, String coordonneeBancaireId) {
         final Fournisseur fournisseur = findFournisseur(fournisseurId);
+        if (soumissionRepository.existsByCoordonneeBancaireId(coordonneeBancaireId)) {
+            throw new BusinessException(ErrorCode.RIB_UTILISE, coordonneeBancaireId);
+        }
         fournisseur.retirerRib(coordonneeBancaireId); // orphanRemoval : supprimé au commit
         return fournisseurMapper.toResponse(fournisseur);
     }
 
     @Override
     public FournisseurResponse getMonProfil() {
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof User user)) {
-            throw new BusinessException(ErrorCode.FOURNISSEUR_NOT_FOUND, "utilisateur courant");
-        }
-        return fournisseurRepository.findByUserId(user.getId())
-                .map(fournisseurMapper::toResponse)
-                .orElseThrow(() -> new BusinessException(ErrorCode.FOURNISSEUR_NOT_FOUND, user.getEmail()));
+        return fournisseurMapper.toResponse(fournisseurConnecte.exiger());
     }
 
     private Fournisseur findFournisseur(String fournisseurId) {

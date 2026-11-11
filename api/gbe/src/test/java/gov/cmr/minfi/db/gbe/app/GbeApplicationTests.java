@@ -32,6 +32,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -325,6 +326,145 @@ class GbeApplicationTests {
                 .andExpect(status().isNotFound());
         assertThat(jdbcTemplate.queryForObject("SELECT supprime FROM expressions_besoin WHERE id = ?",
                 Boolean.class, brouillonId)).isTrue();
+    }
+
+    /** Fournisseur créé par l'admin avec un RIB ; renvoie [jeton, id du RIB]. */
+    private String[] fournisseurAvecRib(String niu, String email, String telephone, String rib) throws Exception {
+        final String admin = "Bearer " + jwtService.generateAccessToken("admin@gbe.cm");
+        final MvcResult r = mockMvc.perform(post("/api/v1/admin/fournisseurs").header("Authorization", admin)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"raisonSociale":"SARL %1$s","niu":"%1$s","telephone":"+237222%3$s",
+                                 "nomRepresentant":"Nom","prenomRepresentant":"Prénom","email":"%2$s",
+                                 "telephoneRepresentant":"+237699%3$s","password":"Temp@1234","ribs":["%4$s"]}
+                                """.formatted(niu, email, telephone, rib)))
+                .andExpect(status().isCreated()).andReturn();
+        return new String[]{"Bearer " + jwtService.generateAccessToken(email), champ(r, "$.ribs[0].id")};
+    }
+
+    @Test
+    void soumission_deposeeParLeFournisseur_offreTotaleEtRecepisse() throws Exception {
+        final Map<String, Object> imputation = jdbcTemplate.queryForMap("""
+                SELECT a.id AS action_id, a.programme_id, a.section_id,
+                       (SELECT c.id FROM chapitres c WHERE c.section_id = a.section_id LIMIT 1) AS chapitre_id,
+                       (SELECT n.id FROM natures_economiques n WHERE n.exercice_id = a.exercice_id LIMIT 1) AS nature_id
+                FROM actions a
+                WHERE a.section_id IS NOT NULL AND a.exercice_id IS NOT NULL
+                  AND EXISTS (SELECT 1 FROM chapitres c WHERE c.section_id = a.section_id)
+                ORDER BY a.id DESC LIMIT 1
+                """);
+        final String admin = "Bearer " + jwtService.generateAccessToken("admin@gbe.cm");
+        final String ordo = ordonnateur("ordo.soumission@minfi.cm", "+237670000011",
+                (String) imputation.get("section_id"), (String) imputation.get("programme_id"));
+        final String[] frs = fournisseurAvecRib("M000000000011S", "frs.un@exemple.cm", "000011",
+                "10005000010000000001112");
+        final String[] autre = fournisseurAvecRib("M000000000012S", "frs.deux@exemple.cm", "000012",
+                "10005000010000000001213");
+
+        // Besoin publié de deux lignes
+        final String activiteId = champ(mockMvc.perform(post("/api/v1/admin/activites").header("Authorization", admin)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"code\":\"S01\",\"libelle\":\"A\",\"actionId\":\"%s\"}"
+                        .formatted(imputation.get("action_id")))).andExpect(status().isCreated()).andReturn(), "$.id");
+        final String tacheId = champ(mockMvc.perform(post("/api/v1/admin/taches").header("Authorization", admin)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"code\":\"S01\",\"libelle\":\"T\",\"activiteId\":\"%s\"}"
+                        .formatted(activiteId))).andExpect(status().isCreated()).andReturn(), "$.id");
+        final String m1 = champ(mockMvc.perform(post("/api/v1/admin/matieres").header("Authorization", admin)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"reference\":\"SOU-1\",\"libelle\":\"Ramette\"}"))
+                .andExpect(status().isCreated()).andReturn(), "$.id");
+        final String m2 = champ(mockMvc.perform(post("/api/v1/admin/matieres").header("Authorization", admin)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"reference\":\"SOU-2\",\"libelle\":\"Encre\"}"))
+                .andExpect(status().isCreated()).andReturn(), "$.id");
+        final String corpsBesoin = """
+                {"objet":"Fournitures","dateClotureSoumission":"2099-01-01T12:00:00","tacheId":"%s","chapitreId":"%s",
+                 "natureEconomiqueId":"%s","lignes":[{"matiereId":"%s","quantiteDemandee":10},
+                 {"matiereId":"%s","quantiteDemandee":2.5}]}
+                """.formatted(tacheId, imputation.get("chapitre_id"), imputation.get("nature_id"), m1, m2);
+        final MvcResult besoin = mockMvc.perform(post("/api/v1/besoins").header("Authorization", ordo)
+                .contentType(MediaType.APPLICATION_JSON).content(corpsBesoin)).andExpect(status().isCreated()).andReturn();
+        final String besoinId = champ(besoin, "$.id");
+        final String l1 = champ(besoin, "$.lignes[0].id");
+        final String l2 = champ(besoin, "$.lignes[1].id");
+        mockMvc.perform(patch("/api/v1/besoins/{id}/publier", besoinId).header("Authorization", ordo))
+                .andExpect(status().isOk());
+
+        final String offre = """
+                {"besoinId":"%s","coordonneeBancaireId":"%s","delaiProposeJours":30,"montantProposeTTC":%s,
+                 "lignes":[{"ligneBesoinId":"%s","prixUnitairePropose":3500},%s]}
+                """;
+        final String ligne2 = "{\"ligneBesoinId\":\"%s\",\"prixUnitairePropose\":1000.40}".formatted(l2);
+
+        // Offre partielle refusée ; un agent n'a pas la permission SOUMISSIONNER
+        mockMvc.perform(post("/api/v1/soumissions").header("Authorization", frs[0]).contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"besoinId":"%s","coordonneeBancaireId":"%s","delaiProposeJours":30,"montantProposeTTC":50000,
+                                 "lignes":[{"ligneBesoinId":"%s","prixUnitairePropose":3500}]}
+                                """.formatted(besoinId, frs[1], l1)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("SOUMISSION_INCOMPLETE"));
+        mockMvc.perform(post("/api/v1/soumissions").header("Authorization", ordo).contentType(MediaType.APPLICATION_JSON)
+                        .content(offre.formatted(besoinId, frs[1], "50000", l1, ligne2)))
+                .andExpect(status().isForbidden());
+        // RIB d'un autre fournisseur refusé
+        mockMvc.perform(post("/api/v1/soumissions").header("Authorization", frs[0]).contentType(MediaType.APPLICATION_JSON)
+                        .content(offre.formatted(besoinId, autre[1], "50000", l1, ligne2)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("RIB_NOT_FOUND"));
+        // TTC inférieur au HT refusé
+        mockMvc.perform(post("/api/v1/soumissions").header("Authorization", frs[0]).contentType(MediaType.APPLICATION_JSON)
+                        .content(offre.formatted(besoinId, frs[1], "100", l1, ligne2)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("MONTANT_TTC_INVALIDE"));
+
+        // Dépôt : récépissé numéroté, horodaté, scellé ; HT calculé par le serveur
+        final MvcResult depot = mockMvc.perform(post("/api/v1/soumissions").header("Authorization", frs[0])
+                        .contentType(MediaType.APPLICATION_JSON).content(offre.formatted(besoinId, frs[1], "44700", l1, ligne2)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.numero").value(org.hamcrest.Matchers.startsWith("SO-2026-")))
+                .andExpect(jsonPath("$.statut").value("DEPOSEE"))
+                .andExpect(jsonPath("$.montantProposeHT").value(37501.00))
+                .andExpect(jsonPath("$.montantProposeTTC").value(44700))
+                .andExpect(jsonPath("$.rib").value("10005000010000000001112"))
+                .andExpect(jsonPath("$.empreinte").value(org.hamcrest.Matchers.matchesPattern("[0-9a-f]{64}")))
+                .andReturn();
+        final String soumissionId = champ(depot, "$.id");
+        final String empreinte = champ(depot, "$.empreinte");
+
+        // Une seule soumission par fournisseur et par besoin
+        mockMvc.perform(post("/api/v1/soumissions").header("Authorization", frs[0]).contentType(MediaType.APPLICATION_JSON)
+                        .content(offre.formatted(besoinId, frs[1], "44700", l1, ligne2)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("SOUMISSION_DEJA_DEPOSEE"));
+
+        // Modification avant la date limite : nouveau sceau
+        mockMvc.perform(put("/api/v1/soumissions/{id}", soumissionId).header("Authorization", frs[0])
+                        .contentType(MediaType.APPLICATION_JSON).content(offre.formatted(besoinId, frs[1], "44000",
+                                l1, ligne2).replace("3500", "3400")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.montantProposeHT").value(36501.00))
+                .andExpect(jsonPath("$.dateDerniereModification").isNotEmpty())
+                .andExpect(jsonPath("$.empreinte").value(org.hamcrest.Matchers.not(empreinte)));
+
+        // Le fournisseur ne voit que ses soumissions
+        mockMvc.perform(get("/api/v1/soumissions").header("Authorization", frs[0]))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.content[0].lignes").doesNotExist());
+        mockMvc.perform(get("/api/v1/soumissions/{id}", soumissionId).header("Authorization", autre[0]))
+                .andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/v1/soumissions/{id}", soumissionId).header("Authorization", frs[0]))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.lignes[0].montantTotalLigneHT").value(34000.00));
+
+        // Une soumission déposée fige le besoin et le RIB utilisé
+        mockMvc.perform(put("/api/v1/besoins/{id}", besoinId).header("Authorization", ordo)
+                        .contentType(MediaType.APPLICATION_JSON).content(corpsBesoin))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("BESOIN_NON_MODIFIABLE"));
+        final String fournisseurId = jdbcTemplate.queryForObject(
+                "SELECT fournisseur_id FROM soumissions WHERE id = ?", String.class, soumissionId);
+        mockMvc.perform(delete("/api/v1/admin/fournisseurs/{f}/ribs/{r}", fournisseurId, frs[1]).header("Authorization", admin))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("RIB_UTILISE"));
     }
 
     @Test

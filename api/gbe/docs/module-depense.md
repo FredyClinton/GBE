@@ -85,7 +85,7 @@ Chaque lot comprend sa migration, ses tests et ses routes, et peut être livré 
 | Lot | Contenu | UC | État |
 |---|---|---|---|
 | **0** | Rôles `FOURNISSEUR` et `COMPTABLE_MATIERE`, nouvelles permissions, référentiel `Matiere`, refonte du statut des crédits (§2.1), rattachement des natures à l'exercice, permissions par défaut du mandat MINISTRE | — | **livré** (2026-11-11, voir §4.1) |
-| **1** | (découpage en §4.2) Référentiels `Activite` et `Tache` (CRUD admin + consultation, migration V11), fournisseurs (création, RIB), expression de besoin rattachée à une tâche, un chapitre, un exercice et une nature économique (brouillon → publiée → clôturée), consultation des besoins ouverts, soumissions | UC01–UC03 | en cours (1a à 1d livrés) |
+| **1** | (découpage en §4.2) Référentiels `Activite` et `Tache` (CRUD admin + consultation, migration V11), fournisseurs (création, RIB), expression de besoin rattachée à une tâche, un chapitre, un exercice et une nature économique (brouillon → publiée → clôturée), consultation des besoins ouverts, soumissions | UC01–UC03 | **livré** (2026-11-11) |
 | **2** | Évaluation et attribution, projet d'acte et formes, contrôle CF (réservation des AE, quitus, visa ou rejet), signature | UC04–UC08 | à faire |
 | **3** | Stockage de fichiers, livraisons, PV conforme ou non conforme, information de l'ordonnateur | UC09–UC11 | à faire |
 | **4** | Demande de paiement, factures et pièces, validation, liquidation, ordonnancement, visa CF, transmission au Trésor, suivi fournisseur | UC12–UC19 | à faire |
@@ -113,7 +113,7 @@ Chaque étape est commitée séparément, avec sa migration et ses tests.
 | **1b** | `Fournisseur` et `CoordonneeBancaire` (V12–V14) : création par l'admin avec un compte `ROLE_FOURNISSEUR`, RIB, permissions par défaut du rôle sans mandat | lot 0 | **livré** (2026-11-11) |
 | **1c** | `ExpressionBesoin` et `LigneBesoin` (V15), UC01 : brouillon, lignes (matière, quantité, spécifications), rattachement tâche / chapitre / exercice / nature, publication, annulation, périmètre du mandat | 1a | **livré** (2026-11-11) |
 | **1d** | Consultation des besoins ouverts (UC02) : besoins publiés non échus, filtres, détail | 1c | **livré** (2026-11-11) |
-| **1e** | `Soumission` et `LigneSoumission` (V16), UC03 : offre totale, choix du RIB, dépôt verrouillé à la date limite, offre non modifiable une fois déposée, récépissé horodaté | 1b, 1d | à faire |
+| **1e** | `Soumission` et `LigneSoumission` (V16), UC03 : offre totale, choix du RIB, dépôt verrouillé à la date limite, offre modifiable jusqu'à la date limite, récépissé horodaté et scellé | 1b, 1d | **livré** (2026-11-11) |
 
 **1a livré :**
 - **Tables `activites` et `taches` :** `code` (unique dans le parent), `sigle`, `libelle`, plus le parent (`action_id` ou `activite_id`). Programme, section et exercice sont recopiés du parent par l'API, et jamais saisis.
@@ -167,6 +167,28 @@ Chaque étape est commitée séparément, avec sa migration et ses tests.
   - le périmètre des mandats est appliqué **dans la requête** (`MandatScopeValidator.Perimetre`), et non plus en mémoire.
 - **Changement de format :** `GET /api/v1/besoins` (livré en 1c) renvoie maintenant une page au lieu d'un tableau.
 
+**1e livré** (d'après les classes `Soumission` et `LigneSoumission` de l'onglet 4, l'onglet 3 et la fiche UC03) :
+- **`Soumission` :** `numero` (`SO-<année>-00001`), `dateSoumission` (horodatage du dépôt), `dateDerniereModification`, `montantProposeHT` (**calculé** : somme des lignes), `montantProposeTTC`, `delaiProposeJours` (un seul délai, sur l'offre, comme dans l'onglet 4), `statut` (`StatutSoumission`, seul `DEPOSEE` est utilisé au lot 1).
+- **`LigneSoumission` :** `numeroOrdre` (celui de la ligne de besoin), `prixUnitairePropose` (> 0), `montantTotalLigneHT` (= prix × quantité, `calculerSousTotalHT`), `remarquesTechniques`.
+- **Règles :**
+  - **offre totale**, contrôlée par `definirOffre` (`validerCompletude` du modèle) : un prix pour chaque ligne du besoin, ni plus ni moins ;
+  - **une soumission par fournisseur et par besoin** (409 `SOUMISSION_DEJA_DEPOSEE`) ;
+  - dépôt seulement sur un besoin ouvert (`BESOIN_NON_OUVERT`) ;
+  - **modifiable jusqu'à la date limite** (Q11) ;
+  - **pas de retrait** et **pas de pièce jointe** (décisions 2026-11-11, conformes au diagramme de classes).
+- **TTC :** calculé via l'interface **`CalculTaxe`** (§4.4). Méthode provisoire `TtcSaisiParFournisseur` : TTC saisi, au moins égal au HT.
+- **Compléments à la classe `Soumission`, issus de la conception :**
+  - **RIB** choisi au dépôt parmi ceux du fournisseur (onglet 3 : « offre financière, prix unitaire & RIB ») ;
+  - **empreinte** SHA-256 recalculée à chaque modification (fiche UC03 : « récépissé scellé et horodaté »).
+- **Écart volontaire :** UC03 dit que l'offre est « enregistrée de façon inaltérable ». La décision Q11 la rend modifiable jusqu'à la date limite. Chaque version est horodatée et scellée.
+- **Contrôles branchés ailleurs :**
+  - un besoin publié n'est plus modifiable dès qu'une soumission existe ;
+  - un RIB utilisé par une soumission ne peut plus être retiré (`RIB_UTILISE`).
+- **Routes `/api/v1/soumissions`** (permission `SOUMISSIONNER`, donc fournisseur connecté) : `POST` (récépissé), `PUT /{id}`, `GET` (paginé, les siennes), `GET /{id}`. La soumission d'un autre fournisseur répond 404.
+- **Pour le lot 2 :**
+  - consultation des offres par l'ordonnateur : faut-il interdire de les voir avant la clôture ? La conception ne le dit pas ;
+  - sort des soumissions quand un besoin publié est annulé.
+
 **Questions avant 1c–1e** (hypothèse par défaut entre parenthèses) :
 
 | # | Question | Hypothèse | Décision |
@@ -174,8 +196,8 @@ Chaque étape est commitée séparément, avec sa migration et ses tests.
 | Q7 | Validation du besoin avant publication (fiche objet : Brouillon → Validée → Publiée) ? | non : l'onglet 3 montre une publication directe par l'ordonnateur | **Décidé (2026-11-11)** : publication directe. |
 | Q8 | `montantEstime` sur le besoin ? L'onglet 3 parle d'« Estimation », alors que la règle actée dit « aucun prix ». | — | **Décidé (2026-11-11)** : pas de montant estimé. |
 | Q9 | Consultation des besoins ouverts : publique sans compte (« portail public ») ou fournisseurs connectés ? | fournisseurs connectés | **Décidé (2026-11-11)** : consultation publique sans compte ; connexion obligatoire pour soumissionner. |
-| Q10 | Pièces justificatives de l'offre au lot 1, ou au lot 3 avec le stockage de fichiers ? | pas de pièce jointe en 1e | **Écart constaté (2026-11-11)** : la fiche UC03 parle de « justificatifs légaux, administratifs et techniques », mais le diagramme de classes ne rattache aucun document à `Soumission` (les pièces ne concernent que la demande de paiement, UC13). À confirmer, et à clarifier avec l'analyse fonctionnelle : pièces par fournisseur ou par offre. |
-| Q11 | Une seule offre par fournisseur et par besoin ? Retrait possible avant la date limite ? | oui / oui | **Décidé (2026-11-11)** : le fournisseur peut **modifier** son offre jusqu'à la clôture des soumissions (date limite) ; une offre par fournisseur et par besoin. Retrait : à confirmer. |
+| Q10 | Pièces justificatives de l'offre au lot 1, ou au lot 3 avec le stockage de fichiers ? | pas de pièce jointe en 1e | **Décidé (2026-11-11)** : pas de pièce jointe, comme dans le diagramme de classes. **Écart constaté** : la fiche UC03 parle de « justificatifs légaux, administratifs et techniques », mais le diagramme de classes ne rattache aucun document à `Soumission` (les pièces ne concernent que la demande de paiement, UC13). À confirmer, et à clarifier avec l'analyse fonctionnelle : pièces par fournisseur ou par offre. |
+| Q11 | Une seule offre par fournisseur et par besoin ? Retrait possible avant la date limite ? | oui / oui | **Décidé (2026-11-11)** : le fournisseur peut **modifier** son offre jusqu'à la clôture des soumissions (date limite) ; une offre par fournisseur et par besoin. Pas de retrait (absent de `StatutSoumission`), décidé le 2026-11-11. |
 | Q12 | À la date limite : passage automatique à `EN_EVALUATION`, ou action de l'ordonnateur ? | dépôt bloqué automatiquement, passage par l'ordonnateur | **Décidé (2026-11-11)** : comme l'hypothèse. |
 
 ### 4.3 Ce que dit le diagramme d'activité (onglet 3)
@@ -251,3 +273,4 @@ Point à part : le mandat MINISTRE (section MINFI) n'a aucune permission en base
 | 2026-11-11 | Q11 : offre modifiable jusqu'à la date limite. Q10 : écart entre la fiche UC03 (justificatifs) et le diagramme de classes (aucun document sur `Soumission`). Restent avant 1e : Q10, retrait de l'offre, calcul HT/TTC (TVA), délai unique sur l'offre. |
 | 2026-11-11 | Évolution notée (§4.4) : méthodes de calcul des taxes selon le type de besoin, à introduire plus tard. Le TTC de la soumission passera par une interface `CalculTaxe` dès 1e (provisoire : TTC saisi par le fournisseur, TTC ≥ HT). |
 | 2026-11-11 | §4.4 corrigé : la conception n'a pas de « type de besoin ». Le calcul des taxes s'appuiera d'abord sur la nature économique du besoin (ou le `TypeActe`). Pas de nouveau champ sans passer d'abord par le drawio. |
+| 2026-11-11 | **1e livré, lot 1 terminé** : soumissions (V16), offre totale, HT calculé, TTC via `CalculTaxe` (provisoire : saisi, ≥ HT), une offre par fournisseur et par besoin, modifiable jusqu'à la date limite, RIB choisi, récépissé scellé. Q10 : pas de pièce jointe. Pas de retrait. Délai unique sur l'offre. |

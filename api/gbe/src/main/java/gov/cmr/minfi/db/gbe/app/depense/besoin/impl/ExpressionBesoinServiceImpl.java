@@ -14,6 +14,7 @@ import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.AnnulationBesoinRequest;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.ExpressionBesoinRequest;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.ExpressionBesoinResponse;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.LigneBesoinRequest;
+import gov.cmr.minfi.db.gbe.app.depense.soumission.SoumissionRepository;
 import gov.cmr.minfi.db.gbe.app.identite.iam.permission.Permission;
 import gov.cmr.minfi.db.gbe.app.identite.mandat.MandatScopeValidator;
 import gov.cmr.minfi.db.gbe.app.identite.mandat.MandatScopeValidator.Perimetre;
@@ -55,6 +56,7 @@ public class ExpressionBesoinServiceImpl implements ExpressionBesoinService {
     private final ChapitreRepository chapitreRepository;
     private final NatureEconomiqueRepository natureEconomiqueRepository;
     private final MatiereRepository matiereRepository;
+    private final SoumissionRepository soumissionRepository;
     private final MandatScopeValidator mandatScopeValidator;
     private final ReferenceGenerator referenceGenerator;
     private final ExpressionBesoinMapper besoinMapper;
@@ -199,9 +201,9 @@ public class ExpressionBesoinServiceImpl implements ExpressionBesoinService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.BESOIN_NOT_FOUND, besoinId));
     }
 
-    /** Branché à l'étape 1e (soumissions) : tant qu'il n'existe pas de soumission, toujours faux. */
+    /** Décision 2026-11-11 : un besoin publié n'est plus modifiable dès qu'une soumission est déposée. */
     private boolean soumissionsDeposees(ExpressionBesoin besoin) {
-        return false;
+        return soumissionRepository.existsByExpressionBesoinId(besoin.getId());
     }
 
     private LocalDateTime maintenant() {

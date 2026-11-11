@@ -9,6 +9,7 @@ import gov.cmr.minfi.db.gbe.app.depense.besoin.ExpressionBesoinRepository;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.StatutExpression;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.ExpressionBesoinRequest;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.LigneBesoinRequest;
+import gov.cmr.minfi.db.gbe.app.depense.soumission.SoumissionRepository;
 import gov.cmr.minfi.db.gbe.app.identite.iam.permission.Permission;
 import gov.cmr.minfi.db.gbe.app.identite.mandat.MandatScopeValidator;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.Chapitre;
@@ -59,6 +60,7 @@ class ExpressionBesoinServiceImplTest {
     @Mock private ChapitreRepository chapitreRepository;
     @Mock private NatureEconomiqueRepository natureEconomiqueRepository;
     @Mock private MatiereRepository matiereRepository;
+    @Mock private SoumissionRepository soumissionRepository;
     @Mock private MandatScopeValidator mandatScopeValidator;
     @Mock private ReferenceGenerator referenceGenerator;
     @Mock private ExpressionBesoinMapper besoinMapper;
@@ -93,7 +95,7 @@ class ExpressionBesoinServiceImplTest {
     @BeforeEach
     void init() {
         service = new ExpressionBesoinServiceImpl(besoinRepository, tacheRepository, chapitreRepository,
-                natureEconomiqueRepository, matiereRepository, mandatScopeValidator, referenceGenerator,
+                natureEconomiqueRepository, matiereRepository, soumissionRepository, mandatScopeValidator, referenceGenerator,
                 besoinMapper, HORLOGE);
         when(tacheRepository.findById("T")).thenReturn(Optional.of(tache));
         when(chapitreRepository.findById("C")).thenReturn(Optional.of(chapitre));
@@ -153,6 +155,18 @@ class ExpressionBesoinServiceImplTest {
         final ExpressionBesoinRequest sansLigne =
                 new ExpressionBesoinRequest("Fournitures", DATE_LIMITE, "T", "C", "N", List.of());
         assertThat(code(() -> service.modifier("B", sansLigne))).isEqualTo(ErrorCode.BESOIN_SANS_LIGNE);
+    }
+
+    @Test
+    void modification_dUnBesoinPublieAvecSoumission_refusee() {
+        final ExpressionBesoin publie = ExpressionBesoin.builder().id("B").reference("EB-2026-00001")
+                .statut(StatutExpression.PUBLIEE).dateClotureSoumission(DATE_LIMITE).build();
+        publie.rattacherA(tache);
+        publie.ajouterLigne(papier, BigDecimal.ONE, null);
+        when(besoinRepository.findById("B")).thenReturn(Optional.of(publie));
+        when(soumissionRepository.existsByExpressionBesoinId("B")).thenReturn(true);
+
+        assertThat(code(() -> service.modifier("B", requete("C", "N")))).isEqualTo(ErrorCode.BESOIN_NON_MODIFIABLE);
     }
 
     @Test

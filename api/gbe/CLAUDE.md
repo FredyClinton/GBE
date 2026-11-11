@@ -47,6 +47,8 @@ Lombok · MapStruct · SpringDoc OpenAPI · TOTP (`dev.samstevens.totp`) · Test
 | `identite/iam/`         | `RoleSysteme` enum (with default permissions), `Permission` enum, `Role` entity         |
 | `referentiel/`          | Master data, one sub-package per domain: `exercice`, `administratif` (Section, Chapitre), `programmatique` (Programme → Action → Activite → Tache; an activité/tâche copies programme, section and exercice from its parent, never from the request; a parent with children cannot be deleted), `economique` (NatureEconomique), `matiere` (plain catalogue: reference + libelle, deliberately not linked to NatureEconomique; read under `/api/v1/referentiel/matieres`, CRUD under `/api/v1/admin/matieres`), `fonctionnel`. `ReferentielMapper` is shared. |
 | `budget/credit/`        | `CreditBudgetaire` — core budget entity and its state machine                           |
+| `depense/soumission/`   | `Soumission` + `LigneSoumission` (UC03) under `/api/v1/soumissions` (`SOUMISSIONNER`, supplier sees only his own via `FournisseurConnecte`): full offer (one price per need line), HT computed, one per supplier and need, editable until the deadline, chosen RIB, SHA-256 seal |
+| `depense/taxe/`         | `CalculTaxe` extension point for TTC (future tax methods by need type, plan §4.4); today `TtcSaisiParFournisseur` (TTC ≥ HT) |
 | `depense/besoin/`       | `ExpressionBesoin` + `LigneBesoin` (UC01) under `/api/v1/besoins` (paginated list, filtered by mandate scope in SQL); public read-only consultation of open needs (UC02) under `/api/v1/public/besoins`; no price, attached to a Tache (exercice/section/programme copied), a Chapitre of the same section and a NatureEconomique; state machine in the entity; soft delete via `@SQLRestriction("supprime = false")` |
 | `admin/`                | Admin-only endpoints (user creation, role listing)                                      |
 | `common/`               | `BaseEntity` auditing, `BusinessException`/`ErrorCode`, `ApplicationExceptionHandler`, configs (CORS + beans in `BeansConfig`, incl. a `Clock` to inject for business dates), `reference/ReferenceGenerator` (atomic `PREFIX-YEAR-00001` numbering) |
@@ -145,6 +147,7 @@ The schema is owned by Flyway (`src/main/resources/db/migration`); Hibernate onl
   `V13__fournisseurs.sql`: tables `fournisseurs` (NIU unique, `user_id` unique) and `coordonnees_bancaires`.
   `V14__telephone_fournisseur.sql`: company `telephone` on `fournisseurs` (the representative's phone stays on `users`).
   `V15__expressions_besoin.sql`: `compteurs_reference`, `expressions_besoin`, `lignes_besoin`.
+  `V16__soumissions.sql`: `soumissions`, `lignes_soumission`.
 - Any entity change needs a new `V<n>__description.sql`. Never edit an applied migration.
 - Pre-Flyway databases get a baseline at version 2 (`baseline-on-migrate`), so only V3+ run on them.
 
