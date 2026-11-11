@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
 import java.util.function.Consumer;
@@ -36,6 +37,13 @@ class CreditBudgetaireTest {
         assertThat(credit.getStatut()).isEqualTo(depart);
     }
 
+    private static void assertErreur(Runnable action, ErrorCode attendu) {
+        assertThatThrownBy(action::run)
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(attendu);
+    }
+
     @Nested
     @DisplayName("Transitions autorisées")
     class TransitionsAutorisees {
@@ -47,9 +55,10 @@ class CreditBudgetaireTest {
             assertThat(c.getStatut()).isEqualTo(ENGAGE);
         }
 
-        @Test
-        void suspendrePuisDebloquer_revientADisponible() {
-            final CreditBudgetaire c = credit(ENGAGE);
+        @ParameterizedTest
+        @EnumSource(value = StatutCredit.class, names = {"DISPONIBLE", "ENGAGE"})
+        void suspendrePuisDebloquer_revientADisponible(StatutCredit depart) {
+            final CreditBudgetaire c = credit(depart);
             c.suspendre();
             assertThat(c.getStatut()).isEqualTo(SUSPENDU);
             c.debloquer();
@@ -99,9 +108,14 @@ class CreditBudgetaireTest {
         }
 
         @ParameterizedTest
-        @EnumSource(value = StatutCredit.class, names = "ENGAGE", mode = EnumSource.Mode.EXCLUDE)
-        void suspendreEtSolder_horsEngage(StatutCredit depart) {
+        @EnumSource(value = StatutCredit.class, names = {"DISPONIBLE", "ENGAGE"}, mode = EnumSource.Mode.EXCLUDE)
+        void suspendre_horsDisponibleOuEngage(StatutCredit depart) {
             assertTransitionRefusee(depart, CreditBudgetaire::suspendre);
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = StatutCredit.class, names = "ENGAGE", mode = EnumSource.Mode.EXCLUDE)
+        void solder_horsEngage(StatutCredit depart) {
             assertTransitionRefusee(depart, CreditBudgetaire::solder);
         }
 
@@ -178,6 +192,62 @@ class CreditBudgetaireTest {
                     .isInstanceOf(BusinessException.class)
                     .extracting(e -> ((BusinessException) e).getErrorCode())
                     .isEqualTo(ErrorCode.MONTANT_CP_INSUFFISANT);
+        }
+            @ParameterizedTest
+        @EnumSource(value = StatutCredit.class, names = {"DISPONIBLE", "ENGAGE"})
+        void consommer_creditOuvert_estAccepte(StatutCredit depart) {
+            final CreditBudgetaire c = credit(depart);
+            c.consommerAE(new BigDecimal("100"));
+            c.consommerCP(new BigDecimal("100"));
+            assertThat(c.getMontantAEDisponible()).isEqualByComparingTo("900");
+            assertThat(c.getMontantCPDisponible()).isEqualByComparingTo("400");
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = StatutCredit.class, names = {"CANTONNE", "SUSPENDU", "SOLDE", "ANNULE"})
+        void consommer_creditBloque_estRefuse(StatutCredit depart) {
+            final CreditBudgetaire c = credit(depart);
+            assertErreur(() -> c.consommerAE(new BigDecimal("100")), ErrorCode.CREDIT_NON_CONSOMMABLE);
+            assertErreur(() -> c.consommerCP(new BigDecimal("100")), ErrorCode.CREDIT_NON_CONSOMMABLE);
+            assertThat(c.getMontantAEDisponible()).isEqualByComparingTo("1000");
+            assertThat(c.getMontantCPDisponible()).isEqualByComparingTo("500");
+        }
+
+        @Test
+        void liberer_creditBloque_resteAutorise() {
+            final CreditBudgetaire c = credit(DISPONIBLE);
+            c.consommerAE(new BigDecimal("300"));
+            c.suspendre();
+            c.libererAE(new BigDecimal("300"));
+            assertThat(c.getMontantAEDisponible()).isEqualByComparingTo("1000");
+        }
+
+        @Test
+        void liberer_auDelaDuConsomme_estRefuse() {
+            final CreditBudgetaire c = credit(DISPONIBLE);
+            c.consommerAE(new BigDecimal("300"));
+            c.consommerCP(new BigDecimal("100"));
+            assertErreur(() -> c.libererAE(new BigDecimal("300.01")), ErrorCode.MONTANT_LIBERE_SUPERIEUR_CONSOMME);
+            assertErreur(() -> c.libererCP(new BigDecimal("101")), ErrorCode.MONTANT_LIBERE_SUPERIEUR_CONSOMME);
+            assertThat(c.getMontantAEConsomme()).isEqualByComparingTo("300");
+            assertThat(c.getMontantCPConsomme()).isEqualByComparingTo("100");
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"0", "-1"})
+        void montantNulOuNegatif_estRefuse(String montant) {
+            final CreditBudgetaire c = credit(DISPONIBLE);
+            final BigDecimal m = new BigDecimal(montant);
+            assertErreur(() -> c.consommerAE(m), ErrorCode.MONTANT_INVALIDE);
+            assertErreur(() -> c.consommerCP(m), ErrorCode.MONTANT_INVALIDE);
+            assertErreur(() -> c.libererAE(m), ErrorCode.MONTANT_INVALIDE);
+            assertErreur(() -> c.libererCP(m), ErrorCode.MONTANT_INVALIDE);
+        }
+
+        @Test
+        void montantNull_estRefuse() {
+            final CreditBudgetaire c = credit(DISPONIBLE);
+            assertErreur(() -> c.consommerAE(null), ErrorCode.MONTANT_INVALIDE);
         }
     }
 }

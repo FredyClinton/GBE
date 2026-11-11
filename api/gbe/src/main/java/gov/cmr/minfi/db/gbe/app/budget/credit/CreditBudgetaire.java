@@ -113,8 +113,12 @@ public class CreditBudgetaire extends BaseEntity
     }
 
     // ── AEManageable ──────────────────────────────────
+    // Module Dépense : les AE sont consommées à la réservation (visa CF de l'engagement)
+    // et libérées à l'annulation d'un acte déjà visé. Une ligne finance plusieurs dépenses.
     @Override
     public void consommerAE(BigDecimal montant) {
+        verifierMontantPositif(montant);
+        verifierConsommable();
         if (montant.compareTo(this.montantAEDisponible) > 0) {
             throw new BusinessException(ErrorCode.MONTANT_AE_INSUFFISANT);
         }
@@ -124,13 +128,20 @@ public class CreditBudgetaire extends BaseEntity
 
     @Override
     public void libererAE(BigDecimal montant) {
+        verifierMontantPositif(montant);
+        if (montant.compareTo(this.montantAEConsomme) > 0) {
+            throw new BusinessException(ErrorCode.MONTANT_LIBERE_SUPERIEUR_CONSOMME, "AE");
+        }
         this.montantAEConsomme = this.montantAEConsomme.subtract(montant);
         this.montantAEDisponible = this.montantAEDisponible.add(montant);
     }
 
     // ── CPManageable ──────────────────────────────────
+    // Module Dépense : les CP sont consommés à l'ordonnancement.
     @Override
     public void consommerCP(BigDecimal montant) {
+        verifierMontantPositif(montant);
+        verifierConsommable();
         if (montant.compareTo(this.montantCPDisponible) > 0) {
             throw new BusinessException(ErrorCode.MONTANT_CP_INSUFFISANT);
         }
@@ -140,13 +151,42 @@ public class CreditBudgetaire extends BaseEntity
 
     @Override
     public void libererCP(BigDecimal montant) {
+        verifierMontantPositif(montant);
+        if (montant.compareTo(this.montantCPConsomme) > 0) {
+            throw new BusinessException(ErrorCode.MONTANT_LIBERE_SUPERIEUR_CONSOMME, "CP");
+        }
         this.montantCPConsomme = this.montantCPConsomme.subtract(montant);
         this.montantCPDisponible = this.montantCPDisponible.add(montant);
+    }
+
+    /**
+     * Un crédit cantonné, suspendu, soldé ou annulé ne peut plus être consommé.
+     * ENGAGE reste accepté tant que l'ancien circuit (routes engager/solder) n'est pas retiré.
+     */
+    public boolean isConsommable() {
+        return this.statut == StatutCredit.DISPONIBLE || this.statut == StatutCredit.ENGAGE;
+    }
+
+    private void verifierConsommable() {
+        if (!isConsommable()) {
+            throw new BusinessException(ErrorCode.CREDIT_NON_CONSOMMABLE, this.statut);
+        }
+    }
+
+    private static void verifierMontantPositif(BigDecimal montant) {
+        if (montant == null || montant.signum() <= 0) {
+            throw new BusinessException(ErrorCode.MONTANT_INVALIDE);
+        }
     }
 
     // ── StatutTransitionable ──────────────────────────
 
     // DISPONIBLE → ENGAGE  (CANTONNE bloqué volontairement)
+    /**
+     * @deprecated ancien circuit : une ligne de crédit finance plusieurs dépenses, l'engagement
+     * passe désormais par {@link #consommerAE(BigDecimal)}. Conservé tant que le front l'utilise.
+     */
+    @Deprecated
     @Override
     public void engager() {
         validerTransition(
@@ -157,13 +197,14 @@ public class CreditBudgetaire extends BaseEntity
         this.statut = StatutCredit.ENGAGE;
     }
 
-    // ENGAGE → SUSPENDU
+    // DISPONIBLE → SUSPENDU
+    // ENGAGE     → SUSPENDU (ancien circuit)
     @Override
     public void suspendre() {
         validerTransition(
-                Set.of(StatutCredit.ENGAGE),
+                Set.of(StatutCredit.DISPONIBLE, StatutCredit.ENGAGE),
                 StatutCredit.SUSPENDU,
-                "Seul un crédit ENGAGÉ peut être suspendu"
+                "Seul un crédit DISPONIBLE (ou ENGAGÉ) peut être suspendu"
         );
         this.statut = StatutCredit.SUSPENDU;
     }
@@ -202,6 +243,10 @@ public class CreditBudgetaire extends BaseEntity
     }
 
     // ENGAGE → SOLDE
+    /**
+     * @deprecated ancien circuit, voir {@link #engager()}. Le solde d'une ligne se lit dans ses montants.
+     */
+    @Deprecated
     @Override
     public void solder() {
         validerTransition(

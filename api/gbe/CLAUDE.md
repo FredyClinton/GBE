@@ -44,7 +44,7 @@ Lombok · MapStruct · SpringDoc OpenAPI · TOTP (`dev.samstevens.totp`) · Test
 | `identite/agent/`       | Government agent records                                                                |
 | `identite/mandat/`      | User ↔ Section/Programme assignments; `MandatScopeValidator`                            |
 | `identite/iam/`         | `RoleSysteme` enum (with default permissions), `Permission` enum, `Role` entity         |
-| `referentiel/`          | Master data, one sub-package per domain: `exercice`, `administratif` (Section, Chapitre), `programmatique` (Programme, Action), `economique` (NatureEconomique), `fonctionnel`. `ReferentielMapper` is shared. |
+| `referentiel/`          | Master data, one sub-package per domain: `exercice`, `administratif` (Section, Chapitre), `programmatique` (Programme, Action), `economique` (NatureEconomique), `matiere` (plain catalogue: reference + libelle, deliberately not linked to NatureEconomique; read under `/api/v1/referentiel/matieres`, CRUD under `/api/v1/admin/matieres`), `fonctionnel`. `ReferentielMapper` is shared. |
 | `budget/credit/`        | `CreditBudgetaire` — core budget entity and its state machine                           |
 | `admin/`                | Admin-only endpoints (user creation, role listing)                                      |
 | `common/`               | `BaseEntity` auditing, `BusinessException`/`ErrorCode`, `ApplicationExceptionHandler`, configs (CORS + beans in `BeansConfig`) |
@@ -72,10 +72,14 @@ Read-only referentiel endpoints are split across several controllers that all sh
 
 Lives in the `CreditBudgetaire` entity (implements `StatutTransitionable`, `AEManageable`, `CPManageable`); each
 transition calls `validerTransition(...)` and throws `BusinessException(TRANSITION_STATUT_INVALIDE)` on illegal moves.
-- `DISPONIBLE ⇄ CANTONNE`: a CANTONNE credit cannot be engaged
-- `DISPONIBLE → ENGAGE → SOLDE`, `ENGAGE → SUSPENDU → DISPONIBLE`
+- A credit line funds many expenses: the Dépense module consumes AE at reservation (CF visa), releases them when a
+  visa'd act is cancelled, and consumes CP at ordonnancement. Statuses only block a line.
+- `DISPONIBLE ⇄ CANTONNE`, `DISPONIBLE|ENGAGE → SUSPENDU → DISPONIBLE`
 - any non-terminal status → `ANNULE`; `SOLDE` and `ANNULE` are terminal
-- `consommerAE/CP` reject amounts above the available balance; `libererAE/CP` give amounts back.
+- `engager()` (`DISPONIBLE → ENGAGE`) and `solder()` (`ENGAGE → SOLDE`) and their routes are `@Deprecated`: kept until
+  the frontend stops using them.
+- `consommerAE/CP` require a consumable credit (`DISPONIBLE` or legacy `ENGAGE`, else `CREDIT_NON_CONSOMMABLE`) and an
+  amount within the available balance; `libererAE/CP` refuse more than the consumed amount. All amounts must be > 0.
 
 Covered by `CreditBudgetaireTest`. Keep it in sync when adding transitions.
 
@@ -109,6 +113,12 @@ The schema is owned by Flyway (`src/main/resources/db/migration`); Hibernate onl
   exercice + section + programme + action + chapitre + nature économique (`UNIQUE NULLS NOT DISTINCT`). The column is
   NULL for credits created before V5, and the API requires it on creation.
   `V6__supprimer_table_engagement_orpheline.sql`: drops the orphan `engagement` table left by an abandoned draft.
+  `V7__rattacher_natures_exercice_2026.sql`: links the natures économiques to the 2026 exercice.
+  `V8__roles_et_permissions_depense.sql`: roles `FOURNISSEUR` / `COMPTABLE_MATIERE`, new permissions, and existing
+  mandates aligned on the role defaults. **The `CHECK` constraints on `mandat.role_systeme` and
+  `mandat_permissions.permission` list the enum values: adding a `RoleSysteme` or `Permission` needs a migration that
+  rebuilds them** (checked by `GbeApplicationTests`).
+  `V9__referentiel_matiere.sql`: table `matieres`.
 - Any entity change needs a new `V<n>__description.sql`. Never edit an applied migration.
 - Pre-Flyway databases get a baseline at version 2 (`baseline-on-migrate`), so only V3+ run on them.
 
@@ -119,6 +129,10 @@ The schema is owned by Flyway (`src/main/resources/db/migration`); Hibernate onl
   routes, CORS preflight and the initial admin login.
 
 ### Docs
+
+**Work in progress: the Dépense module.** The plan, its lots, the open questions and the decision log are in
+`docs/module-depense.md`. Read it before working on this module, and update it (lot status, decisions, log) after each
+step.
 
 Functional analysis (LaTeX report, UML use-case diagrams in draw.io) is in `docs/analyse-fonctionnelle/`;
 domain model/lifecycle diagram in `docs/modele-metier-et-cycle-de-vie.drawio`.

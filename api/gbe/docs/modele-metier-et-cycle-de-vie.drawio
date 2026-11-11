@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="page-1-classes-metier" name="1. Diagramme de Classes Métier (UML)">
-        <mxGraphModel dx="3188" dy="4653" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="4200" pageHeight="2400" math="0" shadow="0">
+        <mxGraphModel dx="25900" dy="1680" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="4200" pageHeight="2400" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -842,7 +842,7 @@
         </mxGraphModel>
     </diagram>
     <diagram id="page-4-classes-cible-strategy" name="4. Modèle Cible (Pattern Strategy &amp; Visa)">
-        <mxGraphModel dx="3054" dy="2260" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="4200" pageHeight="2400" math="0" shadow="0">
+        <mxGraphModel dx="1595" dy="649" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="4200" pageHeight="2400" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -972,7 +972,7 @@
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="p4_CoordonneeBancaire" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style=&#39;margin:0;margin-top:5px;text-align:center;&#39;&gt;&lt;b&gt;CoordonneeBancaire&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;&gt;&lt;p style=&#39;margin:0;margin-left:8px;line-height:1.45;&#39;&gt;- banque : String&lt;br&gt;- codeGuichet : String&lt;br&gt;- numeroCompte : String&lt;br&gt;- cleRib : String&lt;br&gt;- iban : String&lt;/p&gt;" vertex="1">
-                    <mxGeometry height="110" width="260" x="100" y="1060" as="geometry"/>
+                    <mxGeometry height="130" width="260" x="100" y="1060" as="geometry"/>
                 </mxCell>
                 <mxCell id="p4_comp_rib" edge="1" parent="1" source="p4_Fournisseur" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#4A5568;strokeWidth=1.3;startArrow=diamond;startFill=1;startSize=12;endArrow=open;endFill=0;endSize=8;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="p4_CoordonneeBancaire" value="">
                     <mxGeometry relative="1" as="geometry"/>
@@ -1243,7 +1243,7 @@
                         <mxPoint x="1590" y="670" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="p4_LigneSoumission" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style=&#39;margin:0;margin-top:5px;text-align:center;&#39;&gt;&lt;b&gt;LigneSoumission&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#39;1&#39;&gt;&lt;p style=&#39;margin:0;margin-left:8px;line-height:1.45;&#39;&gt;- numeroOrdre : Integer&lt;br&gt;- prixUnitairePropose : Double&lt;br&gt;- montantTotalLigneHT : Double&lt;br&gt;- delaiLivraisonLigne : Integer&lt;br&gt;- remarquesTechniques : String&lt;/p&gt;&lt;hr size=&#39;1&#39;&gt;&lt;p style=&#39;margin:0;margin-left:8px;line-height:1.45;&#39;&gt;+ calculerSousTotalHT() : Double&lt;br&gt;+ getLigneBesoin() : LigneBesoin&lt;/p&gt;" vertex="1">
+                <mxCell id="p4_LigneSoumission" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style=&quot;margin:0;margin-top:5px;text-align:center;&quot;&gt;&lt;b&gt;LigneSoumission&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:0;margin-left:8px;line-height:1.45;&quot;&gt;- numeroOrdre : Integer&lt;br&gt;- prixUnitairePropose : Double&lt;br&gt;- montantTotalLigneHT : Double&lt;br&gt;- remarquesTechniques : String&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:0;margin-left:8px;line-height:1.45;&quot;&gt;+ calculerSousTotalHT() : Double&lt;br&gt;+ getLigneBesoin() : LigneBesoin&lt;/p&gt;" vertex="1">
                     <mxGeometry height="175" width="260" x="100" y="1540" as="geometry"/>
                 </mxCell>
                 <mxCell id="p4_comp_soum_lignes" edge="1" parent="1" source="p4_Soumission" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;startArrow=diamond;startFill=1;startSize=12;endArrow=open;endFill=0;endSize=8;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="p4_LigneSoumission" value="détaille (offre complète)">

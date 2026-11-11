@@ -25,7 +25,9 @@ public enum RoleSysteme {
             return Set.of(
                     Permission.ENGAGE_DEPENSE,
                     Permission.REVISER_AE,
-                    Permission.REVISER_CP
+                    Permission.REVISER_CP,
+                    Permission.EXPRIMER_BESOIN,
+                    Permission.ORDONNANCER
             );
         }
     },
@@ -40,7 +42,9 @@ public enum RoleSysteme {
                     Permission.REVISER_CP,
                     Permission.REJETER_DEPENSE,
                     Permission.MANAGE_USERS,
-                    Permission.MANAGE_AFFECTATIONS
+                    Permission.MANAGE_AFFECTATIONS,
+                    Permission.EXPRIMER_BESOIN,
+                    Permission.ORDONNANCER
             );
         }
     },
@@ -52,18 +56,45 @@ public enum RoleSysteme {
         public Set<Permission> getDefaultPermissions() {
             return Set.of(
                     Permission.VISA_CFI,
-                    Permission.REJETER_CFI
+                    Permission.REJETER_CFI,
+                    Permission.RESERVER_CREDIT,
+                    Permission.QUITUS_NATURE,
+                    Permission.VISER_ORDONNANCEMENT
             );
         }
     },
 
-    // ── Comptable ─────────────────────────────────────
+    // ── Comptable public ──────────────────────────────
     COMPTABLE("Comptable") {
         @Override
         public Set<Permission> getDefaultPermissions() {
             return Set.of(
                     Permission.LIQUIDER_DEPENSE,
                     Permission.PAYER_DEPENSE
+            );
+        }
+    },
+
+    // ── Comptable matière ─────────────────────────────
+    // Réceptionne les livraisons et établit le PV de réception
+    COMPTABLE_MATIERE("Comptable matière") {
+        @Override
+        public Set<Permission> getDefaultPermissions() {
+            return Set.of(
+                    Permission.RECEPTIONNER_LIVRAISON,
+                    Permission.CONSULTER
+            );
+        }
+    },
+
+    // ── Fournisseur (externe) ─────────────────────────
+    // Pas de fiche Agent ni de mandat de section : ne voit que ses propres
+    // soumissions et demandes de paiement (périmètre géré dans le lot 1).
+    FOURNISSEUR("Fournisseur") {
+        @Override
+        public Set<Permission> getDefaultPermissions() {
+            return Set.of(
+                    Permission.SOUMISSIONNER
             );
         }
     },

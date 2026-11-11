@@ -57,6 +57,23 @@ public enum ErrorCode {
             "Le montant CP disponible est insuffisant pour cette opération",
             BAD_REQUEST
     ),
+    MONTANT_INVALIDE(
+            "MONTANT_INVALIDE",
+            "Le montant doit être strictement positif",
+            BAD_REQUEST
+    ),
+    MONTANT_LIBERE_SUPERIEUR_CONSOMME(
+            "MONTANT_LIBERE_SUPERIEUR_CONSOMME",
+            "Le montant %s à libérer dépasse le montant consommé",
+            BAD_REQUEST
+    ),
+    CREDIT_NON_CONSOMMABLE(
+            "CREDIT_NON_CONSOMMABLE",
+            "Un crédit au statut %s ne peut pas être consommé",
+            BAD_REQUEST
+    ),
+    MATIERE_NOT_FOUND("MATIERE_NOT_FOUND", "Matière introuvable : %s", NOT_FOUND),
+    MATIERE_ALREADY_EXISTS("MATIERE_ALREADY_EXISTS", "Une matière de référence %s existe déjà", BAD_REQUEST),
     MANDAT_ALREADY_EXISTS(
             "MANDAT_ALREADY_EXISTS",
             "Un mandat existe déjà pour cet utilisateur sur ce périmètre",

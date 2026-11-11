@@ -6,6 +6,8 @@ import gov.cmr.minfi.db.gbe.app.referentiel.administratif.dto.ChapitreResponse;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.dto.SectionResponse;
 import gov.cmr.minfi.db.gbe.app.referentiel.economique.NatureEconomique;
 import gov.cmr.minfi.db.gbe.app.referentiel.economique.dto.NatureEconomiqueResponse;
+import gov.cmr.minfi.db.gbe.app.referentiel.matiere.Matiere;
+import gov.cmr.minfi.db.gbe.app.referentiel.matiere.dto.MatiereResponse;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.Action;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.Programme;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.dto.ActionResponse;
@@ -30,4 +32,6 @@ public interface ReferentielMapper {
 
     @Mapping(target = "sectionId", source = "section.id")
     ChapitreResponse toChapitreResponse(Chapitre chapitre);
+
+    MatiereResponse toMatiereResponse(Matiere matiere);
 }
