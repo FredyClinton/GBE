@@ -663,9 +663,10 @@ class GbeApplicationTests {
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("ACTE_DEJA_CREE"));
         mockMvc.perform(put("/api/v1/actes/{id}", acteId).header("Authorization", ordo).contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"objet\":\"Fournitures de bureau 2026\",\"delaiLivraisonMois\":2}"))
+                        .content("{\"objet\":\"Fournitures de bureau 2026\",\"delaiLivraisonMois\":2,\"referenceDevis\":\"DEV-2026-14\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.delaiLivraisonMois").value(2));
+                .andExpect(jsonPath("$.delaiLivraisonMois").value(2))
+                .andExpect(jsonPath("$.referenceDevis").value("DEV-2026-14"));
         mockMvc.perform(get("/api/v1/actes").header("Authorization", ordo).param("statut", "PROJET"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(1))

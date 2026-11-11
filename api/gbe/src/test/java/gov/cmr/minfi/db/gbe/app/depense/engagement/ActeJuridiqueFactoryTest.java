@@ -6,6 +6,7 @@ import gov.cmr.minfi.db.gbe.app.common.exception.ErrorCode;
 import gov.cmr.minfi.db.gbe.app.common.reference.ReferenceGenerator;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.ExpressionBesoin;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.StatutExpression;
+import gov.cmr.minfi.db.gbe.app.depense.engagement.forme.DonneesForme;
 import gov.cmr.minfi.db.gbe.app.depense.engagement.forme.StrategieBonDeCommande;
 import gov.cmr.minfi.db.gbe.app.depense.soumission.Soumission;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.Section;
@@ -25,6 +26,7 @@ import static org.mockito.Mockito.when;
 class ActeJuridiqueFactoryTest {
 
     private static final LocalDate EMISSION = LocalDate.of(2026, 11, 3);
+    private static final DonneesForme SANS_SAISIE = new DonneesForme(null, null);
 
     private final ReferenceGenerator compteur = mock(ReferenceGenerator.class);
     private final ActeJuridiqueFactory factory = new ActeJuridiqueFactory(List.of(new StrategieBonDeCommande()), compteur);
@@ -48,14 +50,15 @@ class ActeJuridiqueFactoryTest {
     void bca_numeroteEtRepriseDesMontantsDeLOffre() {
         when(compteur.prochainNumero("BCA-A60")).thenReturn(10097L);
 
-        final ActeJuridique acte = factory.creerActe(besoin, offre(30), null, null, EMISSION);
+        final ActeJuridique acte = factory.creerActe(besoin, offre(30), null, SANS_SAISIE, EMISSION);
 
         assertThat(acte.getNumero()).isEqualTo("BCA-A602010097");
         assertThat(acte.getType()).isEqualTo(TypeActe.BON_DE_COMMANDE);
         assertThat(acte.getStatut()).isEqualTo(StatutActe.PROJET);
         assertThat(acte.getObjet()).isEqualTo("Achat des préimprimés");
         assertThat(acte.getDateEmission()).isEqualTo(EMISSION);
-        assertThat(acte.getDelaiLivraisonMois()).isEqualTo(1);
+        assertThat(acte.getBonDeCommande().getDelaiLivraisonMois()).isEqualTo(1);
+        assertThat(acte.getBonDeCommande().getActeJuridique()).isSameAs(acte);
         assertThat(acte.getMontantTTC()).isEqualByComparingTo("4913100");
         assertThat(acte.getMontantNetAPayer()).isEqualByComparingTo("3893400");
         assertThat(acte.getMontantEnLettres()).isEqualTo("quatre millions neuf cent treize mille cent");
@@ -64,20 +67,19 @@ class ActeJuridiqueFactoryTest {
     @Test
     void numeroDOrdre_surCinqChiffres() {
         when(compteur.prochainNumero("BCA-A60")).thenReturn(1L);
-        assertThat(factory.creerActe(besoin, offre(30), null, null, EMISSION).getNumero()).isEqualTo("BCA-A602000001");
+        assertThat(factory.creerActe(besoin, offre(30), null, SANS_SAISIE, EMISSION).getNumero()).isEqualTo("BCA-A602000001");
     }
 
     @Test
-    void delai_proposeEnMoisArrondiAuSuperieur_ouSaisi() {
-        assertThat(ActeJuridiqueFactory.moisPourJours(1)).isEqualTo(1);
-        assertThat(ActeJuridiqueFactory.moisPourJours(30)).isEqualTo(1);
-        assertThat(ActeJuridiqueFactory.moisPourJours(31)).isEqualTo(2);
-        assertThat(factory.creerActe(besoin, offre(45), null, 3, EMISSION).getDelaiLivraisonMois()).isEqualTo(3);
+    void donneesDeLaForme_saisies() {
+        final ActeJuridique acte = factory.creerActe(besoin, offre(45), null, new DonneesForme(3, " DEV-12 "), EMISSION);
+        assertThat(acte.getBonDeCommande().getDelaiLivraisonMois()).isEqualTo(3);
+        assertThat(acte.getBonDeCommande().getReferenceDevis()).isEqualTo("DEV-12");
     }
 
     @Test
     void formeNonDisponible_refusee() {
-        assertThatThrownBy(() -> factory.creerActe(besoin, offre(30), TypeActe.MARCHE_PUBLIC, null, EMISSION))
+        assertThatThrownBy(() -> factory.creerActe(besoin, offre(30), TypeActe.MARCHE_PUBLIC, SANS_SAISIE, EMISSION))
                 .isInstanceOf(BusinessException.class)
                 .extracting(e -> ((BusinessException) e).getErrorCode())
                 .isEqualTo(ErrorCode.FORME_ACTE_NON_DISPONIBLE);
@@ -86,9 +88,9 @@ class ActeJuridiqueFactoryTest {
     @Test
     void projet_modifiableJusquALaSoumissionAuControle() {
         when(compteur.prochainNumero("BCA-A60")).thenReturn(1L);
-        final ActeJuridique acte = factory.creerActe(besoin, offre(30), null, null, EMISSION);
-        acte.modifier("Nouvel objet", 2);
-        assertThat(acte.getDelaiLivraisonMois()).isEqualTo(2);
+        final ActeJuridique acte = factory.creerActe(besoin, offre(30), null, SANS_SAISIE, EMISSION);
+        acte.modifier("Nouvel objet");
+        assertThat(acte.getObjet()).isEqualTo("Nouvel objet");
 
         final CreditBudgetaire credit = CreditBudgetaire.builder().id("C").build();
         final LocalDateTime maintenant = LocalDateTime.of(2026, 11, 11, 10, 0);
@@ -97,7 +99,7 @@ class ActeJuridiqueFactoryTest {
         assertThat(acte.getCreditBudgetaire()).isSameAs(credit);
         assertThat(acte.getDateSoumissionControle()).isEqualTo(maintenant);
 
-        assertThatThrownBy(() -> acte.modifier("Autre", 3))
+        assertThatThrownBy(() -> acte.modifier("Autre"))
                 .isInstanceOf(BusinessException.class)
                 .extracting(e -> ((BusinessException) e).getErrorCode())
                 .isEqualTo(ErrorCode.ACTE_NON_MODIFIABLE);

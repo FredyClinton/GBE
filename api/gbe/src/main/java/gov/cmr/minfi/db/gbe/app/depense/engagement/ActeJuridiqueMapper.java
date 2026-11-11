@@ -9,6 +9,8 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring", uses = SoumissionMapper.class)
 public interface ActeJuridiqueMapper {
 
+    @Mapping(target = "delaiLivraisonMois", source = "bonDeCommande.delaiLivraisonMois")
+    @Mapping(target = "referenceDevis", source = "bonDeCommande.referenceDevis")
     @Mapping(target = "besoinId", source = "expressionBesoin.id")
     @Mapping(target = "besoinReference", source = "expressionBesoin.reference")
     @Mapping(target = "soumissionId", source = "soumission.id")

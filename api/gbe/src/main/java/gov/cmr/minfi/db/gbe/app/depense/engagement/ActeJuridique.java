@@ -5,6 +5,7 @@ import gov.cmr.minfi.db.gbe.app.common.audit.BaseEntity;
 import gov.cmr.minfi.db.gbe.app.common.exception.BusinessException;
 import gov.cmr.minfi.db.gbe.app.common.exception.ErrorCode;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.ExpressionBesoin;
+import gov.cmr.minfi.db.gbe.app.depense.engagement.forme.BonDeCommande;
 import gov.cmr.minfi.db.gbe.app.depense.soumission.Soumission;
 import jakarta.persistence.*;
 import lombok.*;
@@ -42,10 +43,6 @@ public class ActeJuridique extends BaseEntity {
     /** Date d'émission du BCA : date de création du projet (Q26). */
     @Column(name = "date_emission", nullable = false)
     private LocalDate dateEmission;
-
-    /** Délai de livraison en mois (Q25), proposé à partir du délai de l'offre en jours. */
-    @Column(name = "delai_livraison_mois", nullable = false)
-    private Integer delaiLivraisonMois;
 
     @Column(name = "montant_total_ht", nullable = false, precision = 20, scale = 2)
     private BigDecimal montantTotalHT;
@@ -97,22 +94,35 @@ public class ActeJuridique extends BaseEntity {
     @JoinColumn(name = "credit_budgetaire_id", foreignKey = @ForeignKey(name = "fk_acte_credit"))
     private CreditBudgetaire creditBudgetaire;
 
+    /**
+     * Données de la forme BCA (« applique forme contractuelle », composition). Les autres formes auront leur propre
+     * entité ; une seule est renseignée, selon {@link #type}.
+     */
+    @OneToOne(mappedBy = "acteJuridique", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private BonDeCommande bonDeCommande;
+
     /** Réservation des AE créée par le visa favorable (« bloque crédits » 0..1). */
     @OneToOne(mappedBy = "acteJuridique", fetch = FetchType.LAZY)
     private ReservationCredit reservation;
 
     // ── Cycle de vie ──────────────────────────────────
 
+    public void rattacherBonDeCommande(BonDeCommande bca) {
+        bca.setActeJuridique(this);
+        this.bonDeCommande = bca;
+    }
+
     /** Le projet reste modifiable par l'ordonnateur tant qu'il n'est pas soumis au CF (UC04). */
-    public void modifier(String nouvelObjet, Integer nouveauDelaiMois) {
+    public void verifierModifiable() {
         if (statut != StatutActe.PROJET) {
             throw new BusinessException(ErrorCode.ACTE_NON_MODIFIABLE, numero, statut);
         }
-        if (nouveauDelaiMois == null || nouveauDelaiMois <= 0) {
-            throw new BusinessException(ErrorCode.MONTANT_INVALIDE);
-        }
+    }
+
+    /** Modifie l'objet ; les données de la forme se modifient par sa stratégie. */
+    public void modifier(String nouvelObjet) {
+        verifierModifiable();
         this.objet = nouvelObjet;
-        this.delaiLivraisonMois = nouveauDelaiMois;
     }
 
     /** PROJET → SOUMIS_CONTROLE (soumettreAuVisa, transmettreAuCF de l'onglet 2) : plus de modification unilatérale. */

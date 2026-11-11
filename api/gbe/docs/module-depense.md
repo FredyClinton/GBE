@@ -278,6 +278,14 @@ rapport, section 9 ; drawio, onglets 1, 2, 3 et 4 (deux copies).
   - `PUT /{id}` : modification de l'objet et du délai ;
   - `PATCH /{id}/soumettre` : envoi au CF.
 - **Bénéficiaire (Q27) :** pas encore ajouté, en attente de vérification.
+- **Refonte (V21, demandée le 2026-11-11) : données de la forme séparées de l'acte, par composition.**
+  - L'onglet 4 relie l'acte à une `FormeActeStrategie` qui porte ses propres attributs (« applique forme contractuelle », 1 ↔ 1).
+  - **Données :** l'entité `BonDeCommande` (table `bons_de_commande`, liée 1-1 à l'acte) contient `delaiLivraisonMois` (retiré de l'acte), `referenceDevis` (facultative), `codeBarresSecurite` et `qrCodeSecurite` (remplis avec l'impression, lot 3).
+  - **Comportement :** `StrategieBonDeCommande` numérote l'acte, vérifie l'éligibilité et applique les données (`appliquerDonnees`, `DonneesForme`). Le délai est saisi, sinon conservé, sinon proposé depuis l'offre.
+  - **Pourquoi la composition plutôt que l'héritage :** la forme d'un acte peut changer (`changerForme` de l'onglet 4, par exemple après un rejet du CF).
+  - **Autres formes :** chacune aura sa table et sa stratégie. `changerForme` sera ajouté quand une deuxième forme existera.
+  - **Pas de `delaiExecution` générique sur l'acte :** le délai vit dans les données de chaque forme.
+  - **API :** inchangée, plus `referenceDevis` en entrée et en sortie.
 
 **2c livré (V20) :**
 - **`Visa`** (package `depense/controle`, onglet 4) : numéro, `typeVisa = ENGAGEMENT_JURIDIQUE`, date de réception (envoi au CF), date du visa, décision (`StatutVisa`), observations, référence du quitus et acte. Le CF auteur est tracé par `createdBy`.
@@ -472,3 +480,4 @@ Ce qui a été volontairement laissé de côté, avec sa source et le moment pr�
 | 2026-11-11 | **2b livré** (V19) : projet d'acte BCA (fabrique et stratégie BCA, numéro `BCA-A<exercice><section><ordre>`, montants de l'offre retenue, TTC en lettres), modification en `PROJET`, envoi au CF avec ligne de crédit déduite du besoin. Q24 précisée (ordre par exercice, à vérifier). |
 | 2026-11-11 | Les taxes dépendent du type d'acte : seules les règles du BCA sont connues, on fait avec. Évolution notée en §4.4 et §7 (taux par type, recalcul à l'acte, TTC indicatif sur l'offre). |
 | 2026-11-11 | **2c livré** (V20) : visa du CF en une décision (favorable : quitus + réservation des AE + `VISE_CF` ; rejet : retour en `PROJET` ; réserves : reste soumis). Question Q30 ouverte (périmètre du CF). |
+| 2026-11-11 | Refonte de 2b (V21) : données propres au BCA dans `bons_de_commande` (délai en mois, référence du devis, code-barres et QR code à venir), rattachées à l'acte par composition ; `StrategieBonDeCommande` porte le comportement. |

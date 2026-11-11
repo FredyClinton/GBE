@@ -5,6 +5,7 @@ import gov.cmr.minfi.db.gbe.app.common.exception.ErrorCode;
 import gov.cmr.minfi.db.gbe.app.common.reference.ReferenceGenerator;
 import gov.cmr.minfi.db.gbe.app.common.texte.MontantEnLettres;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.ExpressionBesoin;
+import gov.cmr.minfi.db.gbe.app.depense.engagement.forme.DonneesForme;
 import gov.cmr.minfi.db.gbe.app.depense.engagement.forme.FormeActeStrategie;
 import gov.cmr.minfi.db.gbe.app.depense.soumission.Soumission;
 import org.springframework.stereotype.Component;
@@ -36,30 +37,31 @@ public class ActeJuridiqueFactory {
      */
     public FormeActeStrategie determinerForme(ExpressionBesoin besoin, BigDecimal montantTTC, TypeActe demande) {
         final TypeActe type = demande == null ? TypeActe.BON_DE_COMMANDE : demande;
-        final FormeActeStrategie forme = formes.get(type);
-        if (forme == null) {
-            throw new BusinessException(ErrorCode.FORME_ACTE_NON_DISPONIBLE, type);
-        }
+        final FormeActeStrategie forme = forme(type);
         if (!forme.verifierEligibilite(besoin, montantTTC)) {
             throw new BusinessException(ErrorCode.FORME_ACTE_INELIGIBLE, type);
         }
         return forme;
     }
 
-    public ActeJuridique creerActe(ExpressionBesoin besoin, Soumission retenue, TypeActe demande,
-                                   Integer delaiLivraisonMois, LocalDate dateEmission) {
-        final FormeActeStrategie forme = determinerForme(besoin, retenue.getMontantProposeTTC(), demande);
-        final int delai = delaiLivraisonMois != null ? delaiLivraisonMois : moisPourJours(retenue.getDelaiProposeJours());
-        if (delai <= 0) {
-            throw new BusinessException(ErrorCode.MONTANT_INVALIDE);
+    /** Stratégie de la forme d'un acte existant. */
+    public FormeActeStrategie forme(TypeActe type) {
+        final FormeActeStrategie forme = formes.get(type);
+        if (forme == null) {
+            throw new BusinessException(ErrorCode.FORME_ACTE_NON_DISPONIBLE, type);
         }
+        return forme;
+    }
+
+    public ActeJuridique creerActe(ExpressionBesoin besoin, Soumission retenue, TypeActe demande,
+                                   DonneesForme donnees, LocalDate dateEmission) {
+        final FormeActeStrategie forme = determinerForme(besoin, retenue.getMontantProposeTTC(), demande);
         final String numero = forme.numeroter(besoin, referenceGenerator.prochainNumero(forme.cleCompteur(besoin)));
-        return ActeJuridique.builder()
+        final ActeJuridique acte = ActeJuridique.builder()
                 .numero(numero)
                 .type(forme.type())
                 .objet(besoin.getObjet())
                 .dateEmission(dateEmission)
-                .delaiLivraisonMois(delai)
                 .montantTotalHT(retenue.getMontantProposeHT())
                 .tauxTva(retenue.getTauxTva())
                 .montantTva(retenue.getMontantTva())
@@ -71,10 +73,7 @@ public class ActeJuridiqueFactory {
                 .expressionBesoin(besoin)
                 .soumission(retenue)
                 .build();
-    }
-
-    /** Q25 : délai proposé = délai de l'offre en jours ÷ 30, arrondi au mois supérieur. */
-    static int moisPourJours(Integer jours) {
-        return jours == null || jours <= 0 ? 1 : (jours + 29) / 30;
+        forme.appliquerDonnees(acte, retenue, donnees);
+        return acte;
     }
 }

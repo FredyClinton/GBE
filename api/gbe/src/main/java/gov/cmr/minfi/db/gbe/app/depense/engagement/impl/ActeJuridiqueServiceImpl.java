@@ -13,6 +13,7 @@ import gov.cmr.minfi.db.gbe.app.depense.engagement.*;
 import gov.cmr.minfi.db.gbe.app.depense.engagement.dto.ActeJuridiqueResponse;
 import gov.cmr.minfi.db.gbe.app.depense.engagement.dto.CreationActeRequest;
 import gov.cmr.minfi.db.gbe.app.depense.engagement.dto.ModificationActeRequest;
+import gov.cmr.minfi.db.gbe.app.depense.engagement.forme.DonneesForme;
 import gov.cmr.minfi.db.gbe.app.depense.soumission.Soumission;
 import gov.cmr.minfi.db.gbe.app.depense.soumission.SoumissionRepository;
 import gov.cmr.minfi.db.gbe.app.depense.soumission.StatutSoumission;
@@ -65,8 +66,8 @@ public class ActeJuridiqueServiceImpl implements ActeJuridiqueService {
         final Soumission retenue = soumissionRepository
                 .findByExpressionBesoinIdAndStatut(besoin.getId(), StatutSoumission.RETENUE)
                 .orElseThrow(() -> new BusinessException(ErrorCode.SOUMISSION_NOT_FOUND, besoin.getReference()));
-        final ActeJuridique acte = acteFactory.creerActe(besoin, retenue, request.type(), request.delaiLivraisonMois(),
-                LocalDate.now(clock));
+        final ActeJuridique acte = acteFactory.creerActe(besoin, retenue, request.type(),
+                new DonneesForme(request.delaiLivraisonMois(), request.referenceDevis()), LocalDate.now(clock));
         acteRepository.save(acte);
         log.info("Projet d'acte {} créé pour le besoin {} ({} TTC)", acte.getNumero(), besoin.getReference(),
                 acte.getMontantTTC());
@@ -77,7 +78,9 @@ public class ActeJuridiqueServiceImpl implements ActeJuridiqueService {
     @Transactional
     public ActeJuridiqueResponse modifier(String acteId, ModificationActeRequest request) {
         final ActeJuridique acte = findActeAvecDroit(acteId, Permission.ENGAGE_DEPENSE);
-        acte.modifier(request.objet(), request.delaiLivraisonMois());
+        acte.modifier(request.objet());
+        acteFactory.forme(acte.getType()).appliquerDonnees(acte, acte.getSoumission(),
+                new DonneesForme(request.delaiLivraisonMois(), request.referenceDevis()));
         log.info("Projet d'acte {} modifié", acte.getNumero());
         return acteMapper.toResponse(acte);
     }

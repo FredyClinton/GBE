@@ -18,6 +18,7 @@ public record ActeJuridiqueResponse(
         String objet,
         LocalDate dateEmission,
         Integer delaiLivraisonMois,
+        String referenceDevis,
         LocalDateTime dateSoumissionControle,
         // Montants
         BigDecimal montantTotalHT,
