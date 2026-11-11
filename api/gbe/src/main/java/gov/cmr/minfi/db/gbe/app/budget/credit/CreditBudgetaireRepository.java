@@ -38,6 +38,11 @@ public interface CreditBudgetaireRepository extends JpaRepository<CreditBudgetai
     List<CreditBudgetaire> findByStatut(StatutCredit statut);
 
 
+    /** Ligne de crédit d'une imputation complète (unique, uk_credit_imputation) : déduite du besoin (Q22). */
+    Optional<CreditBudgetaire> findByExerciceIdAndSectionIdAndProgrammeIdAndActionIdAndChapitreIdAndNatureEconomiqueId(
+            String exerciceId, String sectionId, String programmeId, String actionId, String chapitreId,
+            String natureEconomiqueId);
+
     // Vérification d'unicité de l'imputation  avant création
     boolean existsByExerciceIdAndSectionIdAndProgrammeIdAndActionIdAndChapitreIdAndNatureEconomiqueId(
             String exerciceId,

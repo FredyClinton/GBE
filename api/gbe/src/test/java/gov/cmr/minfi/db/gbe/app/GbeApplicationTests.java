@@ -285,8 +285,9 @@ class GbeApplicationTests {
                                     section_id, programme_id, user_id)
                 VALUES (?, 'TEST', CURRENT_DATE, true, CURRENT_DATE, 'ORDONNATEUR', ?, ?, ?)
                 """, mandatId, sectionId, programmeId, userId);
-        jdbcTemplate.update("INSERT INTO mandat_permissions (mandat_id, permission) VALUES (?, 'EXPRIMER_BESOIN')",
-                mandatId);
+        for (String permission : List.of("EXPRIMER_BESOIN", "ENGAGE_DEPENSE")) {
+            jdbcTemplate.update("INSERT INTO mandat_permissions (mandat_id, permission) VALUES (?, ?)", mandatId, permission);
+        }
         return "Bearer " + jwtService.generateAccessToken(email);
     }
 
@@ -598,6 +599,76 @@ class GbeApplicationTests {
                 .andExpect(status().isBadRequest());
         mockMvc.perform(patch("/api/v1/besoins/{id}/infructueux", besoinId).header("Authorization", ordo))
                 .andExpect(status().isBadRequest());
+
+        // Lot 2b — projet d'acte (BCA) repris de l'offre retenue ; HT 35 501 → TVA 6 833,94, IR 1 952,56
+        final String exerciceCode = jdbcTemplate.queryForObject(
+                "SELECT code_exercice::text FROM exercice e JOIN expressions_besoin b ON b.exercice_id = e.id WHERE b.id = ?",
+                String.class, besoinId);
+        final String sectionCode = jdbcTemplate.queryForObject(
+                "SELECT s.code FROM sections s JOIN expressions_besoin b ON b.section_id = s.id WHERE b.id = ?",
+                String.class, besoinId);
+        mockMvc.perform(post("/api/v1/actes").header("Authorization", ordo).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"besoinId\":\"%s\",\"type\":\"MARCHE_PUBLIC\"}".formatted(besoinId)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("FORME_ACTE_NON_DISPONIBLE"));
+        final MvcResult acte = mockMvc.perform(post("/api/v1/actes").header("Authorization", ordo)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"besoinId\":\"%s\"}".formatted(besoinId)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.numero").value(org.hamcrest.Matchers.matchesPattern(
+                        "BCA-A" + exerciceCode + java.util.regex.Pattern.quote(sectionCode) + "\\d{5}")))
+                .andExpect(jsonPath("$.type").value("BON_DE_COMMANDE"))
+                .andExpect(jsonPath("$.statut").value("PROJET"))
+                .andExpect(jsonPath("$.delaiLivraisonMois").value(1))
+                .andExpect(jsonPath("$.montantTotalHT").value(35501.00))
+                .andExpect(jsonPath("$.montantTva").value(6833.94))
+                .andExpect(jsonPath("$.montantIr").value(1952.56))
+                .andExpect(jsonPath("$.montantTTC").value(42334.94))
+                .andExpect(jsonPath("$.montantNetAPayer").value(33548.44))
+                .andExpect(jsonPath("$.montantEnLettres").value(
+                        "quarante-deux mille trois cent trente-quatre et quatre-vingt-quatorze centimes"))
+                .andExpect(jsonPath("$.fournisseurNiu").value("M000000000012S"))
+                .andExpect(jsonPath("$.rib").value("10005000010000000001213"))
+                .andExpect(jsonPath("$.lignes.length()").value(2))
+                .andExpect(jsonPath("$.creditBudgetaireId").doesNotExist())
+                .andReturn();
+        final String acteId = champ(acte, "$.id");
+        mockMvc.perform(post("/api/v1/actes").header("Authorization", ordo).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"besoinId\":\"%s\"}".formatted(besoinId)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("ACTE_DEJA_CREE"));
+        mockMvc.perform(put("/api/v1/actes/{id}", acteId).header("Authorization", ordo).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"objet\":\"Fournitures de bureau 2026\",\"delaiLivraisonMois\":2}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.delaiLivraisonMois").value(2));
+        mockMvc.perform(get("/api/v1/actes").header("Authorization", ordo).param("statut", "PROJET"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.content[0].lignes").doesNotExist());
+        mockMvc.perform(get("/api/v1/actes/{id}", acteId).header("Authorization", frs[0]))
+                .andExpect(status().isForbidden());
+
+        // Envoi au CF : la ligne de crédit est déduite du besoin et doit exister (Q22)
+        mockMvc.perform(patch("/api/v1/actes/{id}/soumettre", acteId).header("Authorization", ordo))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("CREDIT_IMPUTATION_INTROUVABLE"));
+        final String exerciceId = jdbcTemplate.queryForObject(
+                "SELECT exercice_id FROM expressions_besoin WHERE id = ?", String.class, besoinId);
+        final String creditId = champ(mockMvc.perform(post("/api/v1/credits").header("Authorization", admin)
+                        .contentType(MediaType.APPLICATION_JSON).content("""
+                                {"exerciceId":"%s","sectionId":"%s","programmeId":"%s","actionId":"%s","chapitreId":"%s",
+                                 "natureEconomiqueId":"%s","montantAE":1000000,"montantCP":1000000}
+                                """.formatted(exerciceId, imputation.get("section_id"), imputation.get("programme_id"),
+                                imputation.get("action_id"), imputation.get("chapitre_id"), imputation.get("nature_id"))))
+                .andExpect(status().isCreated()).andReturn(), "$.id");
+        mockMvc.perform(patch("/api/v1/actes/{id}/soumettre", acteId).header("Authorization", ordo))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.statut").value("SOUMIS_CONTROLE"))
+                .andExpect(jsonPath("$.creditBudgetaireId").value(creditId))
+                .andExpect(jsonPath("$.dateSoumissionControle").isNotEmpty());
+        mockMvc.perform(put("/api/v1/actes/{id}", acteId).header("Authorization", ordo).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"objet\":\"Autre\",\"delaiLivraisonMois\":3}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("ACTE_NON_MODIFIABLE"));
     }
 
     @Test

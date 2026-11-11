@@ -20,6 +20,8 @@ public interface SoumissionRepository extends JpaRepository<Soumission, String> 
 
     List<Soumission> findAllByExpressionBesoinId(String expressionBesoinId);
 
+    Optional<Soumission> findByExpressionBesoinIdAndStatut(String expressionBesoinId, StatutSoumission statut);
+
     Optional<Soumission> findByIdAndExpressionBesoinId(String id, String expressionBesoinId);
 
     boolean existsByExpressionBesoinIdAndFournisseurId(String expressionBesoinId, String fournisseurId);

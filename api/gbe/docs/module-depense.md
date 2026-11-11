@@ -243,7 +243,7 @@ rapport, section 9 ; drawio, onglets 1, 2, 3 et 4 (deux copies).
 | Étape | Contenu | Source | Dépend de |
 |---|---|---|---|
 | **2a** (**livré**) | **Attribution** : saisie du résultat de la commission (Q4), `EN_EVALUATION → ATTRIBUEE` (`retenirSoumission`) ou `→ INFRUCTUEUSE` (`infructueux()`, « déclarer sans suite ») ; offre retenue `RETENUE`, les autres `NON_RETENUE` ; consultation des offres par l'ordonnateur | onglet 2, onglet 3 (« Évaluer les offres », « Offre valide ? »), Q4 | 1e |
-| **2b** | **Projet d'acte** (UC04) : `ActeJuridique` créé par `ActeJuridiqueFactory` à partir du besoin et de l'offre retenue ; `TypeActe` et une `FormeActeStrategie` par type (BCA, LC, marché, bail) ; forme minimale proposée, forme inférieure refusée (Q3) ; table des seuils (vide → choix libre) ; `PROJET` modifiable → `SOUMIS_CONTROLE` (plus modifiable) | UC04, onglet 4 (factory, stratégies), onglet 1 (`type : TypeActe`), §9 « forme de l'acte » | 2a |
+| **2b** (**livré**) | **Projet d'acte** (UC04) : `ActeJuridique` créé par `ActeJuridiqueFactory` à partir du besoin et de l'offre retenue ; `TypeActe` et une `FormeActeStrategie` par type (BCA, LC, marché, bail) ; forme minimale proposée, forme inférieure refusée (Q3) ; table des seuils (vide → choix libre) ; `PROJET` modifiable → `SOUMIS_CONTROLE` (plus modifiable) | UC04, onglet 4 (factory, stratégies), onglet 1 (`type : TypeActe`), §9 « forme de l'acte » | 2a |
 | **2c** | **Contrôle CF** (UC06 « include » UC07, UC08) : une seule décision transactionnelle (Q1) ; `Visa` (`ENGAGEMENT_JURIDIQUE`) ; si favorable : quitus + `ReservationCredit` + `consommerAE` sur la ligne + acte `VISE_CF` ; sinon rien n'est réservé (Q2) et le dossier revient à l'ordonnateur | UC06–UC08, onglet 2 (`viser`, `rejeter(motif)`), onglet 3 (« refus / rejet » → préparer le projet d'acte), onglet 4 (`Visa`, `ReservationCredit`) | 2b |
 | **2d** | **Signature et notification** (UC05) : `VISE_CF → SIGNE_ORDONNATEUR` (validation tracée : signataire, date, Q6) puis `NOTIFIE_PRESTATAIRE` ; le fournisseur voit l'acte dans son espace ; annulation d'un acte visé ou signé avec `libererAE` (Q2) | UC05, onglet 2 (`signer`, `notifierFournisseur`), onglet 3 (« Notifier le BCA signé ») | 2c |
 
@@ -256,6 +256,27 @@ rapport, section 9 ; drawio, onglets 1, 2, 3 et 4 (deux copies).
   - `PATCH /api/v1/besoins/{id}/attribuer`, corps `{soumissionId}`, permission `EXPRIMER_BESOIN` ;
   - `PATCH /api/v1/besoins/{id}/infructueux`, permission `EXPRIMER_BESOIN`.
 - **Réponses :** `SoumissionResponse` gagne `fournisseurId`, `fournisseurRaisonSociale`, `fournisseurNiu` et `dateDecision`, et `ExpressionBesoinResponse` gagne `dateDecision`. Ce sont des ajouts : aucun champ existant ne change.
+
+**2b livré (V18, V19) :**
+- **Taxes (V18, Q23) :** la table `taxes` contient TVA 19,25 % et IR 5,5 %, modifiables par l'admin. `CalculTaxe` → `TvaEtIrParametres` calcule TVA, IR, TTC et NAP de l'offre, et le fournisseur ne saisit plus le TTC.
+- **Acte (V19), package `depense/engagement` :**
+  - `ActeJuridique` : numéro, type, objet, date d'émission, délai en mois, HT, TVA, IR, TTC, NAP, montant en lettres, statut, besoin, offre retenue, ligne de crédit ;
+  - `ActeJuridiqueFactory` (`determinerForme`, `creerActe`) ;
+  - `FormeActeStrategie` avec une seule stratégie, `StrategieBonDeCommande` (numérotation Q24, éligibilité toujours vraie tant que la table des seuils est vide) ;
+  - `common/texte/MontantEnLettres` (orthographe traditionnelle, vérifiée sur les montants du BCA).
+- **Règles :**
+  - création à partir d'un besoin `ATTRIBUEE` et de son offre `RETENUE`, un acte par besoin (409 `ACTE_DEJA_CREE`) ;
+  - montants, fournisseur, RIB et lignes repris de l'offre ;
+  - délai proposé = jours de l'offre ÷ 30, arrondi au supérieur (Q25) ; date d'émission = date de création (Q26) ;
+  - seuls l'objet et le délai se modifient, et seulement en `PROJET` (`ACTE_NON_MODIFIABLE`) ;
+  - envoi au CF : `PROJET → SOUMIS_CONTROLE`, ligne de crédit déduite de l'imputation du besoin (exercice, section, programme, action de la tâche, chapitre, nature), sinon 400 `CREDIT_IMPUTATION_INTROUVABLE` (Q22). La disponibilité des AE est contrôlée par le CF en 2c.
+- **Routes `/api/v1/actes`** (écriture : `ENGAGE_DEPENSE` + périmètre du besoin ; lecture : périmètre) :
+  - `POST` : création, avec `besoinId`, `type` facultatif (BCA par défaut) et `delaiLivraisonMois` facultatif ;
+  - `GET` : liste paginée, filtres exercice et statut ;
+  - `GET /{id}` : contenu complet du BCA (structure émettrice, imputation, fournisseur, RIB, lignes, montants) ;
+  - `PUT /{id}` : modification de l'objet et du délai ;
+  - `PATCH /{id}/soumettre` : envoi au CF.
+- **Bénéficiaire (Q27) :** pas encore ajouté, en attente de vérification.
 
 **Mise en œuvre prévue de la notification (Q20, étape 2d) :**
 - **Signature :** `signer` fait passer l'acte à `SIGNE_ORDONNATEUR` (signataire, `dateSignature`), puis à `NOTIFIE_PRESTATAIRE` (`dateNotification`) dans la même transaction.
@@ -327,7 +348,7 @@ Elles bloquent les lots 1 et 2. Les hypothèses s'appliquent tant qu'il n'y a pa
 | Q21 | Champs propres à chaque forme (référence du devis, n° d'appel d'offres, lot, retenue de garantie, pénalités, dates et loyer du bail) et documents générés | champs facultatifs saisis au lot 2 ; documents (BCA imprimé, modèle) au lot 3, avec le stockage de fichiers | **Décidé (2026-11-11)** : **seule la forme BCA** est traitée jusqu'à la fin du module ; les autres formes viendront plus tard, selon les informations disponibles. Le bas du BCA sera fourni par l'utilisateur pour en fixer les champs. |
 | Q22 | Imputation : ligne de crédit déduite du besoin, ou choisie par l'ordonnateur ? | déduite du besoin ; soumission au CF refusée si la ligne n'existe pas | **Décidé (2026-11-11)** : déduite du besoin. |
 | Q23 | Taxes du BCA : TVA 19,25 % et IR 5,5 % calculés par le serveur sur le HT (TTC = HT + TVA, NAP = TTC − TVA − IR) ? Le fournisseur cesse-t-il de saisir le TTC dans son offre ? Les taux varient-ils (régime fiscal du fournisseur, exonérations) ? | taux en table de paramétrage ; TTC et NAP calculés par le serveur, à l'offre comme à l'acte ; exonérations plus tard | **Décidé (2026-11-11)** : le serveur calcule les taxes. Taux en table `taxes` (TVA 19,25 %, IR 5,5 %), modifiables par l'admin. L'offre porte TVA, IR, TTC et net à payer, et le fournisseur ne saisit plus le TTC. **Livré (V18).** |
-| Q24 | Format du numéro (BCA-A602010097) | provisoire : `BCA-<année>-00001` | **Décidé (2026-11-11)** : `BCA-A` + code de l'exercice (`exercice.code_exercice`, 60 pour 2026) + code de la section (20 pour le MINFI) + numéro d'ordre. Exemple : `BCA-A602010097` = A, 60, 20, 10097. **Hypothèse à confirmer** : numéro d'ordre sur 5 chiffres, qui repart à 1 pour chaque exercice et chaque section. |
+| Q24 | Format du numéro (BCA-A602010097) | provisoire : `BCA-<année>-00001` | **Décidé (2026-11-11)** : `BCA-A` + code de l'exercice (`exercice.code_exercice`, 60 pour 2026) + code de la section (20 pour le MINFI) + numéro d'ordre **sur 5 chiffres**, qui repart à chaque **exercice** sans tenir compte de la section. Exemple : `BCA-A602010097` = A, 60, 20, 10097. **À vérifier** : la portée par exercice seul, et le premier numéro (00001 supposé, « repart à 0 »). Livré en 2b. |
 | Q25 | Délai de livraison en mois : saisi par l'ordonnateur au projet, ou déduit du délai de l'offre (jours) ? | saisi au projet, proposé à partir de l'offre (jours ÷ 30, arrondi au supérieur) | **Décidé (2026-11-11)** : comme l'hypothèse. |
 | Q26 | Date d'émission : création du projet, envoi au CF ou signature ? | date de création du projet | **Décidé (2026-11-11)** : date de création du projet. |
 | Q27 | Bénéficiaire (11000020 - MINFI) : de quoi s'agit-il, d'où vient-il ? | — | **À vérifier par l'utilisateur** : probablement `<CODE CHAPITRE>-<SIGLE SECTION>` (ex. `11000020 - MINFI`). Ce n'est pas le chapitre du besoin (structure émettrice 33000035), d'où vient-il ? |
@@ -365,7 +386,7 @@ Ce qui a été volontairement laissé de côté, avec sa source et le moment pr�
 - Montant réservé et net à payer (Q17) : décision provisoire « TTC », à revoir ; le BCA montre que NAP = HT − IR.
 
 ### Numérotation et référentiel
-- Numéro du BCA (Q24) : confirmer la longueur du numéro d'ordre (5 chiffres ?) et sa portée (par exercice et section ?).
+- Numéro du BCA (Q24) : à vérifier que le numéro d'ordre repart bien par exercice seul (toutes sections confondues, compteur `BCA-A<code exercice>`), et que le premier numéro est 00001.
 - Bénéficiaire (Q27) : à vérifier par l'utilisateur (`<CODE CHAPITRE>-<SIGLE SECTION>` ?).
 
 ### Soumissions et fournisseurs
@@ -390,6 +411,7 @@ Ce qui a été volontairement laissé de côté, avec sa source et le moment pr�
 - Tags Swagger renommés, ce qui compte si le client est généré à partir des tags. Le passage à `ResponseEntity` ne change rien à l'API.
 - Jeton de rafraîchissement invalide : 401 `REFRESH_TOKEN_INVALIDE` au lieu de 500.
 - Nouveaux champs (ajouts) dans `SoumissionResponse` et `ExpressionBesoinResponse`.
+- Nouvelles routes `/api/v1/actes` (projet d'acte BCA).
 - Offre : le fournisseur ne saisit plus `montantProposeTTC` (ignoré s'il est envoyé). La réponse donne `tauxTva`, `montantTva`, `tauxIr`, `montantIr` et `montantNetAPayer`. Le code d'erreur `MONTANT_TTC_INVALIDE` disparaît.
 
 ---
@@ -423,3 +445,4 @@ Ce qui a été volontairement laissé de côté, avec sa source et le moment pr�
 | 2026-11-11 | BCA réel analysé (§4.5) : imputation décodée par le référentiel, taxes TVA 19,25 % et IR 5,5 %, NAP = HT − IR. Questions Q23–Q29 ouvertes avant 2b. |
 | 2026-11-11 | Q24 (format du n° BCA), Q25, Q26 décidées ; 0112 = classification fonctionnelle ; Q27 à vérifier. Nouvelle section §7 : tout ce qui est reporté, avec sa source. |
 | 2026-11-11 | Q23, Q24 et Q28 (« 60 » = code de l'exercice) décidées. **2b, partie taxes** (V18) : table `taxes` (TVA 19,25 %, IR 5,5 %), `CalculTaxe` → `TvaEtIrParametres`, l'offre porte TVA, IR, TTC et NAP calculés par le serveur. |
+| 2026-11-11 | **2b livré** (V19) : projet d'acte BCA (fabrique et stratégie BCA, numéro `BCA-A<exercice><section><ordre>`, montants de l'offre retenue, TTC en lettres), modification en `PROJET`, envoi au CF avec ligne de crédit déduite du besoin. Q24 précisée (ordre par exercice, à vérifier). |

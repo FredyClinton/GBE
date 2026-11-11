@@ -60,6 +60,7 @@ Lombok · MapStruct · SpringDoc OpenAPI · TOTP (`dev.samstevens.totp`) · Test
 | `referentiel/`          | Master data, one sub-package per domain: `exercice`, `administratif` (Section, Chapitre), `programmatique` (Programme → Action → Activite → Tache; an activité/tâche copies programme, section and exercice from its parent, never from the request; a parent with children cannot be deleted), `economique` (NatureEconomique), `matiere` (plain catalogue: reference + libelle, deliberately not linked to NatureEconomique; read under `/api/v1/referentiel/matieres`, CRUD under `/api/v1/admin/matieres`), `taxe` (TVA / IR rates, read under `/api/v1/referentiel/taxes`, `PUT /api/v1/admin/taxes/{code}`), `fonctionnel`. `ReferentielMapper` is shared. |
 | `budget/credit/`        | `CreditBudgetaire` — core budget entity and its state machine                           |
 | `depense/soumission/`   | `Soumission` + `LigneSoumission` (UC03) under `/api/v1/soumissions` (`SOUMISSIONNER`, supplier sees only his own via `FournisseurConnecte`): full offer (one price per need line), HT computed, one per supplier and need, editable until the deadline, chosen RIB, SHA-256 seal |
+| `depense/engagement/`  | `ActeJuridique` (UC04) under `/api/v1/actes` (`ENGAGE_DEPENSE` + scope of the need): built by `ActeJuridiqueFactory` from an `ATTRIBUEE` need and its `RETENUE` offer (amounts, supplier, RIB, lines copied), one `FormeActeStrategie` bean per `TypeActe` (only `StrategieBonDeCommande` today: number `BCA-A<code exercice><code section><5-digit order per exercice>`), TTC in words (`common/texte/MontantEnLettres`); `PROJET` editable (objet, delay in months) → `SOUMIS_CONTROLE` with the credit line deduced from the need's imputation |
 | `depense/taxe/`         | `CalculTaxe` extension point (future tax methods by need type, plan §4.4); today `TvaEtIrParametres`: TVA and IR applied to HT with the rates of table `taxes`, TTC = HT + TVA, net à payer = TTC − TVA − IR (the supplier no longer enters a TTC) |
 | `depense/besoin/`       | `ExpressionBesoin` + `LigneBesoin` (UC01) under `/api/v1/besoins` (paginated list, filtered by mandate scope in SQL); public read-only consultation of open needs (UC02) under `/api/v1/public/besoins`; no price, attached to a Tache (exercice/section/programme copied), a Chapitre of the same section and a NatureEconomique; state machine in the entity; soft delete via `@SQLRestriction("supprime = false")`; lot 2a: after closing, `PATCH /{id}/attribuer` (one offer RETENUE, the others NON_RETENUE, unique partial index) or `/{id}/infructueux` (offers stay DEPOSEE); the ordonnateur reads the offers under `/{id}/soumissions` at any time |
 | `admin/`                | Admin-only endpoints (user creation, role listing)                                      |
@@ -169,6 +170,7 @@ The schema is owned by Flyway (`src/main/resources/db/migration`); Hibernate onl
   `V16__soumissions.sql`: `soumissions`, `lignes_soumission`.
   `V17__attribution_besoin.sql`: `date_decision` on needs and offers, one `RETENUE` offer per need.
   `V18__taxes.sql`: table `taxes` (TVA 19.25, IR 5.5; `taxes_code_check` lists `CodeTaxe`), tax amounts on `soumissions`.
+  `V19__actes_juridiques.sql`: `actes_juridiques` (one per need and per offer; CHECKs list `TypeActe` and `StatutActe`).
 - Any entity change needs a new `V<n>__description.sql`. Never edit an applied migration.
 - Pre-Flyway databases get a baseline at version 2 (`baseline-on-migrate`), so only V3+ run on them.
 
@@ -176,6 +178,7 @@ The schema is owned by Flyway (`src/main/resources/db/migration`); Hibernate onl
 
 - `CreditBudgetaireTest`, `MandatScopeValidatorTest`, `CreditBudgetaireServiceImplTest`, `ActiviteTacheServiceImplTest`:
   plain unit tests (Mockito, no Spring context). Surefire reports `@Nested` classes under their `@DisplayName` / `$Inner` name.
+- If tests fail with « Unresolved compilation problem », an IDE (Eclipse compiler) wrote stale classes into `target/`: run `./mvnw clean test`.
 - `GbeApplicationTests`: full context on a Testcontainers `postgres:17.9`. It checks the migrations, auth on protected
   routes, CORS preflight and the initial admin login. To call a protected route, build a token with
   `jwtService.generateAccessToken(email)` (no TOTP needed), e.g. the supplier end-to-end test.
