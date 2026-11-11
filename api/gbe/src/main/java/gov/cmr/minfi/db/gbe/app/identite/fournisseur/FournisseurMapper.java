@@ -12,7 +12,7 @@ public interface FournisseurMapper {
     @Mapping(target = "nomRepresentant", source = "user.lastName")
     @Mapping(target = "prenomRepresentant", source = "user.firstName")
     @Mapping(target = "email", source = "user.email")
-    @Mapping(target = "telephone", source = "user.phoneNumber")
+    @Mapping(target = "telephoneRepresentant", source = "user.phoneNumber")
     @Mapping(target = "actif", source = "user.enabled")
     @Mapping(target = "ribs", source = "coordonneesBancaires")
     FournisseurResponse toResponse(Fournisseur fournisseur);

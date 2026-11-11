@@ -110,10 +110,10 @@ Chaque étape est commitée séparément, avec sa migration et ses tests.
 | Étape | Contenu | Dépend de | État |
 |---|---|---|---|
 | **1a** | Référentiels `Activite` et `Tache` (V11) | — | **livré** (2026-11-11) |
-| **1b** | `Fournisseur` et `CoordonneeBancaire` (V12–V13) : création par l'admin avec un compte `ROLE_FOURNISSEUR`, RIB, permissions par défaut du rôle sans mandat | lot 0 | **livré** (2026-11-11) |
-| **1c** | `ExpressionBesoin` et `LigneBesoin` (V14), UC01 : brouillon, lignes (matière, quantité, spécifications), rattachement tâche / chapitre / exercice / nature, publication, annulation, périmètre du mandat | 1a | à faire |
+| **1b** | `Fournisseur` et `CoordonneeBancaire` (V12–V14) : création par l'admin avec un compte `ROLE_FOURNISSEUR`, RIB, permissions par défaut du rôle sans mandat | lot 0 | **livré** (2026-11-11) |
+| **1c** | `ExpressionBesoin` et `LigneBesoin` (V15), UC01 : brouillon, lignes (matière, quantité, spécifications), rattachement tâche / chapitre / exercice / nature, publication, annulation, périmètre du mandat | 1a | à faire |
 | **1d** | Consultation des besoins ouverts (UC02) : besoins publiés non échus, filtres, détail | 1c | à faire |
-| **1e** | `Soumission` et `LigneSoumission` (V15), UC03 : offre totale, choix du RIB, dépôt verrouillé à la date limite, offre non modifiable une fois déposée, récépissé horodaté | 1b, 1d | à faire |
+| **1e** | `Soumission` et `LigneSoumission` (V16), UC03 : offre totale, choix du RIB, dépôt verrouillé à la date limite, offre non modifiable une fois déposée, récépissé horodaté | 1b, 1d | à faire |
 
 **1a livré :**
 - **Tables `activites` et `taches` :** `code` (unique dans le parent), `sigle`, `libelle`, plus le parent (`action_id` ou `activite_id`). Programme, section et exercice sont recopiés du parent par l'API, et jamais saisis.
@@ -126,7 +126,7 @@ Chaque étape est commitée séparément, avec sa migration et ses tests.
   - suppression refusée pour une activité qui contient des tâches (`ACTIVITE_A_DES_TACHES`) et pour une action qui contient des activités (`ACTION_A_DES_ACTIVITES`, contrôle ajouté à `ActionServiceImpl`).
 
 **1b livré :**
-- **Fournisseur :** `raisonSociale`, `niu` (unique), `rccm`, `adresse`. Il est lié à un compte `User` créé en même temps : rôle `FOURNISSEUR`, nom et prénom du représentant, email, téléphone, mot de passe provisoire, `firstLogin`. Pas d'agent, pas de mandat.
+- **Fournisseur :** `raisonSociale`, `niu` (unique), `rccm`, `adresse`, `telephone` (de l'entreprise, ajouté en V14 comme dans le diagramme de classes). Il est lié à un compte `User` créé en même temps : rôle `FOURNISSEUR`, nom, prénom et téléphone du représentant (`telephoneRepresentant`, unique), email, mot de passe provisoire, `firstLogin`. Pas d'agent, pas de mandat.
 - **Coordonnées bancaires :** **seul le RIB** est stocké (décision 2026-11-11) : 23 caractères, banque 5 chiffres, guichet 5 chiffres, compte 11 caractères, clé 2 chiffres. Les espaces et tirets sont retirés, et un fournisseur peut avoir plusieurs RIB (choix au dépôt, onglet 3). La clé RIB n'est pas recalculée.
 - **Routes admin** (`MANAGE_USERS`) : `POST`/`GET`/`GET {id}`/`PUT {id}` sous `/api/v1/admin/fournisseurs`, `POST {id}/ribs`, `DELETE {id}/ribs/{ribId}`. Activation du compte : routes `/api/v1/admin/users/{userId}/activate|deactivate` existantes. La suppression d'un compte fournisseur est refusée (`FOURNISSEUR_LIE_AU_COMPTE`).
 - **Espace fournisseur :** `GET /api/v1/fournisseurs/moi` (`ROLE_FOURNISSEUR`).
@@ -191,3 +191,4 @@ Point à part : le mandat MINISTRE (section MINFI) n'a aucune permission en base
 | 2026-11-11 | Lot 0 commité (`2d14474`). Puis : annulation d'un crédit bloquée tant que des AE/CP sont consommés ; `engager`/`solder` et les statuts `ENGAGE`/`SOLDE` retirés (V10). |
 | 2026-11-11 | Lot 1 découpé en 1a–1e. **1a livré** : activités et tâches (V11). Lecture de l'onglet 3 (§4.3) : publication directe, RIB au dépôt, refus du CF renvoyé à la préparation de l'acte, liquidation par l'ordonnateur (écart avec `LIQUIDER_DEPENSE` sur `COMPTABLE`). Questions Q7–Q12 ouvertes. |
 | 2026-11-11 | **1b livré** : fournisseurs et RIB (V13), rôle externe sans mandat, `LIQUIDER_DEPENSE` déplacée vers l'ordonnateur (V12), refus d'autorisation en 403 au lieu de 500. Q8 : pas de montant estimé. |
+| 2026-11-11 | V14 : `telephone` de l'entreprise sur `Fournisseur` (déjà présent dans le diagramme de classes). Le téléphone du compte devient `telephoneRepresentant` dans l'API. |

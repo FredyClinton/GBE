@@ -133,6 +133,7 @@ The schema is owned by Flyway (`src/main/resources/db/migration`); Hibernate onl
   `V11__referentiel_activites_taches.sql`: tables `activites` and `taches` (code unique within the parent).
   `V12__liquidation_par_ordonnateur.sql`: `LIQUIDER_DEPENSE` moves from COMPTABLE to ORDONNATEUR/MINISTRE mandates.
   `V13__fournisseurs.sql`: tables `fournisseurs` (NIU unique, `user_id` unique) and `coordonnees_bancaires`.
+  `V14__telephone_fournisseur.sql`: company `telephone` on `fournisseurs` (the representative's phone stays on `users`).
 - Any entity change needs a new `V<n>__description.sql`. Never edit an applied migration.
 - Pre-Flyway databases get a baseline at version 2 (`baseline-on-migrate`), so only V3+ run on them.
 

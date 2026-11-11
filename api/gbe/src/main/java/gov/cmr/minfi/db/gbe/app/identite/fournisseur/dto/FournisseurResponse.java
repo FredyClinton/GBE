@@ -13,11 +13,12 @@ public record FournisseurResponse(
         String niu,
         String rccm,
         String adresse,
+        String telephone,
         String userId,
         String nomRepresentant,
         String prenomRepresentant,
         String email,
-        String telephone,
+        String telephoneRepresentant,
         boolean actif,
         List<CoordonneeBancaireResponse> ribs
 ) {}

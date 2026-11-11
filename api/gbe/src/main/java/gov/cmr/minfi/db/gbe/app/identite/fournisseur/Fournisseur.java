@@ -37,6 +37,10 @@ public class Fournisseur extends BaseEntity {
     @Column(name = "adresse", columnDefinition = "TEXT")
     private String adresse;
 
+    /** Téléphone de l'entreprise (celui du représentant est porté par son compte User). */
+    @Column(name = "telephone", length = 30)
+    private String telephone;
+
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false, unique = true, foreignKey = @ForeignKey(name = "fk_fournisseur_user"))
     private User user;

@@ -131,9 +131,10 @@ class GbeApplicationTests {
                         .header("Authorization", admin)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"raisonSociale":"SARL Test","niu":"M000000000001T","nomRepresentant":"Essomba",
-                                 "prenomRepresentant":"Marie","email":"fournisseur.test@exemple.cm",
-                                 "telephone":"+237690000001","password":"Temp@1234",
+                                {"raisonSociale":"SARL Test","niu":"M000000000001T","telephone":"+237222000001",
+                                 "nomRepresentant":"Essomba","prenomRepresentant":"Marie",
+                                 "email":"fournisseur.test@exemple.cm","telephoneRepresentant":"+237690000001",
+                                 "password":"Temp@1234",
                                  "ribs":["10005 00001 01234567890 12"]}
                                 """))
                 .andExpect(status().isCreated())
@@ -144,6 +145,8 @@ class GbeApplicationTests {
         mockMvc.perform(get("/api/v1/fournisseurs/moi").header("Authorization", fournisseur))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.raisonSociale").value("SARL Test"))
+                .andExpect(jsonPath("$.telephone").value("+237222000001"))
+                .andExpect(jsonPath("$.telephoneRepresentant").value("+237690000001"))
                 .andExpect(jsonPath("$.actif").value(true));
         // Pas d'accès aux routes d'administration
         mockMvc.perform(get("/api/v1/admin/fournisseurs").header("Authorization", fournisseur))

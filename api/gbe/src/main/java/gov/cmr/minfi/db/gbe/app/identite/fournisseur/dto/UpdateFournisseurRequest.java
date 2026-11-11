@@ -8,5 +8,6 @@ public record UpdateFournisseurRequest(
         @NotBlank String raisonSociale,
         @NotBlank @Size(max = 50) String niu,
         @Size(max = 100) String rccm,
-        String adresse
+        String adresse,
+        @NotBlank @Size(max = 30) String telephone
 ) {}

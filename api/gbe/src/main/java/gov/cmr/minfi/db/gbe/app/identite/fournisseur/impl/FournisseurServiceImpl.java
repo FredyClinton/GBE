@@ -50,7 +50,7 @@ public class FournisseurServiceImpl implements FournisseurService {
         if (userRepository.existsByEmailIgnoreCase(request.email())) {
             throw new BusinessException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
-        if (userRepository.existsByPhoneNumberIgnoreCase(request.telephone())) {
+        if (userRepository.existsByPhoneNumberIgnoreCase(request.telephoneRepresentant())) {
             throw new BusinessException(ErrorCode.PHONE_NUMBER_ALREADY_EXISTS);
         }
         final String nomRole = "ROLE_" + RoleSysteme.FOURNISSEUR.name();
@@ -63,7 +63,7 @@ public class FournisseurServiceImpl implements FournisseurService {
                 .role(role)
                 .firstName(request.prenomRepresentant())
                 .lastName(request.nomRepresentant())
-                .phoneNumber(request.telephone())
+                .phoneNumber(request.telephoneRepresentant())
                 .nui(niu)
                 .enabled(true)
                 .locked(false)
@@ -80,6 +80,7 @@ public class FournisseurServiceImpl implements FournisseurService {
                 .niu(niu)
                 .rccm(request.rccm())
                 .adresse(request.adresse())
+                .telephone(request.telephone())
                 .user(user)
                 .build();
         if (request.ribs() != null) {
@@ -114,6 +115,7 @@ public class FournisseurServiceImpl implements FournisseurService {
         fournisseur.setNiu(niu);
         fournisseur.setRccm(request.rccm());
         fournisseur.setAdresse(request.adresse());
+        fournisseur.setTelephone(request.telephone());
         fournisseur.getUser().setNui(niu);
         log.info("Fournisseur modifié : {}", fournisseurId);
         return fournisseurMapper.toResponse(fournisseur);

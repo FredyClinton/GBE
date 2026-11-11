@@ -16,12 +16,14 @@ public record CreateFournisseurRequest(
         @NotBlank @Size(max = 50) String niu,
         @Size(max = 100) String rccm,
         String adresse,
+        @NotBlank @Size(max = 30) @Schema(description = "Téléphone de l'entreprise") String telephone,
 
         // ── Compte de connexion (représentant) ────────────
         @NotBlank String nomRepresentant,
         @NotBlank String prenomRepresentant,
         @NotBlank @Email String email,
-        @NotBlank String telephone,
+        @NotBlank @Schema(description = "Téléphone du représentant (identifiant de son compte, unique)")
+        String telephoneRepresentant,
 
         @NotBlank
         @Size(min = 8, max = 72)

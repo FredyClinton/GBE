@@ -48,7 +48,7 @@ class FournisseurServiceImplTest {
 
     private static CreateFournisseurRequest requete(List<String> ribs) {
         return new CreateFournisseurRequest("SARL Exemple", " M012345678901A ", "RC/YAO/2020/B/1", "Yaoundé",
-                "Mbarga", "Paul", "contact@exemple.cm", "+237699000000", "Temp@1234", ribs);
+                "+237222000000", "Mbarga", "Paul", "contact@exemple.cm", "+237699000000", "Temp@1234", ribs);
     }
 
     private static ErrorCode code(Runnable r) {
@@ -79,10 +79,12 @@ class FournisseurServiceImplTest {
         assertThat(user.getValue().isEnabled()).isTrue();
         assertThat(user.getValue().getAgent()).isNull();
         assertThat(user.getValue().getLastName()).isEqualTo("Mbarga");
+        assertThat(user.getValue().getPhoneNumber()).isEqualTo("+237699000000");
 
         final ArgumentCaptor<Fournisseur> f = ArgumentCaptor.forClass(Fournisseur.class);
         verify(fournisseurRepository).save(f.capture());
         assertThat(f.getValue().getNiu()).isEqualTo("M012345678901A");
+        assertThat(f.getValue().getTelephone()).isEqualTo("+237222000000");
         assertThat(f.getValue().getUser()).isSameAs(user.getValue());
         assertThat(f.getValue().getCoordonneesBancaires())
                 .extracting(c -> c.getRib()).containsExactly("10005000010123456789012");
