@@ -1,5 +1,6 @@
 package gov.cmr.minfi.db.gbe.app.depense.besoin;
 
+import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.BesoinOuvertResponse;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.ExpressionBesoinResponse;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.LigneBesoinResponse;
 import org.mapstruct.Mapper;
@@ -35,6 +36,20 @@ public interface ExpressionBesoinMapper {
     @Mapping(target = "natureEconomiqueLibelle", ignore = true)
     @Mapping(target = "lignes", ignore = true)
     ExpressionBesoinResponse toResume(ExpressionBesoin besoin);
+
+    @Mapping(target = "sectionLibelle", source = "section.libelleFr")
+    @Mapping(target = "structureEmettrice", source = "chapitre.libelleFr")
+    @Mapping(target = "natureEconomiqueCode", source = "natureEconomique.code")
+    @Mapping(target = "natureEconomiqueLibelle", source = "natureEconomique.libelleFr")
+    BesoinOuvertResponse toBesoinOuvert(ExpressionBesoin besoin);
+
+    /** Pour les listes publiques : sans les lignes. */
+    @Mapping(target = "sectionLibelle", source = "section.libelleFr")
+    @Mapping(target = "structureEmettrice", source = "chapitre.libelleFr")
+    @Mapping(target = "natureEconomiqueCode", source = "natureEconomique.code")
+    @Mapping(target = "natureEconomiqueLibelle", source = "natureEconomique.libelleFr")
+    @Mapping(target = "lignes", ignore = true)
+    BesoinOuvertResponse toBesoinOuvertResume(ExpressionBesoin besoin);
 
     @Mapping(target = "matiereId", source = "matiere.id")
     @Mapping(target = "matiereReference", source = "matiere.reference")

@@ -47,7 +47,7 @@ Lombok · MapStruct · SpringDoc OpenAPI · TOTP (`dev.samstevens.totp`) · Test
 | `identite/iam/`         | `RoleSysteme` enum (with default permissions), `Permission` enum, `Role` entity         |
 | `referentiel/`          | Master data, one sub-package per domain: `exercice`, `administratif` (Section, Chapitre), `programmatique` (Programme → Action → Activite → Tache; an activité/tâche copies programme, section and exercice from its parent, never from the request; a parent with children cannot be deleted), `economique` (NatureEconomique), `matiere` (plain catalogue: reference + libelle, deliberately not linked to NatureEconomique; read under `/api/v1/referentiel/matieres`, CRUD under `/api/v1/admin/matieres`), `fonctionnel`. `ReferentielMapper` is shared. |
 | `budget/credit/`        | `CreditBudgetaire` — core budget entity and its state machine                           |
-| `depense/besoin/`       | `ExpressionBesoin` + `LigneBesoin` (UC01) under `/api/v1/besoins`: no price, attached to a Tache (exercice/section/programme copied), a Chapitre of the same section and a NatureEconomique; state machine in the entity; soft delete via `@SQLRestriction("supprime = false")` |
+| `depense/besoin/`       | `ExpressionBesoin` + `LigneBesoin` (UC01) under `/api/v1/besoins` (paginated list, filtered by mandate scope in SQL); public read-only consultation of open needs (UC02) under `/api/v1/public/besoins`; no price, attached to a Tache (exercice/section/programme copied), a Chapitre of the same section and a NatureEconomique; state machine in the entity; soft delete via `@SQLRestriction("supprime = false")` |
 | `admin/`                | Admin-only endpoints (user creation, role listing)                                      |
 | `common/`               | `BaseEntity` auditing, `BusinessException`/`ErrorCode`, `ApplicationExceptionHandler`, configs (CORS + beans in `BeansConfig`, incl. a `Clock` to inject for business dates), `reference/ReferenceGenerator` (atomic `PREFIX-YEAR-00001` numbering) |
 
@@ -111,7 +111,15 @@ Covered by `CreditBudgetaireTest`. Keep it in sync when adding transitions.
   `JWT_PRIVATE_KEY_PATH` / `JWT_PUBLIC_KEY_PATH`.
 - CORS: `app.cors.allowed-origins` (comma-separated, no trailing `/`), wired into Spring Security via `.cors()` so
   preflight requests pass before authentication.
-- Public routes: `/api/v1/auth/**` and Swagger (`PUBLIC_URLS` in `SecurityConfig`).
+- Public routes: `/api/v1/auth/**` and Swagger (`PUBLIC_URLS` in `SecurityConfig`), plus **GET only** on
+  `/api/v1/public/**` (`PUBLIC_GET_URLS`).
+
+### Pagination
+
+Lists that can grow return `common/pagination/PageResponse` (`content`, `page` from 0, `size`, `totalElements`,
+`totalPages`), never Spring's `Page` JSON. Query params `page`, `size` (default 20, capped at 100 in `application.yaml`),
+`sort=prop,asc|desc`; services restrict sortable properties with `Tris.verifier` (else 400 `TRI_INVALIDE`). Mandate
+scope must be applied in the query (`MandatScopeValidator.perimetreCourant()` → `Perimetre`), not by filtering a page.
 
 ### Database (Flyway)
 

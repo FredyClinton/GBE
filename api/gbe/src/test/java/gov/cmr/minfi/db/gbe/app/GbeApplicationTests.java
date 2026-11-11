@@ -276,19 +276,49 @@ class GbeApplicationTests {
                 .andExpect(jsonPath("$.code").value("BESOIN_CLOTURE_PREMATUREE"));
 
         // Lecture : dans le périmètre oui, ailleurs non
-        mockMvc.perform(get("/api/v1/besoins").param("statut", "PUBLIEE").header("Authorization", ordo))
+        mockMvc.perform(get("/api/v1/besoins").param("statut", "PUBLIEE").param("size", "5")
+                        .header("Authorization", ordo))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[?(@.id == '%s')]".formatted(besoinId)).exists());
+                .andExpect(jsonPath("$.content[?(@.id == '%s')]".formatted(besoinId)).exists())
+                .andExpect(jsonPath("$.size").value(5))
+                .andExpect(jsonPath("$.totalElements").value(1));
         mockMvc.perform(get("/api/v1/besoins").header("Authorization", horsPerimetre))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[?(@.id == '%s')]".formatted(besoinId)).doesNotExist());
+                .andExpect(jsonPath("$.totalElements").value(0));
+        mockMvc.perform(get("/api/v1/besoins").param("sort", "objet,asc").header("Authorization", ordo))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("TRI_INVALIDE"));
         mockMvc.perform(get("/api/v1/besoins/{id}", besoinId).header("Authorization", horsPerimetre))
+                .andExpect(status().isForbidden());
+
+        // Consultation publique (UC02) : sans jeton, recherche par mot-clé sur les matières
+        mockMvc.perform(get("/api/v1/public/besoins").param("motCle", "PAPIER A4").param("size", "500"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[?(@.id == '%s')]".formatted(besoinId)).exists())
+                .andExpect(jsonPath("$.content[0].tacheId").doesNotExist())
+                .andExpect(jsonPath("$.content[0].lignes").doesNotExist())
+                .andExpect(jsonPath("$.size").value(100));
+        mockMvc.perform(get("/api/v1/public/besoins").param("motCle", "introuvable-xyz"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(0));
+        mockMvc.perform(get("/api/v1/public/besoins").param("dateLimiteAvant", "2098-12-31T00:00:00"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[?(@.id == '%s')]".formatted(besoinId)).doesNotExist());
+        mockMvc.perform(get("/api/v1/public/besoins/{id}", besoinId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.reference").value(org.hamcrest.Matchers.startsWith("EB-2026-")))
+                .andExpect(jsonPath("$.structureEmettrice").isNotEmpty())
+                .andExpect(jsonPath("$.lignes[0].matiereLibelle").value("Papier A4"));
+        // La consultation publique est en lecture seule
+        mockMvc.perform(post("/api/v1/public/besoins").contentType(MediaType.APPLICATION_JSON).content("{}"))
                 .andExpect(status().isForbidden());
 
         // Brouillon supprimé logiquement : il disparaît mais reste en base
         final String brouillonId = champ(mockMvc.perform(post("/api/v1/besoins").header("Authorization", ordo)
                         .contentType(MediaType.APPLICATION_JSON).content(corps))
                 .andExpect(status().isCreated()).andReturn(), "$.id");
+        // Un brouillon n'est pas visible du public
+        mockMvc.perform(get("/api/v1/public/besoins/{id}", brouillonId)).andExpect(status().isNotFound());
         mockMvc.perform(delete("/api/v1/besoins/{id}", brouillonId).header("Authorization", ordo))
                 .andExpect(status().isNoContent());
         mockMvc.perform(get("/api/v1/besoins/{id}", brouillonId).header("Authorization", ordo))

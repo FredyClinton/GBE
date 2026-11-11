@@ -3,6 +3,7 @@ package gov.cmr.minfi.db.gbe.app.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -35,6 +36,10 @@ public class SecurityConfig {
             "/webjars/**",
             "/swagger-ui.html",
     };
+    /** Routes publiques en lecture seule (GET uniquement). */
+    private static final String[] PUBLIC_GET_URLS = {
+            "/api/v1/public/**",
+    };
     private final JwtFilter jwtFilter;
 
     @Bean
@@ -47,6 +52,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth.requestMatchers(
                                         PUBLIC_URLS
                                 )
+                                .permitAll()
+                                // Consultation publique (besoins ouverts, UC02) : lecture seule, sans compte
+                                .requestMatchers(HttpMethod.GET, PUBLIC_GET_URLS)
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()

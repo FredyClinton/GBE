@@ -12,8 +12,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
-import java.util.function.BiPredicate;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -54,13 +54,32 @@ public class MandatScopeValidator {
     }
 
     /**
-     * Périmètre de l'utilisateur connecté, calculé une seule fois, pour filtrer une liste :
-     * {@code perimetre.test(sectionId, programmeId)}.
+     * Périmètre de l'utilisateur connecté (mandats valides), pour filtrer une requête en base :
+     * sections entières (mandat MINISTRE sans programme) et programmes couverts.
      */
-    public BiPredicate<String, String> perimetreCourant() {
-        final List<Mandat> mandats = mandatsValidesDeUtilisateurCourant();
-        return (sectionId, programmeId) -> mandats.stream()
-                .anyMatch(m -> mandatCorrespondAuCredit(m, sectionId, programmeId));
+    public Perimetre perimetreCourant() {
+        final Set<String> sections = new HashSet<>();
+        final Set<String> programmes = new HashSet<>();
+        for (Mandat mandat : mandatsValidesDeUtilisateurCourant()) {
+            if (mandat.getRoleSysteme() == RoleSysteme.MINISTRE && mandat.getProgramme() == null) {
+                sections.add(mandat.getSection().getId());
+            } else if (mandat.getProgramme() != null) {
+                programmes.add(mandat.getProgramme().getId());
+            }
+        }
+        return new Perimetre(sections, programmes);
+    }
+
+    /** Sections couvertes entièrement et programmes couverts ; même règle que {@link #checkAccessPerimetre}. */
+    public record Perimetre(Set<String> sectionsEntieres, Set<String> programmes) {
+
+        public boolean isVide() {
+            return sectionsEntieres.isEmpty() && programmes.isEmpty();
+        }
+
+        public boolean contient(String sectionId, String programmeId) {
+            return sectionsEntieres.contains(sectionId) || programmes.contains(programmeId);
+        }
     }
 
     /**

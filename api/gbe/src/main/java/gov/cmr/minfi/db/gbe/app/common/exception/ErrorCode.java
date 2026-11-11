@@ -108,6 +108,7 @@ public enum ErrorCode {
             "Les soumissions ne peuvent être clôturées qu'après la date limite (%s)", BAD_REQUEST),
     BESOIN_CHAPITRE_HORS_SECTION("BESOIN_CHAPITRE_HORS_SECTION",
             "Le chapitre %s n'appartient pas à la section de la tâche", BAD_REQUEST),
+    TRI_INVALIDE("TRI_INVALIDE", "Tri impossible sur « %s » ; propriétés autorisées : %s", BAD_REQUEST),
     MATIERE_NOT_FOUND("MATIERE_NOT_FOUND", "Matière introuvable : %s", NOT_FOUND),
     MATIERE_ALREADY_EXISTS("MATIERE_ALREADY_EXISTS", "Une matière de référence %s existe déjà", BAD_REQUEST),
     MANDAT_ALREADY_EXISTS(

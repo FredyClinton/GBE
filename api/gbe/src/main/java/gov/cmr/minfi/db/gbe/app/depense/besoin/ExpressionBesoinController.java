@@ -10,7 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import gov.cmr.minfi.db.gbe.app.common.pagination.PageResponse;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Expressions de besoin côté administration (UC01). Le périmètre des mandats est contrôlé dans le service.
@@ -31,14 +33,19 @@ public class ExpressionBesoinController {
         return besoinService.creer(request);
     }
 
+    /**
+     * Besoins du périmètre de l'utilisateur, paginés : {@code ?page=0&size=20&sort=datePublication,desc}.
+     * Tri possible sur reference (défaut, décroissant), dateExpression, datePublication, dateClotureSoumission, statut.
+     */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<ExpressionBesoinResponse> rechercher(
+    public PageResponse<ExpressionBesoinResponse> rechercher(
             @RequestParam(required = false) String exerciceId,
             @RequestParam(required = false) String sectionId,
             @RequestParam(required = false) String programmeId,
-            @RequestParam(required = false) StatutExpression statut) {
-        return besoinService.rechercher(exerciceId, sectionId, programmeId, statut);
+            @RequestParam(required = false) StatutExpression statut,
+            @ParameterObject Pageable pageable) {
+        return besoinService.rechercher(exerciceId, sectionId, programmeId, statut, pageable);
     }
 
     @GetMapping("/{besoinId}")

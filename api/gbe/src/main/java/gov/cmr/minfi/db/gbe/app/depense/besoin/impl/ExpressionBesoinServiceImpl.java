@@ -2,6 +2,8 @@ package gov.cmr.minfi.db.gbe.app.depense.besoin.impl;
 
 import gov.cmr.minfi.db.gbe.app.common.exception.BusinessException;
 import gov.cmr.minfi.db.gbe.app.common.exception.ErrorCode;
+import gov.cmr.minfi.db.gbe.app.common.pagination.PageResponse;
+import gov.cmr.minfi.db.gbe.app.common.pagination.Tris;
 import gov.cmr.minfi.db.gbe.app.common.reference.ReferenceGenerator;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.ExpressionBesoin;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.ExpressionBesoinMapper;
@@ -14,6 +16,7 @@ import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.ExpressionBesoinResponse;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.LigneBesoinRequest;
 import gov.cmr.minfi.db.gbe.app.identite.iam.permission.Permission;
 import gov.cmr.minfi.db.gbe.app.identite.mandat.MandatScopeValidator;
+import gov.cmr.minfi.db.gbe.app.identite.mandat.MandatScopeValidator.Perimetre;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.Chapitre;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.ChapitreRepository;
 import gov.cmr.minfi.db.gbe.app.referentiel.economique.NatureEconomique;
@@ -24,6 +27,9 @@ import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.Tache;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.TacheRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +37,7 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.function.BiPredicate;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -40,6 +46,9 @@ import java.util.function.BiPredicate;
 public class ExpressionBesoinServiceImpl implements ExpressionBesoinService {
 
     static final String PREFIXE_REFERENCE = "EB";
+    static final Set<String> TRIS_AUTORISES =
+            Set.of("reference", "dateExpression", "datePublication", "dateClotureSoumission", "statut");
+    private static final String AUCUN_ID = "-";
 
     private final ExpressionBesoinRepository besoinRepository;
     private final TacheRepository tacheRepository;
@@ -123,13 +132,21 @@ public class ExpressionBesoinServiceImpl implements ExpressionBesoinService {
     }
 
     @Override
-    public List<ExpressionBesoinResponse> rechercher(String exerciceId, String sectionId, String programmeId,
-                                                     StatutExpression statut) {
-        final BiPredicate<String, String> perimetre = mandatScopeValidator.perimetreCourant();
-        return besoinRepository.rechercher(exerciceId, sectionId, programmeId, statut).stream()
-                .filter(b -> perimetre.test(b.getSection().getId(), b.getProgramme().getId()))
-                .map(besoinMapper::toResume)
-                .toList();
+    public PageResponse<ExpressionBesoinResponse> rechercher(String exerciceId, String sectionId, String programmeId,
+                                                             StatutExpression statut, Pageable pageable) {
+        final Perimetre perimetre = mandatScopeValidator.perimetreCourant();
+        final Pageable page = Tris.verifier(pageable, TRIS_AUTORISES, Sort.by(Sort.Direction.DESC, "reference"));
+        if (perimetre.isVide()) {
+            return PageResponse.of(Page.empty(page), besoinMapper::toResume);
+        }
+        return PageResponse.of(besoinRepository.rechercherDansPerimetre(
+                nonVide(perimetre.sectionsEntieres()), nonVide(perimetre.programmes()),
+                exerciceId, sectionId, programmeId, statut, page), besoinMapper::toResume);
+    }
+
+    /** JPQL n'accepte pas « IN () » : une valeur qui ne correspond à aucun id remplace l'ensemble vide. */
+    private static Set<String> nonVide(Set<String> ids) {
+        return ids.isEmpty() ? Set.of(AUCUN_ID) : ids;
     }
 
     // ── Interne ───────────────────────────────────────

@@ -4,7 +4,8 @@ import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.AnnulationBesoinRequest;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.ExpressionBesoinRequest;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.ExpressionBesoinResponse;
 
-import java.util.List;
+import gov.cmr.minfi.db.gbe.app.common.pagination.PageResponse;
+import org.springframework.data.domain.Pageable;
 
 public interface ExpressionBesoinService {
 
@@ -22,7 +23,7 @@ public interface ExpressionBesoinService {
 
     ExpressionBesoinResponse getBesoin(String besoinId);
 
-    /** Besoins du périmètre de l'utilisateur connecté ; filtres facultatifs. */
-    List<ExpressionBesoinResponse> rechercher(String exerciceId, String sectionId, String programmeId,
-                                              StatutExpression statut);
+    /** Besoins du périmètre de l'utilisateur connecté, paginés ; filtres facultatifs. */
+    PageResponse<ExpressionBesoinResponse> rechercher(String exerciceId, String sectionId, String programmeId,
+                                                      StatutExpression statut, Pageable pageable);
 }
