@@ -234,6 +234,29 @@ Lu le 2026-11-11. Il complète le rapport sur plusieurs points :
 - **Proposition :** **ne pas ajouter de champ** ; s'appuyer d'abord sur la nature économique du besoin. N'introduire un vrai « type de besoin » que si elle ne suffit pas, et **d'abord dans le drawio**. Calcul par **stratégie** (même principe que `FormeActeStrategie`), avec des paramètres en table plutôt que dans le code.
 - **Préparation dès 1e :** le calcul du TTC d'une offre passe par une seule interface (`CalculTaxe`), qui reçoit le besoin (donc sa nature), pour pouvoir brancher plus tard une méthode par type de besoin sans toucher au reste du code. En attendant, le comportement provisoire est celui du modèle : le fournisseur saisit le TTC, et le serveur vérifie seulement que TTC ≥ HT.
 
+### 4.5 Lot 2 — découpage proposé (2026-11-11, en attente des réponses Q13–Q22)
+
+Sources relues : fiches UC04–UC08 et fiches objet (`ActeJuridique`, `Credit`, `QuitusNatureEconomique`, `Visa`) du
+rapport, section 9 ; drawio, onglets 1, 2, 3 et 4 (deux copies).
+
+| Étape | Contenu | Source | Dépend de |
+|---|---|---|---|
+| **2a** | **Attribution** : saisie du résultat de la commission (Q4), `EN_EVALUATION → ATTRIBUEE` (`retenirSoumission`) ou `→ INFRUCTUEUSE` (`infructueux()`, « déclarer sans suite ») ; offre retenue `RETENUE`, les autres `NON_RETENUE` ; consultation des offres par l'ordonnateur | onglet 2, onglet 3 (« Évaluer les offres », « Offre valide ? »), Q4 | 1e |
+| **2b** | **Projet d'acte** (UC04) : `ActeJuridique` créé par `ActeJuridiqueFactory` à partir du besoin et de l'offre retenue ; `TypeActe` et une `FormeActeStrategie` par type (BCA, LC, marché, bail) ; forme minimale proposée, forme inférieure refusée (Q3) ; table des seuils (vide → choix libre) ; `PROJET` modifiable → `SOUMIS_CONTROLE` (plus modifiable) | UC04, onglet 4 (factory, stratégies), onglet 1 (`type : TypeActe`), §9 « forme de l'acte » | 2a |
+| **2c** | **Contrôle CF** (UC06 « include » UC07, UC08) : une seule décision transactionnelle (Q1) ; `Visa` (`ENGAGEMENT_JURIDIQUE`) ; si favorable : quitus + `ReservationCredit` + `consommerAE` sur la ligne + acte `VISE_CF` ; sinon rien n'est réservé (Q2) et le dossier revient à l'ordonnateur | UC06–UC08, onglet 2 (`viser`, `rejeter(motif)`), onglet 3 (« refus / rejet » → préparer le projet d'acte), onglet 4 (`Visa`, `ReservationCredit`) | 2b |
+| **2d** | **Signature et notification** (UC05) : `VISE_CF → SIGNE_ORDONNATEUR` (validation tracée : signataire, date, Q6) puis `NOTIFIE_PRESTATAIRE` ; le fournisseur voit l'acte dans son espace ; annulation d'un acte visé ou signé avec `libererAE` (Q2) | UC05, onglet 2 (`signer`, `notifierFournisseur`), onglet 3 (« Notifier le BCA signé ») | 2c |
+
+**Écarts relevés dans la conception (à trancher, voir Q13–Q22) :**
+- `ActeJuridique → ReservationCredit` est en **0..1** (onglets 1 et 4) alors que la fiche objet dit « adossé à **1..*** crédits ». Proposition : une seule réservation, sur une seule ligne.
+- `ReservationCredit` n'est **relié à aucune ligne de crédit** dans les diagrammes. Il faut ajouter `ReservationCredit → CreditBudgetaire`.
+- **Imputation :** UC04 dit que l'ordonnateur « renseigne l'imputation budgétaire prévisionnelle ». Or le besoin porte déjà l'exercice, la section, le programme, la tâche (donc l'action), le chapitre et la nature, c'est-à-dire exactement la clé `uk_credit_imputation`. Proposition : la ligne de crédit est **déduite** du besoin.
+- **Quitus :** la fiche objet `QuitusNatureEconomique` (date, code nomenclature, justification, statut) n'existe pas dans l'onglet 4, où seul `Visa.referenceQuitus` le représente. L'onglet 4 relie aussi `Matiere → NatureEconomique` (« classé dans (quitus CF) »), lien écarté au lot 0 : le quitus porte donc sur la **nature du besoin**.
+- **`StatutVisa.SUSPENDU_RESERVES`** contre la fiche objet `Visa` : « favorable **avec réserves** ».
+- **`StatutActe.REJETE`** contre l'onglet 2 et l'onglet 3, où un rejet **renvoie le dossier** à la préparation du projet d'acte (`rejeter(motif)` → `ATTRIBUEE`).
+- **`StatutSoumission`** prévoit `RECEVABLE`, `EN_EXAMEN` et `REJETEE`, mais l'évaluation se fait en commission externe (Q4).
+- **Signature :** l'onglet 2 a un seul état `SIGNE_ENGAGE`, et `StatutActe` en a deux (`SIGNE_ORDONNATEUR`, `NOTIFIE_PRESTATAIRE`). UC05 notifie « immédiatement ».
+- Les **documents** (`genererModele`, `imprimerBCA`, code-barres et QR code) supposent le stockage de fichiers, prévu au lot 3.
+
 ---
 
 ## 5. Questions ouvertes
@@ -248,6 +271,21 @@ Elles bloquent les lots 1 et 2. Les hypothèses s'appliquent tant qu'il n'y a pa
 | Q4 | Évaluation des offres **dans l'application**, ou seul le résultat d'une commission externe est saisi ? | seul le résultat est saisi | **Décidé (2026-11-11)** : commission externe, seul le résultat (offre retenue, PV de commission) est saisi. |
 | Q5 | Fournisseurs : **auto-inscription** ou création par l'admin ? | création par l'admin | **Décidé (2026-11-11)** : création par l'admin. |
 | Q6 | Signature : validation tracée (qui, quand) ou téléversement d'un document signé ? | validation tracée | **Décidé (2026-11-11)** : validation tracée (utilisateur, date). |
+
+**Questions du lot 2** (hypothèse par défaut entre parenthèses) :
+
+| # | Question | Hypothèse | Décision |
+|---|---|---|---|
+| Q13 | Attribution : que saisit-on du résultat de la commission ? | offre retenue, référence et date du PV de commission (texte, le fichier viendra au lot 3) ; les autres offres passent `NON_RETENUE` ; `RECEVABLE`, `EN_EXAMEN` et `REJETEE` ne sont pas utilisés pour l'instant | — |
+| Q14 | Quand l'ordonnateur peut-il voir les offres ? | seulement après la clôture (`EN_EVALUATION`) | — |
+| Q15 | Que deviennent les offres d'un besoin annulé ou infructueux ? | elles restent `DEPOSEE`, figées ; le fournisseur voit le statut du besoin | — |
+| Q16 | Les fournisseurs non retenus sont-ils informés dans l'application (§9) ? | oui, par le statut `NON_RETENUE` de leur offre | — |
+| Q17 | Quel montant réserver sur les AE, et que vaut `montantNetAPayer` au lot 2 ? | le TTC de l'acte (donc de l'offre retenue) ; net à payer = TTC, les retenues viennent au lot 4 | — |
+| Q18 | Sens des trois décisions du CF : `FAVORABLE`, `DEFAVORABLE_REJET`, `SUSPENDU_RESERVES` ; à quoi sert `StatutActe.REJETE` ? | rejet → l'acte revient en `PROJET` (corrigeable, comme dans les onglets 2 et 3) ; réserves → l'acte reste `SOUMIS_CONTROLE` en attente de compléments ; `REJETE` n'est pas utilisé | — |
+| Q19 | Quitus : objet à part (fiche `QuitusNatureEconomique`) ou porté par le visa (onglet 4, `referenceQuitus`) ? | porté par le visa | — |
+| Q20 | Notification : automatique à la signature (UC05) et visible dans l'espace du fournisseur ? | oui : signature puis `NOTIFIE_PRESTATAIRE` dans la même opération, et le fournisseur consulte ses actes | — |
+| Q21 | Champs propres à chaque forme (référence du devis, n° d'appel d'offres, lot, retenue de garantie, pénalités, dates et loyer du bail) et documents générés | champs facultatifs saisis au lot 2 ; documents (BCA imprimé, modèle) au lot 3, avec le stockage de fichiers | — |
+| Q22 | Imputation : ligne de crédit déduite du besoin, ou choisie par l'ordonnateur ? | déduite du besoin ; soumission au CF refusée si la ligne n'existe pas | — |
 
 Autres questions du rapport (section 9), pour les lots 3 et 4 : livraisons partielles et paiements partiels, procédure en cas de non-conformité, liste des pièces justificatives obligatoires, rôle exact du comptable public (prise en charge, rejet, statut de paiement), limite du suivi fournisseur.
 
@@ -279,3 +317,4 @@ Point à part : le mandat MINISTRE (section MINFI) n'a aucune permission en base
 | 2026-11-11 | Documentation Swagger de tous les contrôleurs (`@Operation`, `@ApiResponses`, `@Parameter`) et regroupement des tags : Authentification, Mon compte, Administration · …, Référentiel · … (consultation et administration ensemble), Budget, Dépense · …, Espace fournisseur. Test de non-régression sur `/v3/api-docs`. |
 | 2026-11-11 | Tous les contrôleurs retournent `ResponseEntity` (corps JSON inchangé). Renouvellement de jeton : 401 `REFRESH_TOKEN_INVALIDE` au lieu de 500 (jeton invalide, expiré, d'un autre type, ou compte inactif), 400 si absent. |
 | 2026-11-11 | Sécurité, corrigé avant le lot 2 : le filtre JWT n'accepte plus que les jetons d'accès (un jeton MFA contournait la double authentification, un jeton de rafraîchissement servait de jeton d'accès). Un jeton invalide rend la requête anonyme (403 sur route protégée) au lieu d'une exception non gérée. |
+| 2026-11-11 | Lot 2 : conception relue (UC04–UC08, fiches objet, §9, onglets 1–4). Découpage 2a–2d proposé (§4.5), écarts relevés, questions Q13–Q22 ouvertes. |
