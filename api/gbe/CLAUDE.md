@@ -118,6 +118,10 @@ Covered by `CreditBudgetaireTest`. Keep it in sync when adding transitions.
 - `POST /auth/refresh` (`JwtService.extraireSujetRefreshToken`): returns a new access token and the same refresh token.
   A malformed, expired or wrong-type token (access/MFA), or an account deleted, disabled or locked since login, gives
   401 `REFRESH_TOKEN_INVALIDE`; a missing token gives 400.
+- `JwtFilter` authenticates **only access tokens** (`JwtService.extraireSujetAccessToken` checks signature, expiry and
+  `token_type = ACCES_TOKEN`): an MFA token (password only, no TOTP) or a refresh token never opens the API. An invalid
+  token or a deleted account leaves the request anonymous (protected route → 403 as without a token, public routes
+  still work); never throw from the filter.
 
 ### Configuration and profiles
 

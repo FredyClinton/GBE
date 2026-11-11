@@ -125,6 +125,25 @@ class GbeApplicationTests {
                 .andExpect(status().isBadRequest());
     }
 
+    /**
+     * Seul un jeton d'accès authentifie : un jeton MFA (mot de passe seul, sans TOTP) ou de rafraîchissement ne doit
+     * pas ouvrir l'API. Un jeton invalide rend la requête anonyme : refus comme sans jeton, routes publiques intactes.
+     */
+    @Test
+    void filtreJwt_nAccepteQueLesJetonsDAcces() throws Exception {
+        final String route = "/api/v1/referentiel/sections";
+        mockMvc.perform(get(route).header("Authorization", "Bearer " + jwtService.generateAccessToken("admin@gbe.cm")))
+                .andExpect(status().isOk());
+        for (String refuse : List.of(jwtService.generateMfaToken("admin@gbe.cm"),
+                jwtService.generateRefreshToken("admin@gbe.cm"), "pas-un-jwt",
+                jwtService.generateAccessToken("inconnu@gbe.cm"))) {
+            mockMvc.perform(get(route).header("Authorization", "Bearer " + refuse))
+                    .andExpect(status().isForbidden());
+        }
+        mockMvc.perform(get("/api/v1/public/besoins").header("Authorization", "Bearer pas-un-jwt"))
+                .andExpect(status().isOk());
+    }
+
     @Test
     void migrationsAppliquees_referentielEtRolesCharges() {
         assertThat(sectionRepository.count()).isGreaterThan(1);

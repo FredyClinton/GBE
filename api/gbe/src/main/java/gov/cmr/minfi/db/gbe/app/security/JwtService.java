@@ -15,6 +15,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Getter
@@ -22,6 +23,7 @@ import java.util.Map;
 public class JwtService {
 
     private static final String TOKEN_TYPE = "token_type";
+    private static final String ACCESS_TOKEN_TYPE = "ACCES_TOKEN";
     private static final String MFA_TOKEN_TYPE = "MFA_TOKEN";
     private static final String REFRESH_TOKEN_TYPE = "REFRESH_TOKEN";
     private final PrivateKey privateKey;
@@ -46,7 +48,7 @@ public class JwtService {
     }
 
     public String generateAccessToken(final String username) {
-        final Map<String, Object> claims = Map.of(TOKEN_TYPE, "ACCES_TOKEN");
+        final Map<String, Object> claims = Map.of(TOKEN_TYPE, ACCESS_TOKEN_TYPE);
         return buildToken(username, claims, this.accesTokenExpiration);
     }
 
@@ -65,9 +67,22 @@ public class JwtService {
                 .compact();
     }
 
-    public boolean isTokenValid(final String token, final String expectedUsername) {
-        final String username = extractUsername(token);
-        return username.equals(expectedUsername) && !isTokenExpired(token);
+    /**
+     * Identifiant (e-mail) porté par un jeton d'accès valide : signature correcte, non expiré (vérifié par le parseur)
+     * et de type accès. Vide pour tout autre jeton, y compris un jeton MFA (obtenu avec le seul mot de passe, il ne
+     * doit pas ouvrir l'API sans le code TOTP) ou un jeton de rafraîchissement.
+     */
+    public Optional<String> extraireSujetAccessToken(final String token) {
+        final Claims claims;
+        try {
+            claims = lireClaims(token);
+        } catch (final JwtException | IllegalArgumentException e) {
+            return Optional.empty();
+        }
+        if (!ACCESS_TOKEN_TYPE.equals(claims.get(TOKEN_TYPE))) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(claims.getSubject());
     }
 
     private boolean isTokenExpired(String token) {
@@ -80,14 +95,19 @@ public class JwtService {
 
     private Claims extractClaims(String token) {
         try {
-            return Jwts.parser()
-                    .verifyWith(this.publicKey)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
+            return lireClaims(token);
         } catch (final JwtException e) {
             throw new RuntimeException("Invalid JWT token", e);
         }
+    }
+
+    /** Vérifie la signature et l'expiration ; lève {@link JwtException} ou {@link IllegalArgumentException} sinon. */
+    private Claims lireClaims(final String token) {
+        return Jwts.parser()
+                .verifyWith(this.publicKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     /**
@@ -98,11 +118,7 @@ public class JwtService {
     public String extraireSujetRefreshToken(final String refreshToken) {
         final Claims claims;
         try {
-            claims = Jwts.parser()
-                    .verifyWith(this.publicKey)
-                    .build()
-                    .parseSignedClaims(refreshToken)
-                    .getPayload();
+            claims = lireClaims(refreshToken);
         } catch (final JwtException | IllegalArgumentException e) {
             throw new BusinessException(ErrorCode.REFRESH_TOKEN_INVALIDE);
         }
