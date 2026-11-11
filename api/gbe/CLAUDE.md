@@ -44,7 +44,7 @@ Lombok · MapStruct · SpringDoc OpenAPI · TOTP (`dev.samstevens.totp`) · Test
 | `identite/agent/`       | Government agent records                                                                |
 | `identite/mandat/`      | User ↔ Section/Programme assignments; `MandatScopeValidator`                            |
 | `identite/iam/`         | `RoleSysteme` enum (with default permissions), `Permission` enum, `Role` entity         |
-| `referentiel/`          | Master data, one sub-package per domain: `exercice`, `administratif` (Section, Chapitre), `programmatique` (Programme, Action), `economique` (NatureEconomique), `matiere` (plain catalogue: reference + libelle, deliberately not linked to NatureEconomique; read under `/api/v1/referentiel/matieres`, CRUD under `/api/v1/admin/matieres`), `fonctionnel`. `ReferentielMapper` is shared. |
+| `referentiel/`          | Master data, one sub-package per domain: `exercice`, `administratif` (Section, Chapitre), `programmatique` (Programme → Action → Activite → Tache; an activité/tâche copies programme, section and exercice from its parent, never from the request; a parent with children cannot be deleted), `economique` (NatureEconomique), `matiere` (plain catalogue: reference + libelle, deliberately not linked to NatureEconomique; read under `/api/v1/referentiel/matieres`, CRUD under `/api/v1/admin/matieres`), `fonctionnel`. `ReferentielMapper` is shared. |
 | `budget/credit/`        | `CreditBudgetaire` — core budget entity and its state machine                           |
 | `admin/`                | Admin-only endpoints (user creation, role listing)                                      |
 | `common/`               | `BaseEntity` auditing, `BusinessException`/`ErrorCode`, `ApplicationExceptionHandler`, configs (CORS + beans in `BeansConfig`) |
@@ -56,7 +56,8 @@ Each module: `Entity`, `XxxRepository`, `XxxService` interface + `impl/XxxServic
 Read-only services are annotated `@Transactional(readOnly = true)`.
 
 Read-only referentiel endpoints are split across several controllers that all share the prefix `/api/v1/referentiel`
-(e.g. `/sections/{id}/programmes` lives in `ProgrammeController`). Action CRUD is separate, under `/api/v1/admin/actions`.
+(e.g. `/sections/{id}/programmes` lives in `ProgrammeController`). Action CRUD is separate, under `/api/v1/admin/actions`;
+same for `/api/v1/admin/activites`, `/api/v1/admin/taches` and `/api/v1/admin/matieres` (all `MANAGE_USERS`).
 
 ### Authorization (two levels)
 
@@ -122,12 +123,14 @@ The schema is owned by Flyway (`src/main/resources/db/migration`); Hibernate onl
   `V9__referentiel_matiere.sql`: table `matieres`.
   `V10__retirer_statuts_engage_solde_credit.sql`: `ENGAGE`/`SOLDE` credits become `DISPONIBLE`; rebuilds
   `credit_budgetaire_statut_check` (same rule as above: a `StatutCredit` change needs a migration).
+  `V11__referentiel_activites_taches.sql`: tables `activites` and `taches` (code unique within the parent).
 - Any entity change needs a new `V<n>__description.sql`. Never edit an applied migration.
 - Pre-Flyway databases get a baseline at version 2 (`baseline-on-migrate`), so only V3+ run on them.
 
 ### Tests
 
-- `CreditBudgetaireTest`, `MandatScopeValidatorTest`: plain unit tests (Mockito, no Spring context).
+- `CreditBudgetaireTest`, `MandatScopeValidatorTest`, `CreditBudgetaireServiceImplTest`, `ActiviteTacheServiceImplTest`:
+  plain unit tests (Mockito, no Spring context). Surefire reports `@Nested` classes under their `@DisplayName` / `$Inner` name.
 - `GbeApplicationTests`: full context on a Testcontainers `postgres:17.9`. It checks the migrations, auth on protected
   routes, CORS preflight and the initial admin login.
 

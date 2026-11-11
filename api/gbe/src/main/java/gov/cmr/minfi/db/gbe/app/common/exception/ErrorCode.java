@@ -77,6 +77,14 @@ public enum ErrorCode {
             "Annulation impossible : %s d'AE et %s de CP sont consommés sur ce crédit",
             BAD_REQUEST
     ),
+    ACTION_A_DES_ACTIVITES("ACTION_A_DES_ACTIVITES",
+            "L'action %s contient des activités : supprimez-les ou déplacez-les d'abord", BAD_REQUEST),
+    ACTIVITE_NOT_FOUND("ACTIVITE_NOT_FOUND", "Activité introuvable : %s", NOT_FOUND),
+    ACTIVITE_ALREADY_EXISTS("ACTIVITE_ALREADY_EXISTS", "Une activité de code %s existe déjà dans cette action", BAD_REQUEST),
+    ACTIVITE_A_DES_TACHES("ACTIVITE_A_DES_TACHES",
+            "L'activité %s contient des tâches : supprimez-les ou déplacez-les d'abord", BAD_REQUEST),
+    TACHE_NOT_FOUND("TACHE_NOT_FOUND", "Tâche introuvable : %s", NOT_FOUND),
+    TACHE_ALREADY_EXISTS("TACHE_ALREADY_EXISTS", "Une tâche de code %s existe déjà dans cette activité", BAD_REQUEST),
     MATIERE_NOT_FOUND("MATIERE_NOT_FOUND", "Matière introuvable : %s", NOT_FOUND),
     MATIERE_ALREADY_EXISTS("MATIERE_ALREADY_EXISTS", "Une matière de référence %s existe déjà", BAD_REQUEST),
     MANDAT_ALREADY_EXISTS(

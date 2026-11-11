@@ -10,6 +10,7 @@ import gov.cmr.minfi.db.gbe.app.referentiel.administratif.SectionRepository;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.Action;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.ActionRepository;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.ActionService;
+import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.ActiviteRepository;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.Programme;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.ProgrammeRepository;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.dto.ActionRequest;
@@ -27,6 +28,7 @@ import java.util.List;
 public class ActionServiceImpl implements ActionService {
 
     private final ActionRepository actionRepository;
+    private final ActiviteRepository activiteRepository;
     private final ProgrammeRepository programmeRepository;
     private final SectionRepository sectionRepository;
     private final ExerciceRepository exerciceRepository;
@@ -118,6 +120,9 @@ public class ActionServiceImpl implements ActionService {
     @Transactional
     public void deleteAction(String actionId) {
         final Action action = findAction(actionId);
+        if (activiteRepository.existsByActionId(actionId)) {
+            throw new BusinessException(ErrorCode.ACTION_A_DES_ACTIVITES, action.getCodeAction());
+        }
         actionRepository.delete(action);
         log.info("Deleted action {}", actionId);
     }

@@ -85,7 +85,7 @@ Chaque lot comprend sa migration, ses tests et ses routes, et peut être livré 
 | Lot | Contenu | UC | État |
 |---|---|---|---|
 | **0** | Rôles `FOURNISSEUR` et `COMPTABLE_MATIERE`, nouvelles permissions, référentiel `Matiere`, refonte du statut des crédits (§2.1), rattachement des natures à l'exercice, permissions par défaut du mandat MINISTRE | — | **livré** (2026-11-11, voir §4.1) |
-| **1** | Référentiels `Activite` et `Tache` (CRUD admin + consultation, migration V11), fournisseurs (création, RIB), expression de besoin rattachée à une tâche, un chapitre, un exercice et une nature économique (brouillon → publiée → clôturée), consultation des besoins ouverts, soumissions | UC01–UC03 | à faire |
+| **1** | (découpage en §4.2) Référentiels `Activite` et `Tache` (CRUD admin + consultation, migration V11), fournisseurs (création, RIB), expression de besoin rattachée à une tâche, un chapitre, un exercice et une nature économique (brouillon → publiée → clôturée), consultation des besoins ouverts, soumissions | UC01–UC03 | en cours (1a livré) |
 | **2** | Évaluation et attribution, projet d'acte et formes, contrôle CF (réservation des AE, quitus, visa ou rejet), signature | UC04–UC08 | à faire |
 | **3** | Stockage de fichiers, livraisons, PV conforme ou non conforme, information de l'ordonnateur | UC09–UC11 | à faire |
 | **4** | Demande de paiement, factures et pièces, validation, liquidation, ordonnancement, visa CF, transmission au Trésor, suivi fournisseur | UC12–UC19 | à faire |
@@ -102,6 +102,51 @@ Chaque lot comprend sa migration, ses tests et ses routes, et peut être livré 
 - **front** : retirer les appels à `engager`/`solder` et les statuts `ENGAGE`/`SOLDE` de l'interface ;
 - lot 1 : le fournisseur n'a pas de mandat, alors que les permissions ne sont chargées que depuis les mandats (`UserServiceImpl.loadUserByUsername`). Il faudra lui attribuer les permissions par défaut de son rôle ;
 - nature économique : portée par l'expression de besoin (lot 1), jamais par la matière. Quand les besoins référenceront les matières, la suppression d'une matière utilisée sera refusée par la clé étrangère ;
+
+### 4.2 Lot 1 — découpage
+
+Chaque étape est commitée séparément, avec sa migration et ses tests.
+
+| Étape | Contenu | Dépend de | État |
+|---|---|---|---|
+| **1a** | Référentiels `Activite` et `Tache` (V11) | — | **livré** (2026-11-11) |
+| **1b** | `Fournisseur` et `CoordonneeBancaire` (V12) : création par l'admin avec un compte `ROLE_FOURNISSEUR`, RIB, permissions par défaut du rôle sans mandat | lot 0 | à faire |
+| **1c** | `ExpressionBesoin` et `LigneBesoin` (V13), UC01 : brouillon, lignes (matière, quantité, spécifications), rattachement tâche / chapitre / exercice / nature, publication, annulation, périmètre du mandat | 1a | à faire |
+| **1d** | Consultation des besoins ouverts (UC02) : besoins publiés non échus, filtres, détail | 1c | à faire |
+| **1e** | `Soumission` et `LigneSoumission` (V14), UC03 : offre totale, choix du RIB, dépôt verrouillé à la date limite, offre non modifiable une fois déposée, récépissé horodaté | 1b, 1d | à faire |
+
+**1a livré :**
+- **Tables `activites` et `taches` :** `code` (unique dans le parent), `sigle`, `libelle`, plus le parent (`action_id` ou `activite_id`). Programme, section et exercice sont recopiés du parent par l'API, et jamais saisis.
+- **Consultation :**
+  - `GET /api/v1/referentiel/actions/{id}/activites`, `/programmes/{id}/activites?exerciceId=`, `/activites/{id}` ;
+  - `GET /api/v1/referentiel/activites/{id}/taches`, `/programmes/{id}/taches?exerciceId=`, `/taches/{id}`.
+- **Gestion :** `POST`, `PUT /{id}` et `DELETE /{id}` sous `/api/v1/admin/activites` et `/api/v1/admin/taches`, avec la permission `MANAGE_USERS`.
+- **Règles :**
+  - déplacer une activité vers une autre action met à jour ses tâches ;
+  - suppression refusée pour une activité qui contient des tâches (`ACTIVITE_A_DES_TACHES`) et pour une action qui contient des activités (`ACTION_A_DES_ACTIVITES`, contrôle ajouté à `ActionServiceImpl`).
+
+**Questions avant 1c–1e** (hypothèse par défaut entre parenthèses) :
+
+| # | Question | Hypothèse | Décision |
+|---|---|---|---|
+| Q7 | Validation du besoin avant publication (fiche objet : Brouillon → Validée → Publiée) ? | non : l'onglet 3 montre une publication directe par l'ordonnateur | — |
+| Q8 | `montantEstime` sur le besoin ? L'onglet 3 parle d'« Estimation », alors que la règle actée dit « aucun prix ». | — | — |
+| Q9 | Consultation des besoins ouverts : publique sans compte (« portail public ») ou fournisseurs connectés ? | fournisseurs connectés | — |
+| Q10 | Pièces justificatives de l'offre au lot 1, ou au lot 3 avec le stockage de fichiers ? | lot 3 | — |
+| Q11 | Une seule offre par fournisseur et par besoin ? Retrait possible avant la date limite ? | oui / oui | — |
+| Q12 | À la date limite : passage automatique à `EN_EVALUATION`, ou action de l'ordonnateur ? | dépôt bloqué automatiquement, passage par l'ordonnateur | — |
+
+### 4.3 Ce que dit le diagramme d'activité (onglet 3)
+
+Lu le 2026-11-11. Il complète le rapport sur plusieurs points :
+- **Besoin :** l'ordonnateur l'exprime (« sélection imputation, matière & estimation ») puis le **publie lui-même**. Le comptable matière n'intervient qu'à la réception.
+- **Soumission :** « offre financière, prix unitaire **& RIB** ». Le fournisseur indique au dépôt le RIB à payer, choisi parmi ses coordonnées bancaires.
+- **Évaluation :** l'ordonnateur retient une offre. Si aucune n'est valide, le besoin est **déclaré sans suite** (`INFRUCTUEUSE`), ce qui clôt le dossier sans engagement.
+- **Contrôle CF :** quitus (classement matière / nature) → réservation des AE → décision. En cas de **refus, le dossier revient à la préparation du projet d'acte**, il n'est pas abandonné. Cohérent avec Q1 et Q2 : validation unique, rien de réservé si refus.
+- **Non-conformité :** PV de non-conformité, puis **reprise de la livraison** (boucle). Cela répond à une question du lot 3.
+- **Liquidation :** faite par **l'ordonnateur** (« vérification pièces & service fait »). Or `LIQUIDER_DEPENSE` est aujourd'hui une permission par défaut du rôle `COMPTABLE`. **Écart à corriger avant le lot 4.**
+- **Visa d'ordonnancement :** le CF contrôle la liquidation et les retenues fiscales (IR), puis transmet au Trésor.
+- **Comptable public :** prise en charge du mandat (contrôle de régularité), virement sur le RIB, puis le fournisseur constate le règlement.
 
 ---
 
@@ -134,3 +179,4 @@ Point à part : le mandat MINISTRE (section MINFI) n'a aucune permission en base
 | 2026-11-11 | `Matiere` simplifiée (V9 réécrite, jamais appliquée) : référence + libellé, sans nature économique, unité, description ni statut. |
 | 2026-11-11 | Lecture de l'onglet 4 du diagramme : `Activite`/`Tache` (Action → Activité → Tâche, `exercice_id` comme `Action`) ajoutées au lot 1 ; le besoin se rattache à une tâche. Pas de lien matière ↔ nature, confirmé. |
 | 2026-11-11 | Lot 0 commité (`2d14474`). Puis : annulation d'un crédit bloquée tant que des AE/CP sont consommés ; `engager`/`solder` et les statuts `ENGAGE`/`SOLDE` retirés (V10). |
+| 2026-11-11 | Lot 1 découpé en 1a–1e. **1a livré** : activités et tâches (V11). Lecture de l'onglet 3 (§4.3) : publication directe, RIB au dépôt, refus du CF renvoyé à la préparation de l'acte, liquidation par l'ordonnateur (écart avec `LIQUIDER_DEPENSE` sur `COMPTABLE`). Questions Q7–Q12 ouvertes. |

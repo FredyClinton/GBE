@@ -9,6 +9,10 @@ import gov.cmr.minfi.db.gbe.app.referentiel.economique.dto.NatureEconomiqueRespo
 import gov.cmr.minfi.db.gbe.app.referentiel.matiere.Matiere;
 import gov.cmr.minfi.db.gbe.app.referentiel.matiere.dto.MatiereResponse;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.Action;
+import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.Activite;
+import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.Tache;
+import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.dto.ActiviteResponse;
+import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.dto.TacheResponse;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.Programme;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.dto.ActionResponse;
 import gov.cmr.minfi.db.gbe.app.referentiel.programmatique.dto.ProgrammeResponse;
@@ -34,4 +38,19 @@ public interface ReferentielMapper {
     ChapitreResponse toChapitreResponse(Chapitre chapitre);
 
     MatiereResponse toMatiereResponse(Matiere matiere);
+
+    @Mapping(target = "actionId", source = "action.id")
+    @Mapping(target = "actionCode", source = "action.codeAction")
+    @Mapping(target = "programmeId", source = "programme.id")
+    @Mapping(target = "sectionId", source = "section.id")
+    @Mapping(target = "exerciceId", source = "exercice.id")
+    ActiviteResponse toActiviteResponse(Activite activite);
+
+    @Mapping(target = "activiteId", source = "activite.id")
+    @Mapping(target = "activiteCode", source = "activite.code")
+    @Mapping(target = "actionId", source = "action.id")
+    @Mapping(target = "programmeId", source = "programme.id")
+    @Mapping(target = "sectionId", source = "section.id")
+    @Mapping(target = "exerciceId", source = "exercice.id")
+    TacheResponse toTacheResponse(Tache tache);
 }
