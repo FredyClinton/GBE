@@ -190,6 +190,19 @@ Lu le 2026-11-11. Il complète le rapport sur plusieurs points :
 - **Visa d'ordonnancement :** le CF contrôle la liquidation et les retenues fiscales (IR), puis transmet au Trésor.
 - **Comptable public :** prise en charge du mandat (contrôle de régularité), virement sur le RIB, puis le fournisseur constate le règlement.
 
+### 4.4 Évolutions prévues
+
+**Méthodes de calcul des taxes selon le type de besoin** (demandé le 2026-11-11, à faire plus tard)
+
+- **Besoin :** le calcul des taxes (TVA et autres retenues) dépendra du **type de besoin**. Les méthodes de calcul seront introduites plus tard.
+- **Ce que dit la conception :** elle ne le prévoit pas encore. Le modèle a `montantProposeHT` et `montantProposeTTC` sur `Soumission` (onglets 1 et 4), et `montantHT`, `montantTVA`, `montantTTC` sur `Facture` (fiche objet). Mais il n'a ni taux, ni méthode de calcul, ni **type de besoin** sur `ExpressionBesoin`. L'onglet 3 mentionne en plus les « retenues fiscales (IR) » contrôlées par le CF au visa d'ordonnancement.
+- **À définir :**
+  - la liste des types de besoin ;
+  - pour chaque type, la ou les taxes, leur taux ou leur règle, et les exonérations éventuelles ;
+  - les objets concernés : TTC de la soumission, TVA de la facture (lot 4), retenues à l'ordonnancement.
+- **Conception à compléter :** un `TypeBesoin` sur `ExpressionBesoin`, et une **stratégie de calcul** par type (même principe que les formes d'acte, `FormeActeStrategie`), avec des paramètres en table plutôt que dans le code. À reporter dans le drawio quand les règles seront connues.
+- **Préparation dès 1e :** le calcul du TTC d'une offre passe par une seule interface (`CalculTaxe`), pour pouvoir brancher plus tard une méthode par type de besoin sans toucher au reste du code. En attendant, le comportement provisoire est celui du modèle : le fournisseur saisit le TTC, et le serveur vérifie seulement que TTC ≥ HT.
+
 ---
 
 ## 5. Questions ouvertes
@@ -227,3 +240,4 @@ Point à part : le mandat MINISTRE (section MINFI) n'a aucune permission en base
 | 2026-11-11 | **1c livré** : expressions de besoin (V15). Décisions : unité dans les spécifications, pas de conditions de recevabilité, référence `EB-AAAA-00001`, date limite avec heure, modification autorisée tant qu'aucune soumission, matière unique par besoin, suppression logique des brouillons, clôture par l'ordonnateur après la date limite (Q7, Q12). |
 | 2026-11-11 | **1d livré** : consultation publique des besoins ouverts (Q9 : public, connexion pour soumissionner). Pagination `PageResponse` sur les listes de besoins, périmètre filtré en base. |
 | 2026-11-11 | Q11 : offre modifiable jusqu'à la date limite. Q10 : écart entre la fiche UC03 (justificatifs) et le diagramme de classes (aucun document sur `Soumission`). Restent avant 1e : Q10, retrait de l'offre, calcul HT/TTC (TVA), délai unique sur l'offre. |
+| 2026-11-11 | Évolution notée (§4.4) : méthodes de calcul des taxes selon le type de besoin, à introduire plus tard. Le TTC de la soumission passera par une interface `CalculTaxe` dès 1e (provisoire : TTC saisi par le fournisseur, TTC ≥ HT). |
