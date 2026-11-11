@@ -183,7 +183,7 @@ The schema is owned by Flyway (`src/main/resources/db/migration`); Hibernate onl
 
 **Work in progress: the Dépense module.** The plan, its lots, the open questions and the decision log are in
 `docs/module-depense.md`. Read it before working on this module, and update it (lot status, decisions, log) after each
-step.
+step. Anything deliberately postponed goes in its §7 « Reporté » (with its source), never only in chat.
 
 Functional analysis (LaTeX report, UML use-case diagrams in draw.io) is in `docs/analyse-fonctionnelle/`;
 domain model/lifecycle diagram in `docs/modele-metier-et-cycle-de-vie.drawio`.

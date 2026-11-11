@@ -265,7 +265,7 @@ rapport, section 9 ; drawio, onglets 1, 2, 3 et 4 (deux copies).
 
 | Zone du BCA | Exemple | Source dans GBE | État |
 |---|---|---|---|
-| N° | BCA-A602010097 | `ActeJuridique.numero` | format à préciser (Q24) |
+| N° | BCA-A602010097 | `ActeJuridique.numero` | `BCA-A<EXERCICE><SECTION><TROUVE><N° D'ORDRE>` (Q24, segment « TROUVE » à préciser) |
 | Structure émettrice | 33000035 - Division de l'Informatique | chapitre du besoin (code `2033000035` en base) | ✓ |
 | Date d'émission | 03/11/2026 | absente du modèle | Q26 |
 | Délai de livraison (en mois) | 1 | `delaiLivraisonMois` (onglet 1) / `delaiLivraisonMaxMois` (onglet 4) ; l'offre a `delaiProposeJours` | Q25 |
@@ -273,7 +273,7 @@ rapport, section 9 ; drawio, onglets 1, 2, 3 et 4 (deux copies).
 | N° contribuable, raison sociale, adresse, téléphone | M086… | `Fournisseur` (NIU…) | ✓ |
 | N° RIB | 10025… | RIB choisi dans l'offre (1e) | ✓ |
 | Programme, action, activité, tâche | 233, 7, 202337G011… | tâche du besoin → activité → action → programme | ✓ |
-| Imputation budgétaire | 60 20 233 7 33000035 0112 360140 | 20 = section, 233 = programme, 7 = action, 33000035 = chapitre, 360140 = nature (vérifié en base) ; « 60 » et « 0112 » (classe fonctionnelle ? table vide) inconnus | Q28 |
+| Imputation budgétaire | 60 20 233 7 33000035 0112 360140 | 20 = section, 233 = programme, 7 = action, 33000035 = chapitre, 360140 = nature (vérifié en base) ; 0112 = classification fonctionnelle (Q28) ; « 60 » inconnu | Q28 |
 | Bénéficiaire | 11000020 - MINFI | absent du modèle et du référentiel | Q27 |
 | Lignes : n°, référence, désignation, qté, P.U., P.T. HT | 34-004-220017… | matière, quantité (besoin) et prix (offre retenue) | ✓ |
 | Total HT, TVA (19,25 %), IR (5,5 %), NAP, total TTC | 4 120 000 ; 793 100 ; 226 600 ; 3 893 400 ; 4 913 100 | TVA et IR absents du modèle de l'acte | Q23 |
@@ -326,16 +326,68 @@ Elles bloquent les lots 1 et 2. Les hypothèses s'appliquent tant qu'il n'y a pa
 | Q21 | Champs propres à chaque forme (référence du devis, n° d'appel d'offres, lot, retenue de garantie, pénalités, dates et loyer du bail) et documents générés | champs facultatifs saisis au lot 2 ; documents (BCA imprimé, modèle) au lot 3, avec le stockage de fichiers | **Décidé (2026-11-11)** : **seule la forme BCA** est traitée jusqu'à la fin du module ; les autres formes viendront plus tard, selon les informations disponibles. Le bas du BCA sera fourni par l'utilisateur pour en fixer les champs. |
 | Q22 | Imputation : ligne de crédit déduite du besoin, ou choisie par l'ordonnateur ? | déduite du besoin ; soumission au CF refusée si la ligne n'existe pas | **Décidé (2026-11-11)** : déduite du besoin. |
 | Q23 | Taxes du BCA : TVA 19,25 % et IR 5,5 % calculés par le serveur sur le HT (TTC = HT + TVA, NAP = TTC − TVA − IR) ? Le fournisseur cesse-t-il de saisir le TTC dans son offre ? Les taux varient-ils (régime fiscal du fournisseur, exonérations) ? | taux en table de paramétrage ; TTC et NAP calculés par le serveur, à l'offre comme à l'acte ; exonérations plus tard | — |
-| Q24 | Format du numéro (BCA-A602010097) | provisoire : `BCA-<année>-00001` | — |
-| Q25 | Délai de livraison en mois : saisi par l'ordonnateur au projet, ou déduit du délai de l'offre (jours) ? | saisi au projet, proposé à partir de l'offre (jours ÷ 30, arrondi au supérieur) | — |
-| Q26 | Date d'émission : création du projet, envoi au CF ou signature ? | date de création du projet | — |
-| Q27 | Bénéficiaire (11000020 - MINFI) : de quoi s'agit-il, d'où vient-il ? | — | — |
-| Q28 | Imputation : sens de « 60 » et origine de « 0112 » (classe fonctionnelle, table vide) | sert seulement à l'impression, peut attendre | — |
-| Q29 | « Fait à » : lieu saisi sur l'acte ou fixé par structure ? | sert à l'impression, peut attendre | — |
+| Q24 | Format du numéro (BCA-A602010097) | provisoire : `BCA-<année>-00001` | **Décidé (2026-11-11)** : `BCA-A<EXERCICE><SECTION><TROUVE><NUMÉRO D'ORDRE>`. Sur l'exemple `BCA-A602010097` : `6` = exercice 2026 ?, `20` = section MINFI. **À préciser** : le segment « TROUVE », la longueur de chaque segment et la portée du numéro d'ordre (par exercice et section ?). |
+| Q25 | Délai de livraison en mois : saisi par l'ordonnateur au projet, ou déduit du délai de l'offre (jours) ? | saisi au projet, proposé à partir de l'offre (jours ÷ 30, arrondi au supérieur) | **Décidé (2026-11-11)** : comme l'hypothèse. |
+| Q26 | Date d'émission : création du projet, envoi au CF ou signature ? | date de création du projet | **Décidé (2026-11-11)** : date de création du projet. |
+| Q27 | Bénéficiaire (11000020 - MINFI) : de quoi s'agit-il, d'où vient-il ? | — | **À vérifier par l'utilisateur** : probablement `<CODE CHAPITRE>-<SIGLE SECTION>` (ex. `11000020 - MINFI`). Ce n'est pas le chapitre du besoin (structure émettrice 33000035), d'où vient-il ? |
+| Q28 | Imputation : sens de « 60 » et origine de « 0112 » (classe fonctionnelle, table vide) | sert seulement à l'impression, peut attendre | **Partiellement décidé (2026-11-11)** : `0112` = classification fonctionnelle. Restent : le sens de `60` et le rattachement de la classe fonctionnelle (table `classe_fonctionnelle` vide). Reporté avec l'impression (§7). |
+| Q29 | « Fait à » : lieu saisi sur l'acte ou fixé par structure ? | sert à l'impression, peut attendre | Reporté avec l'impression (§7). |
 
 Autres questions du rapport (section 9), pour les lots 3 et 4 : livraisons partielles et paiements partiels, procédure en cas de non-conformité, liste des pièces justificatives obligatoires, rôle exact du comptable public (prise en charge, rejet, statut de paiement), limite du suivi fournisseur.
 
 Point à part : le mandat MINISTRE (section MINFI) n'a aucune permission en base. **Décidé (2026-11-11)** : lui donner les permissions par défaut du rôle, par migration (lot 0).
+
+---
+
+## 7. Reporté (à faire plus tard)
+
+Ce qui a été volontairement laissé de côté, avec sa source et le moment prévu. À relire au début de chaque lot.
+
+### Impression et documents de l'acte (lot 3, avec le stockage de fichiers)
+- **BCA imprimé** : `genererModele` / `imprimerBCA` (onglet 4), mise en page du BCA réel (§4.5).
+- **Code-barres et QR code** : `codeBarres`, `qrCodeSecurite` (onglet 1, `BonDeCommandeAdministratif`), `codeBarresSecurite` (onglet 4). Leur contenu est à définir.
+- **Imputation imprimée complète** `60 20 233 7 33000035 0112 360140` (Q28) :
+  - le sens du préfixe « 60 » est inconnu ;
+  - `0112` est la classification fonctionnelle, mais la table `classe_fonctionnelle` est vide et rattachée à rien : il faut définir d'où vient la fonction d'un besoin ou d'une ligne de crédit.
+- **« Fait à … »** (Q29) : lieu de signature, saisi sur l'acte ou fixé par structure.
+- **Talon du BCA :** case du visa du CF, RIB, « Paierie générale du Trésor ». Ce poste comptable assignataire est absent du modèle et concerne le comptable public (lot 4).
+- **Pièces de l'offre** (Q10, écart avec UC03) et éventuel PV de commission en fichier (Q13).
+
+### Formes d'acte autres que le BCA (Q21)
+- Lettre-commande, marché public, convention de bail et leurs champs propres (onglet 4 : référence du devis, n° d'appel d'offres, lot, cautions, retenue de garantie, pénalités, dates et loyer du bail).
+- Ces formes viendront quand les informations seront disponibles. Jusque-là, seule la forme BCA est traitée, mais l'architecture garde la `FormeActeStrategie` (une stratégie par forme).
+- La table des seuils (Q3) reste vide, et le choix de la forme est libre.
+
+### Taxes et montants
+- Méthodes de calcul par type de besoin (§4.4), exonérations, et taux selon le régime fiscal du fournisseur (Q23).
+- Montant réservé et net à payer (Q17) : décision provisoire « TTC », à revoir ; le BCA montre que NAP = HT − IR.
+
+### Numérotation et référentiel
+- Numéro du BCA (Q24) : segment « TROUVE », longueur des segments, portée du numéro d'ordre.
+- Bénéficiaire (Q27) : à vérifier par l'utilisateur (`<CODE CHAPITRE>-<SIGLE SECTION>` ?).
+
+### Soumissions et fournisseurs
+- `StatutSoumission` : `RECEVABLE`, `EN_EXAMEN` et `REJETEE` ne sont pas utilisés (Q13, commission externe).
+- Le fournisseur ne gère pas lui-même ses RIB (l'admin le fait). `estActif` et `validerCle()` du RIB (onglet 1) ne sont pas repris (on suit l'onglet 4).
+- Les offres sont visibles de l'ordonnateur avant la clôture (Q14) : point de confidentialité à garder en tête.
+
+### Notifications
+- Pas d'e-mail ni de SMS : les décisions sont visibles dans l'application (statut des offres, actes notifiés dans l'espace fournisseur, Q20). Une boîte de notifications pourra être ajoutée plus tard (PV, paiement…).
+
+### Sécurité et API
+- **401 ou 403 :** une requête sans jeton ou avec un jeton invalide reçoit 403. Un `AuthenticationEntryPoint` renverrait 401, à coordonner avec le frontend.
+- **Compte désactivé :** il garde l'accès jusqu'à l'expiration de son jeton d'accès. Le filtre pourrait le refuser tout de suite.
+- **Rotation du jeton de rafraîchissement :** le même jeton est renvoyé, sans rotation.
+- **Pagination :** les listes de crédits ne sont pas paginées (cela changerait la forme des réponses).
+
+### À signaler au frontend
+- Routes `PATCH /credits/{id}/engager` et `/solder` supprimées, avec les statuts `ENGAGE` et `SOLDE`.
+- Un refus de permission répond 403 au lieu de 500.
+- `GET /api/v1/besoins` renvoie une page (`PageResponse`).
+- API fournisseur : `telephoneRepresentant` pour le téléphone du représentant.
+- Tags Swagger renommés, ce qui compte si le client est généré à partir des tags. Le passage à `ResponseEntity` ne change rien à l'API.
+- Jeton de rafraîchissement invalide : 401 `REFRESH_TOKEN_INVALIDE` au lieu de 500.
+- Nouveaux champs (ajouts) dans `SoumissionResponse` et `ExpressionBesoinResponse`.
 
 ---
 
@@ -366,3 +418,4 @@ Point à part : le mandat MINISTRE (section MINFI) n'a aucune permission en base
 | 2026-11-11 | Lot 2 : conception relue (UC04–UC08, fiches objet, §9, onglets 1–4). Découpage 2a–2d proposé (§4.5), écarts relevés, questions Q13–Q22 ouvertes. |
 | 2026-11-11 | Q13–Q22 décidées (seule la forme BCA jusqu'à la fin). **2a livré** (V17) : attribution d'un besoin à une offre, infructuosité, consultation des offres par l'ordonnateur à tout moment. |
 | 2026-11-11 | BCA réel analysé (§4.5) : imputation décodée par le référentiel, taxes TVA 19,25 % et IR 5,5 %, NAP = HT − IR. Questions Q23–Q29 ouvertes avant 2b. |
+| 2026-11-11 | Q24 (format du n° BCA), Q25, Q26 décidées ; 0112 = classification fonctionnelle ; Q27 à vérifier. Nouvelle section §7 : tout ce qui est reporté, avec sa source. |
