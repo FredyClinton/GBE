@@ -375,7 +375,7 @@ Elles bloquent les lots 1 et 2. Les hypothèses s'appliquent tant qu'il n'y a pa
 | Q24 | Format du numéro (BCA-A602010097) | provisoire : `BCA-<année>-00001` | **Décidé (2026-11-11)** : `BCA-A` + code de l'exercice (`exercice.code_exercice`, 60 pour 2026) + code de la section (20 pour le MINFI) + numéro d'ordre **sur 5 chiffres**, qui repart à chaque **exercice** sans tenir compte de la section. Exemple : `BCA-A602010097` = A, 60, 20, 10097. **À vérifier** : la portée par exercice seul, et le premier numéro (00001 supposé, « repart à 0 »). Livré en 2b. |
 | Q25 | Délai de livraison en mois : saisi par l'ordonnateur au projet, ou déduit du délai de l'offre (jours) ? | saisi au projet, proposé à partir de l'offre (jours ÷ 30, arrondi au supérieur) | **Décidé (2026-11-11)** : comme l'hypothèse. |
 | Q26 | Date d'émission : création du projet, envoi au CF ou signature ? | date de création du projet | **Décidé (2026-11-11)** : date de création du projet. |
-| Q27 | Bénéficiaire (11000020 - MINFI) : de quoi s'agit-il, d'où vient-il ? | — | **À vérifier par l'utilisateur** : probablement `<CODE CHAPITRE>-<SIGLE SECTION>` (ex. `11000020 - MINFI`). Ce n'est pas le chapitre du besoin (structure émettrice 33000035), d'où vient-il ? |
+| Q27 | Bénéficiaire (11000020 - MINFI) : de quoi s'agit-il, d'où vient-il ? | — | **Conception mise à jour (2026-11-11)** : classe `Beneficiaire` (`code`, `libelle`) ajoutée aux onglets 1 et 4 des deux drawio, avec l'association `ExpressionBesoin` → `Beneficiaire` « au profit de (bénéficiaire) ». Absente du rapport et du référentiel (code `11000020` introuvable parmi les chapitres). **Reste à définir avant de coder** : nature du code (chapitre ou autre nomenclature), source des données, multiplicité, valeur par défaut. |
 | Q28 | Imputation : sens de « 60 » et origine de « 0112 » (classe fonctionnelle, table vide) | sert seulement à l'impression, peut attendre | **Décidé (2026-11-11)** : `60` = code de l'exercice (2026), `0112` = classification fonctionnelle. Reste : d'où vient la classification fonctionnelle (table `classe_fonctionnelle` vide). Reporté avec l'impression (§7). |
 | Q29 | « Fait à » : lieu saisi sur l'acte ou fixé par structure ? | sert à l'impression, peut attendre | Reporté avec l'impression (§7). |
 | Q30 | Périmètre du CF : aujourd'hui, seul un mandat MINISTRE sans programme couvre toute la section ; un CF ne voit et ne vise que les actes de son programme. Le CF doit-il couvrir toute une section (ou une « zone de compétence », attribut `zoneCompetence` de la classe `ControleurFinancier`) ? | — | — |
@@ -419,7 +419,7 @@ Ce qui a été volontairement laissé de côté, avec sa source et le moment pr�
 ### Numérotation et référentiel
 - Numéros du visa (`VISA-<année>-00001`), de la réservation (`RES-…`) et du quitus (`QUI-…`) : provisoires, à aligner sur les formats réels.
 - Numéro du BCA (Q24) : à vérifier que le numéro d'ordre repart bien par exercice seul (toutes sections confondues, compteur `BCA-A<code exercice>`), et que le premier numéro est 00001.
-- Bénéficiaire (Q27) : à vérifier par l'utilisateur (`<CODE CHAPITRE>-<SIGLE SECTION>` ?).
+- Bénéficiaire (Q27) : classe `Beneficiaire` ajoutée au drawio (onglets 1 et 4). Pas encore codée : il faut savoir si le code est un chapitre (`<CODE CHAPITRE>-<SIGLE SECTION>` ?) ou une autre nomenclature, et d'où viennent les données.
 
 ### Soumissions et fournisseurs
 - `StatutSoumission` : `RECEVABLE`, `EN_EXAMEN` et `REJETEE` ne sont pas utilisés (Q13, commission externe).
@@ -481,3 +481,4 @@ Ce qui a été volontairement laissé de côté, avec sa source et le moment pr�
 | 2026-11-11 | Les taxes dépendent du type d'acte : seules les règles du BCA sont connues, on fait avec. Évolution notée en §4.4 et §7 (taux par type, recalcul à l'acte, TTC indicatif sur l'offre). |
 | 2026-11-11 | **2c livré** (V20) : visa du CF en une décision (favorable : quitus + réservation des AE + `VISE_CF` ; rejet : retour en `PROJET` ; réserves : reste soumis). Question Q30 ouverte (périmètre du CF). |
 | 2026-11-11 | Refonte de 2b (V21) : données propres au BCA dans `bons_de_commande` (délai en mois, référence du devis, code-barres et QR code à venir), rattachées à l'acte par composition ; `StrategieBonDeCommande` porte le comportement. |
+| 2026-11-11 | Drawio : classe `Beneficiaire` (code, libellé) et association « au profit de (bénéficiaire) » depuis `ExpressionBesoin`, onglets 1 et 4 des deux copies. Pas encore de code (Q27). |
