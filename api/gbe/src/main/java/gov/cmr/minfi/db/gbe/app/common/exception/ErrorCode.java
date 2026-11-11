@@ -72,6 +72,11 @@ public enum ErrorCode {
             "Un crédit au statut %s ne peut pas être consommé",
             BAD_REQUEST
     ),
+    CREDIT_ANNULATION_CREDITS_CONSOMMES(
+            "CREDIT_ANNULATION_CREDITS_CONSOMMES",
+            "Annulation impossible : %s d'AE et %s de CP sont consommés sur ce crédit",
+            BAD_REQUEST
+    ),
     MATIERE_NOT_FOUND("MATIERE_NOT_FOUND", "Matière introuvable : %s", NOT_FOUND),
     MATIERE_ALREADY_EXISTS("MATIERE_ALREADY_EXISTS", "Une matière de référence %s existe déjà", BAD_REQUEST),
     MANDAT_ALREADY_EXISTS(

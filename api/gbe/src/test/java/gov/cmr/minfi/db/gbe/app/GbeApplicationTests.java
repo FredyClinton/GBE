@@ -1,5 +1,6 @@
 package gov.cmr.minfi.db.gbe.app;
 
+import gov.cmr.minfi.db.gbe.app.budget.credit.StatutCredit;
 import gov.cmr.minfi.db.gbe.app.identite.iam.permission.Permission;
 import gov.cmr.minfi.db.gbe.app.identite.iam.role.RoleRepository;
 import gov.cmr.minfi.db.gbe.app.identite.iam.role.RoleSysteme;
@@ -87,6 +88,13 @@ class GbeApplicationTests {
         for (Permission p : Permission.values()) {
             assertThat(permissions).contains("'" + p.name() + "'");
         }
+        final String statuts = jdbcTemplate.queryForObject(
+                "SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname = 'credit_budgetaire_statut_check'",
+                String.class);
+        for (StatutCredit st : StatutCredit.values()) {
+            assertThat(statuts).contains("'" + st.name() + "'");
+        }
+        assertThat(statuts).doesNotContain("'ENGAGE'", "'SOLDE'");
     }
 
     @Test

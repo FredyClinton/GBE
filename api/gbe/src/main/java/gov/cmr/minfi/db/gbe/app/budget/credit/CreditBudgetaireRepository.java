@@ -63,14 +63,11 @@ public interface CreditBudgetaireRepository extends JpaRepository<CreditBudgetai
     );
 
 
-    // Tous les crédits actifs (non annulés, non soldés)  d'un exercice
+    // Tous les crédits actifs (non annulés) d'un exercice
     @Query("""
             SELECT c FROM CreditBudgetaire c
             WHERE c.exercice.id = :exerciceId
-            AND c.statut NOT IN (
-                gov.cmr.minfi.db.gbe.app.budget.credit.StatutCredit.ANNULE,
-                gov.cmr.minfi.db.gbe.app.budget.credit.StatutCredit.SOLDE
-            )
+            AND c.statut <> gov.cmr.minfi.db.gbe.app.budget.credit.StatutCredit.ANNULE
             """)
     List<CreditBudgetaire> findActifsByExerciceId(@Param("exerciceId") String exerciceId);
 

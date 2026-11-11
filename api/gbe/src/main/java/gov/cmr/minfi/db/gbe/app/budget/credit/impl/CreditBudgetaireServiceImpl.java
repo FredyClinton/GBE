@@ -155,15 +155,6 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
 
 	@Override
 	@Transactional
-	public void engagerCredit(String creditId) {
-		final CreditBudgetaire credit = findCredit(creditId);
-		mandatScopeValidator.checkAccessCreditWithPermission(credit, Permission.ENGAGE_DEPENSE);
-		credit.engager();
-		creditBudgetaireRepository.save(credit);
-	}
-
-	@Override
-	@Transactional
 	public void suspendreCredit(String creditId) {
 		final CreditBudgetaire credit = findCredit(creditId);
 		mandatScopeValidator.checkAccessCreditWithPermission(credit, Permission.REVISER_AE);
@@ -195,15 +186,6 @@ public class CreditBudgetaireServiceImpl implements CreditBudgetaireService {
 		final CreditBudgetaire credit = findCredit(creditId);
 		mandatScopeValidator.checkAccessCreditWithPermission(credit, Permission.REVISER_AE);
 		credit.decantionner();
-		creditBudgetaireRepository.save(credit);
-	}
-
-	@Override
-	@Transactional
-	public void solderCredit(String creditId) {
-		final CreditBudgetaire credit = findCredit(creditId);
-		mandatScopeValidator.checkAccessCreditWithPermission(credit, Permission.ENGAGE_DEPENSE);
-		credit.solder();
 		creditBudgetaireRepository.save(credit);
 	}
 

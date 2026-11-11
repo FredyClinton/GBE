@@ -23,8 +23,6 @@ public interface CreditBudgetaireService {
     void updateCP(String creditId, UpdateCreditBudgetaireRequest request);
 
 
-    void engagerCredit(String creditId);
-
     void suspendreCredit(String creditId);
 
     void debloquerCredit(String creditId);
@@ -32,8 +30,6 @@ public interface CreditBudgetaireService {
     void cantionnerCredit(String creditId);
 
     void decantionnerCredit(String creditId);
-
-    void solderCredit(String creditId);
 
     void annulerCredit(String creditId);
 }

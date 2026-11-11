@@ -90,20 +90,6 @@ public class CreditBudgetaireController {
 
 
     // Transitions de statut
-    /**
-     * @deprecated ancien circuit : l'engagement passe par la réservation des AE (module Dépense).
-     * Route conservée jusqu'à accord avec le front, puis à retirer.
-     */
-    @Deprecated
-    @PatchMapping("/{creditId}/engager")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasAuthority('ENGAGE_DEPENSE')")
-    public void engagerCredit(
-            @PathVariable String creditId
-    ) {
-        creditBudgetaireService.engagerCredit(creditId);
-    }
-
     @PatchMapping("/{creditId}/suspendre")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('REVISER_AE')")
@@ -120,20 +106,6 @@ public class CreditBudgetaireController {
             @PathVariable String creditId
     ) {
         creditBudgetaireService.debloquerCredit(creditId);
-    }
-
-    /**
-     * @deprecated ancien circuit : l'engagement passe par la réservation des AE (module Dépense).
-     * Route conservée jusqu'à accord avec le front, puis à retirer.
-     */
-    @Deprecated
-    @PatchMapping("/{creditId}/solder")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasAuthority('ENGAGE_DEPENSE')")
-    public void solderCredit(
-            @PathVariable String creditId
-    ) {
-        creditBudgetaireService.solderCredit(creditId);
     }
 
     @PatchMapping("/{creditId}/cantonner")

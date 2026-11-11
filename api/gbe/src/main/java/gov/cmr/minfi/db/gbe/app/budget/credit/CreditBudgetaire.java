@@ -159,12 +159,9 @@ public class CreditBudgetaire extends BaseEntity
         this.montantCPDisponible = this.montantCPDisponible.add(montant);
     }
 
-    /**
-     * Un crédit cantonné, suspendu, soldé ou annulé ne peut plus être consommé.
-     * ENGAGE reste accepté tant que l'ancien circuit (routes engager/solder) n'est pas retiré.
-     */
+    /** Seul un crédit DISPONIBLE peut être consommé (cantonné, suspendu ou annulé : bloqué). */
     public boolean isConsommable() {
-        return this.statut == StatutCredit.DISPONIBLE || this.statut == StatutCredit.ENGAGE;
+        return this.statut == StatutCredit.DISPONIBLE;
     }
 
     private void verifierConsommable() {
@@ -181,30 +178,13 @@ public class CreditBudgetaire extends BaseEntity
 
     // ── StatutTransitionable ──────────────────────────
 
-    // DISPONIBLE → ENGAGE  (CANTONNE bloqué volontairement)
-    /**
-     * @deprecated ancien circuit : une ligne de crédit finance plusieurs dépenses, l'engagement
-     * passe désormais par {@link #consommerAE(BigDecimal)}. Conservé tant que le front l'utilise.
-     */
-    @Deprecated
-    @Override
-    public void engager() {
-        validerTransition(
-                Set.of(StatutCredit.DISPONIBLE),
-                StatutCredit.ENGAGE,
-                "Seul un crédit DISPONIBLE peut être engagé (un crédit CANTONNE doit d'abord être décantonné)"
-        );
-        this.statut = StatutCredit.ENGAGE;
-    }
-
     // DISPONIBLE → SUSPENDU
-    // ENGAGE     → SUSPENDU (ancien circuit)
     @Override
     public void suspendre() {
         validerTransition(
-                Set.of(StatutCredit.DISPONIBLE, StatutCredit.ENGAGE),
+                Set.of(StatutCredit.DISPONIBLE),
                 StatutCredit.SUSPENDU,
-                "Seul un crédit DISPONIBLE (ou ENGAGÉ) peut être suspendu"
+                "Seul un crédit DISPONIBLE peut être suspendu"
         );
         this.statut = StatutCredit.SUSPENDU;
     }
@@ -242,33 +222,21 @@ public class CreditBudgetaire extends BaseEntity
         this.statut = StatutCredit.DISPONIBLE;
     }
 
-    // ENGAGE → SOLDE
-    /**
-     * @deprecated ancien circuit, voir {@link #engager()}. Le solde d'une ligne se lit dans ses montants.
-     */
-    @Deprecated
-    @Override
-    public void solder() {
-        validerTransition(
-                Set.of(StatutCredit.ENGAGE),
-                StatutCredit.SOLDE,
-                "Seul un crédit ENGAGÉ peut être soldé"
-        );
-        this.statut = StatutCredit.SOLDE;
-    }
-
     // DISPONIBLE → ANNULE
-    // ENGAGE     → ANNULE
     // SUSPENDU   → ANNULE
     // CANTONNE   → ANNULE
+    // Refusé tant que des AE ou des CP sont consommés : il faut d'abord annuler les actes qui les portent.
     @Override
     public void annuler() {
         validerTransition(
-                Set.of(StatutCredit.DISPONIBLE, StatutCredit.ENGAGE,
-                        StatutCredit.SUSPENDU, StatutCredit.CANTONNE),
+                Set.of(StatutCredit.DISPONIBLE, StatutCredit.SUSPENDU, StatutCredit.CANTONNE),
                 StatutCredit.ANNULE,
-                "Un crédit SOLDÉ ne peut pas être annulé"
+                "Un crédit déjà ANNULÉ ne peut pas être annulé"
         );
+        if (this.montantAEConsomme.signum() > 0 || this.montantCPConsomme.signum() > 0) {
+            throw new BusinessException(ErrorCode.CREDIT_ANNULATION_CREDITS_CONSOMMES,
+                    this.montantAEConsomme, this.montantCPConsomme);
+        }
         this.statut = StatutCredit.ANNULE;
     }
 
@@ -291,7 +259,6 @@ public class CreditBudgetaire extends BaseEntity
     }
 
     public boolean isTerminal() {
-        return this.statut == StatutCredit.SOLDE
-                || this.statut == StatutCredit.ANNULE;
+        return this.statut == StatutCredit.ANNULE;
     }
 }

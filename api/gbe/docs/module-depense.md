@@ -39,7 +39,7 @@ Circuit complet de la dépense, du besoin au paiement. Il fait intervenir 5 acte
 ## 2. Écarts avec le code actuel
 
 1. **Statut de `CreditBudgetaire`.** Dans le code, une ligne de crédit passe à `ENGAGE` puis `SOLDE`, comme si elle ne servait qu'à une dépense. Dans le modèle, une ligne finance plusieurs dépenses : chaque `ReservationCredit` bloque des AE, la liquidation consomme des CP.
-   → Proposition : `consommerAE`/`libererAE` appelés à la réservation et au rejet, `consommerCP` à l'ordonnancement ; les statuts du crédit ne servent plus qu'à le bloquer (cantonné, suspendu, annulé). Les routes `engager`/`solder` sur un crédit deviennent inutiles.
+   → **Fait (lot 0)** : `consommerAE` à la réservation, `libererAE` à l'annulation d'un acte visé, `consommerCP` à l'ordonnancement. Les statuts du crédit ne servent plus qu'à le bloquer (cantonné, suspendu, annulé). Les statuts `ENGAGE`/`SOLDE` et les routes `engager`/`solder` ont été retirés (V10).
 2. **Acteurs manquants.** `RoleSysteme` n'a ni `FOURNISSEUR` ni `COMPTABLE_MATIERE` (`COMPTABLE` correspond au comptable public). Le fournisseur est **externe** : pas de fiche `Agent`, pas de `Mandat` de section ; il ne voit que ses propres soumissions et demandes.
 3. **Référentiels manquants.**
    - `Matiere` : catalogue des matières (référence, libellé). **Décision 2026-11-11 : aucun lien avec `NatureEconomique`**, car une matière peut relever de plusieurs natures selon le contexte. C'est un écart volontaire avec l'onglet 4 du diagramme (`Matiere` → `NatureEconomique`, « classé dans (quitus CF) »). La nature est portée par l'expression de besoin (`ExpressionBesoin` → `NatureEconomique`, « consomme »).
@@ -85,23 +85,23 @@ Chaque lot comprend sa migration, ses tests et ses routes, et peut être livré 
 | Lot | Contenu | UC | État |
 |---|---|---|---|
 | **0** | Rôles `FOURNISSEUR` et `COMPTABLE_MATIERE`, nouvelles permissions, référentiel `Matiere`, refonte du statut des crédits (§2.1), rattachement des natures à l'exercice, permissions par défaut du mandat MINISTRE | — | **livré** (2026-11-11, voir §4.1) |
-| **1** | Référentiels `Activite` et `Tache` (CRUD admin + consultation, migration V10), fournisseurs (création, RIB), expression de besoin rattachée à une tâche, un chapitre, un exercice et une nature économique (brouillon → publiée → clôturée), consultation des besoins ouverts, soumissions | UC01–UC03 | à faire |
+| **1** | Référentiels `Activite` et `Tache` (CRUD admin + consultation, migration V11), fournisseurs (création, RIB), expression de besoin rattachée à une tâche, un chapitre, un exercice et une nature économique (brouillon → publiée → clôturée), consultation des besoins ouverts, soumissions | UC01–UC03 | à faire |
 | **2** | Évaluation et attribution, projet d'acte et formes, contrôle CF (réservation des AE, quitus, visa ou rejet), signature | UC04–UC08 | à faire |
 | **3** | Stockage de fichiers, livraisons, PV conforme ou non conforme, information de l'ordonnateur | UC09–UC11 | à faire |
 | **4** | Demande de paiement, factures et pièces, validation, liquidation, ordonnancement, visa CF, transmission au Trésor, suivi fournisseur | UC12–UC19 | à faire |
 
 ### 4.1 Lot 0 — ce qui a été livré
 
-- **Migrations** : V7 (natures → exercice 2026), V8 (rôles, contraintes `CHECK`, permissions des mandats existants), V9 (table `matieres`).
+- **Migrations** : V7 (natures → exercice 2026), V8 (rôles, contraintes `CHECK`, permissions des mandats existants), V9 (table `matieres`), V10 (statuts des crédits).
 - **Rôles et permissions** : `FOURNISSEUR` (`SOUMISSIONNER`) et `COMPTABLE_MATIERE` (`RECEPTIONNER_LIVRAISON`, `CONSULTER`). Ajouts : `EXPRIMER_BESOIN` et `ORDONNANCER` pour ORDONNATEUR et MINISTRE ; `RESERVER_CREDIT`, `QUITUS_NATURE` et `VISER_ORDONNANCEMENT` pour CONTROLEUR_FINANCIER. Les mandats existants ont reçu ces permissions, le mandat MINISTRE vide a reçu celles du rôle, et le super-admin initial les a toutes.
 - **Matières** : simple catalogue (`reference` unique, `libelle`), **sans lien avec la nature économique**. Consultation : `GET /api/v1/referentiel/matieres` et `GET /{id}`. Gestion : `/api/v1/admin/matieres` (`POST`, `PUT /{id}`, `DELETE /{id}`), avec la permission `MANAGE_USERS` comme pour les actions.
-- **Crédit** : `consommerAE/CP` refusés sur un crédit cantonné, suspendu, soldé ou annulé (`CREDIT_NON_CONSOMMABLE`). `libererAE/CP` refusent un montant supérieur au consommé. Tout montant doit être > 0. `suspendre` est possible depuis `DISPONIBLE`. `engager`/`solder` (entité et routes) sont `@Deprecated` mais fonctionnent encore, et `ENGAGE` reste consommable.
+- **Crédit** : `consommerAE/CP` refusés sur un crédit cantonné, suspendu, soldé ou annulé (`CREDIT_NON_CONSOMMABLE`). `libererAE/CP` refusent un montant supérieur au consommé. Tout montant doit être > 0. `suspendre` part de `DISPONIBLE`. L'annulation est refusée tant que des AE ou des CP sont consommés (`CREDIT_ANNULATION_CREDITS_CONSOMMES`).
+- **V10** : retrait des statuts `ENGAGE`/`SOLDE` (les crédits concernés redeviennent `DISPONIBLE`), de `engager()`/`solder()` et des routes `PATCH /api/v1/credits/{id}/engager` et `/solder` (accord donné le 2026-11-11). Statuts restants : `DISPONIBLE`, `CANTONNE`, `SUSPENDU`, `ANNULE`.
 
 **Reste à traiter :**
-- retirer `engager`/`solder` et les statuts `ENGAGE`/`SOLDE` **après accord du front** ;
+- **front** : retirer les appels à `engager`/`solder` et les statuts `ENGAGE`/`SOLDE` de l'interface ;
 - lot 1 : le fournisseur n'a pas de mandat, alors que les permissions ne sont chargées que depuis les mandats (`UserServiceImpl.loadUserByUsername`). Il faudra lui attribuer les permissions par défaut de son rôle ;
 - nature économique : portée par l'expression de besoin (lot 1), jamais par la matière. Quand les besoins référenceront les matières, la suppression d'une matière utilisée sera refusée par la clé étrangère ;
-- faut-il interdire l'annulation d'un crédit dont des AE sont consommées ? Rien ne l'empêche pour l'instant.
 
 ---
 
@@ -133,3 +133,4 @@ Point à part : le mandat MINISTRE (section MINFI) n'a aucune permission en base
 | 2026-11-11 | Lot 0 livré : V7–V9, rôles et permissions, référentiel `Matiere`, règles de consommation des crédits, routes `engager`/`solder` dépréciées. Tests : 52 unitaires crédit, 8 intégration, tous verts. |
 | 2026-11-11 | `Matiere` simplifiée (V9 réécrite, jamais appliquée) : référence + libellé, sans nature économique, unité, description ni statut. |
 | 2026-11-11 | Lecture de l'onglet 4 du diagramme : `Activite`/`Tache` (Action → Activité → Tâche, `exercice_id` comme `Action`) ajoutées au lot 1 ; le besoin se rattache à une tâche. Pas de lien matière ↔ nature, confirmé. |
+| 2026-11-11 | Lot 0 commité (`2d14474`). Puis : annulation d'un crédit bloquée tant que des AE/CP sont consommés ; `engager`/`solder` et les statuts `ENGAGE`/`SOLDE` retirés (V10). |

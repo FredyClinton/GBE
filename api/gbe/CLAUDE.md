@@ -74,12 +74,13 @@ Lives in the `CreditBudgetaire` entity (implements `StatutTransitionable`, `AEMa
 transition calls `validerTransition(...)` and throws `BusinessException(TRANSITION_STATUT_INVALIDE)` on illegal moves.
 - A credit line funds many expenses: the Dépense module consumes AE at reservation (CF visa), releases them when a
   visa'd act is cancelled, and consumes CP at ordonnancement. Statuses only block a line.
-- `DISPONIBLE ⇄ CANTONNE`, `DISPONIBLE|ENGAGE → SUSPENDU → DISPONIBLE`
-- any non-terminal status → `ANNULE`; `SOLDE` and `ANNULE` are terminal
-- `engager()` (`DISPONIBLE → ENGAGE`) and `solder()` (`ENGAGE → SOLDE`) and their routes are `@Deprecated`: kept until
-  the frontend stops using them.
-- `consommerAE/CP` require a consumable credit (`DISPONIBLE` or legacy `ENGAGE`, else `CREDIT_NON_CONSOMMABLE`) and an
-  amount within the available balance; `libererAE/CP` refuse more than the consumed amount. All amounts must be > 0.
+- Statuses: `DISPONIBLE`, `CANTONNE`, `SUSPENDU`, `ANNULE` (`ENGAGE`/`SOLDE` and the `engager`/`solder` routes were
+  removed in V10).
+- `DISPONIBLE ⇄ CANTONNE`, `DISPONIBLE ⇄ SUSPENDU` (`suspendre` / `debloquer`)
+- `DISPONIBLE|CANTONNE|SUSPENDU → ANNULE`, refused while AE or CP are consumed
+  (`CREDIT_ANNULATION_CREDITS_CONSOMMES`); `ANNULE` is terminal.
+- `consommerAE/CP` require a `DISPONIBLE` credit (else `CREDIT_NON_CONSOMMABLE`) and an amount within the available
+  balance; `libererAE/CP` refuse more than the consumed amount (allowed on a blocked credit). All amounts must be > 0.
 
 Covered by `CreditBudgetaireTest`. Keep it in sync when adding transitions.
 
@@ -119,6 +120,8 @@ The schema is owned by Flyway (`src/main/resources/db/migration`); Hibernate onl
   `mandat_permissions.permission` list the enum values: adding a `RoleSysteme` or `Permission` needs a migration that
   rebuilds them** (checked by `GbeApplicationTests`).
   `V9__referentiel_matiere.sql`: table `matieres`.
+  `V10__retirer_statuts_engage_solde_credit.sql`: `ENGAGE`/`SOLDE` credits become `DISPONIBLE`; rebuilds
+  `credit_budgetaire_statut_check` (same rule as above: a `StatutCredit` change needs a migration).
 - Any entity change needs a new `V<n>__description.sql`. Never edit an applied migration.
 - Pre-Flyway databases get a baseline at version 2 (`baseline-on-migrate`), so only V3+ run on them.
 
