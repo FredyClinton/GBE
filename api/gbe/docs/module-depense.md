@@ -233,6 +233,7 @@ Lu le 2026-11-11. Il complète le rapport sur plusieurs points :
   - les objets concernés : TTC de la soumission, TVA de la facture (lot 4), retenues à l'ordonnancement.
 - **Proposition :** **ne pas ajouter de champ** ; s'appuyer d'abord sur la nature économique du besoin. N'introduire un vrai « type de besoin » que si elle ne suffit pas, et **d'abord dans le drawio**. Calcul par **stratégie** (même principe que `FormeActeStrategie`), avec des paramètres en table plutôt que dans le code.
 - **Préparation dès 1e :** le calcul du TTC d'une offre passe par une seule interface (`CalculTaxe`), qui reçoit le besoin (donc sa nature), pour pouvoir brancher plus tard une méthode par type de besoin sans toucher au reste du code.
+- **Les taxes dépendent du type d'acte juridique** (précisé par l'utilisateur, 2026-11-11). **Seules les règles du BCA sont connues** (TVA 19,25 %, IR 5,5 %) : on fait avec. Le code actuel est donc juste pour le BCA, seule forme traitée. La conception ne relie aucun taux au type d'acte ; seule `StrategieMarchePublic` porte des retenues propres (`tauxRetenueGarantie`, `penaliteJour`).
 - **Depuis 2b (V18, Q23) :** `TvaEtIrParametres` remplace le TTC saisi par le fournisseur. TVA et IR sont appliqués au HT avec les taux de la table `taxes` ; TTC = HT + TVA ; NAP = TTC − TVA − IR. Les méthodes par type de besoin et par régime fiscal restent à faire (§7).
 
 ### 4.5 Lot 2 — découpage (2026-11-11, Q13–Q22 décidées)
@@ -381,6 +382,12 @@ Ce qui a été volontairement laissé de côté, avec sa source et le moment pr�
 - La table des seuils (Q3) reste vide, et le choix de la forme est libre.
 
 ### Taxes et montants
+- **Taxes selon le type d'acte** (à faire quand les règles de la LC, du marché et du bail seront connues) :
+  - colonne `type_acte` dans `taxes`, avec un taux par forme ;
+  - `CalculTaxe.calculer(besoin, typeActe, montantHT)`, et chaque `FormeActeStrategie` ajoute ses retenues propres (retenue de garantie du marché…) ;
+  - à la création de l'acte, recalcul des taxes avec le type choisi au lieu de la recopie de l'offre : l'acte fait foi (montant réservé, montant en lettres) ;
+  - le TTC de l'offre devient indicatif (calculé avec la forme BCA), et les offres se comparent sur le HT ;
+  - à décider alors : le type d'acte peut-il être fixé dès la publication du besoin, pour un TTC exact sur l'offre ?
 - Méthodes de calcul par type de besoin (§4.4), exonérations, et taux selon le régime fiscal du fournisseur. Aujourd'hui, les mêmes taux TVA et IR (table `taxes`) s'appliquent à toutes les offres (Q23).
 - Arrondi : au centime (demi supérieur). Le franc CFA n'a pas de centimes : il faudra peut-être arrondir à l'unité.
 - Montant réservé et net à payer (Q17) : décision provisoire « TTC », à revoir ; le BCA montre que NAP = HT − IR.
@@ -446,3 +453,4 @@ Ce qui a été volontairement laissé de côté, avec sa source et le moment pr�
 | 2026-11-11 | Q24 (format du n° BCA), Q25, Q26 décidées ; 0112 = classification fonctionnelle ; Q27 à vérifier. Nouvelle section §7 : tout ce qui est reporté, avec sa source. |
 | 2026-11-11 | Q23, Q24 et Q28 (« 60 » = code de l'exercice) décidées. **2b, partie taxes** (V18) : table `taxes` (TVA 19,25 %, IR 5,5 %), `CalculTaxe` → `TvaEtIrParametres`, l'offre porte TVA, IR, TTC et NAP calculés par le serveur. |
 | 2026-11-11 | **2b livré** (V19) : projet d'acte BCA (fabrique et stratégie BCA, numéro `BCA-A<exercice><section><ordre>`, montants de l'offre retenue, TTC en lettres), modification en `PROJET`, envoi au CF avec ligne de crédit déduite du besoin. Q24 précisée (ordre par exercice, à vérifier). |
+| 2026-11-11 | Les taxes dépendent du type d'acte : seules les règles du BCA sont connues, on fait avec. Évolution notée en §4.4 et §7 (taux par type, recalcul à l'acte, TTC indicatif sur l'offre). |
