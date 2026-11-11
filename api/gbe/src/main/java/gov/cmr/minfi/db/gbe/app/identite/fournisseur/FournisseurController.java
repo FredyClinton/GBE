@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,8 +31,7 @@ public class FournisseurController {
         @ApiResponse(responseCode = "404", description = "Aucun fournisseur rattaché au compte")
     })
     @GetMapping("/moi")
-    @ResponseStatus(HttpStatus.OK)
-    public FournisseurResponse getMonProfil() {
-        return fournisseurService.getMonProfil();
+    public ResponseEntity<FournisseurResponse> getMonProfil() {
+        return ResponseEntity.ok(fournisseurService.getMonProfil());
     }
 }

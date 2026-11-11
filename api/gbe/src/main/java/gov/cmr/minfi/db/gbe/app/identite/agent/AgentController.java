@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,9 +36,8 @@ public class AgentController {
         @ApiResponse(responseCode = "403", description = "Permission MANAGE_USERS manquante")
     })
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public AgentResponse createAgent(@Valid @RequestBody CreateAgentRequest request) {
-        return agentService.createAgent(request);
+    public ResponseEntity<AgentResponse> createAgent(@Valid @RequestBody CreateAgentRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(agentService.createAgent(request));
     }
 
     @Operation(
@@ -49,9 +49,8 @@ public class AgentController {
         @ApiResponse(responseCode = "403", description = "Permission MANAGE_USERS manquante")
     })
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public List<AgentResponse> getAllAgents() {
-        return agentService.getAllsAgents();
+    public ResponseEntity<List<AgentResponse>> getAllAgents() {
+        return ResponseEntity.ok(agentService.getAllsAgents());
     }
 
     @Operation(
@@ -63,9 +62,8 @@ public class AgentController {
         @ApiResponse(responseCode = "403", description = "Permission MANAGE_USERS manquante")
     })
     @GetMapping("/without-account")
-    @ResponseStatus(HttpStatus.OK)
-    public List<AgentResponse> getAgentsWithoutAccount() {
-        return agentService.getAgentsWithoutAccount();
+    public ResponseEntity<List<AgentResponse>> getAgentsWithoutAccount() {
+        return ResponseEntity.ok(agentService.getAgentsWithoutAccount());
     }
 
     @Operation(
@@ -78,9 +76,8 @@ public class AgentController {
         @ApiResponse(responseCode = "404", description = "Agent introuvable")
     })
     @GetMapping("/{agentId}")
-    @ResponseStatus(HttpStatus.OK)
-    public AgentResponse getAgent(@Parameter(description = "Identifiant de l'agent", required = true) @PathVariable String agentId) {
-        return agentService.getAgent(agentId);
+    public ResponseEntity<AgentResponse> getAgent(@Parameter(description = "Identifiant de l'agent", required = true) @PathVariable String agentId) {
+        return ResponseEntity.ok(agentService.getAgent(agentId));
     }
 
     @Operation(
@@ -93,9 +90,9 @@ public class AgentController {
         @ApiResponse(responseCode = "404", description = "Agent introuvable")
     })
     @PatchMapping("/{agentId}/deactivate")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deactivateAgent(@Parameter(description = "Identifiant de l'agent", required = true) @PathVariable String agentId) {
+    public ResponseEntity<Void> deactivateAgent(@Parameter(description = "Identifiant de l'agent", required = true) @PathVariable String agentId) {
         agentService.deactivateAgent(agentId);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(
@@ -108,8 +105,8 @@ public class AgentController {
         @ApiResponse(responseCode = "404", description = "Agent introuvable")
     })
     @PatchMapping("/{agentId}/reactivate")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void reactivateAgent(@Parameter(description = "Identifiant de l'agent", required = true) @PathVariable String agentId) {
+    public ResponseEntity<Void> reactivateAgent(@Parameter(description = "Identifiant de l'agent", required = true) @PathVariable String agentId) {
         agentService.reactivateAgent(agentId);
+        return ResponseEntity.noContent().build();
     }
 }

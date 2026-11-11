@@ -133,9 +133,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	@Override
 	public AuthenticationResponse refreshToken(RefreshRequest request) {
+		final String email = jwtService.extraireSujetRefreshToken(request.refreshToken());
+		// Un compte supprimé, désactivé ou verrouillé depuis l'émission du jeton ne peut plus le renouveler.
+		final User user = userRepository.findByEmailIgnoreCase(email)
+			.filter(u -> u.isEnabled() && u.isAccountNonLocked())
+			.orElseThrow(() -> new BusinessException(ErrorCode.REFRESH_TOKEN_INVALIDE));
 		return AuthenticationResponse
 			.builder()
-			.accessToken(jwtService.refreshAccessToken(request.refreshToken()))
+			.accessToken(jwtService.generateAccessToken(user.getUsername()))
 			.refreshToken(request.refreshToken())
 			.tokenType("Bearer")
 			.build();

@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,9 +30,8 @@ public class MatiereController {
         @ApiResponse(responseCode = "200", description = "Liste des matières")
     })
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public List<MatiereResponse> getAllMatieres() {
-        return matiereService.getAllMatieres();
+    public ResponseEntity<List<MatiereResponse>> getAllMatieres() {
+        return ResponseEntity.ok(matiereService.getAllMatieres());
     }
 
     @Operation(
@@ -44,8 +43,7 @@ public class MatiereController {
         @ApiResponse(responseCode = "404", description = "Matière introuvable")
     })
     @GetMapping("/{matiereId}")
-    @ResponseStatus(HttpStatus.OK)
-    public MatiereResponse getMatiere(@Parameter(description = "Identifiant de la matière", required = true) @PathVariable String matiereId) {
-        return matiereService.getMatiere(matiereId);
+    public ResponseEntity<MatiereResponse> getMatiere(@Parameter(description = "Identifiant de la matière", required = true) @PathVariable String matiereId) {
+        return ResponseEntity.ok(matiereService.getMatiere(matiereId));
     }
 }

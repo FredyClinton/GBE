@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,9 +29,8 @@ public class ChapitreController {
         @ApiResponse(responseCode = "200", description = "Liste des chapitres")
     })
     @GetMapping("/sections/{sectionId}/chapitres")
-    @ResponseStatus(HttpStatus.OK)
-    public List<ChapitreResponse> getChapitresBySection(@Parameter(description = "Identifiant de la section", required = true) @PathVariable String sectionId) {
-        return chapitreService.getChapitresBySection(sectionId);
+    public ResponseEntity<List<ChapitreResponse>> getChapitresBySection(@Parameter(description = "Identifiant de la section", required = true) @PathVariable String sectionId) {
+        return ResponseEntity.ok(chapitreService.getChapitresBySection(sectionId));
     }
 
     @Operation(
@@ -42,8 +41,7 @@ public class ChapitreController {
         @ApiResponse(responseCode = "200", description = "Liste des chapitres")
     })
     @GetMapping("/exercice/{exerciceId}/chapitres")
-    @ResponseStatus(HttpStatus.OK)
-    public List<ChapitreResponse> getChapitresByExercice(@Parameter(description = "Identifiant de l'exercice", required = true) @PathVariable String exerciceId) {
-        return chapitreService.getChapitresByExercice(exerciceId);
+    public ResponseEntity<List<ChapitreResponse>> getChapitresByExercice(@Parameter(description = "Identifiant de l'exercice", required = true) @PathVariable String exerciceId) {
+        return ResponseEntity.ok(chapitreService.getChapitresByExercice(exerciceId));
     }
 }

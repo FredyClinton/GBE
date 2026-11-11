@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,14 +32,14 @@ public class UserController {
         @ApiResponse(responseCode = "400", description = "Données invalides")
     })
     @PatchMapping("/me")
-    @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public  void updateProfileInfo(
+    public ResponseEntity<Void> updateProfileInfo(
             @RequestBody
             @Valid
             ProfileUpdateRequest request,
             final Authentication principal
             ){
         this.userServices.updateProfileInfo(request, getUserId(principal));
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(
@@ -51,12 +51,12 @@ public class UserController {
         @ApiResponse(responseCode = "400", description = "Mot de passe actuel incorrect ou confirmation différente")
     })
     @PostMapping("/me/password")
-    @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public  void changePassword(
+    public ResponseEntity<Void> changePassword(
             @RequestBody @Valid ChangePasswordRequest request,
             final Authentication principal
             ){
         this.userServices.changePassword(request, getUserId(principal));
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(
@@ -67,9 +67,9 @@ public class UserController {
         @ApiResponse(responseCode = "204", description = "Compte désactivé")
     })
     @PatchMapping("/me/deactivate")
-    @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public  void deactivateAccount( final Authentication principal){
+    public ResponseEntity<Void> deactivateAccount( final Authentication principal){
         this.userServices.deactivateAccount(getUserId(principal));
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(
@@ -80,9 +80,9 @@ public class UserController {
         @ApiResponse(responseCode = "204", description = "Compte réactivé")
     })
     @PatchMapping("/me/reactivate")
-    @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public  void reactivateAccount( final Authentication principal){
+    public ResponseEntity<Void> reactivateAccount( final Authentication principal){
         this.userServices.reactivateAccount(getUserId(principal));
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(
@@ -93,9 +93,9 @@ public class UserController {
         @ApiResponse(responseCode = "204", description = "Compte supprimé")
     })
     @DeleteMapping("/me")
-    @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public  void deleteAccount( final Authentication principal){
+    public ResponseEntity<Void> deleteAccount( final Authentication principal){
         this.userServices.deleteAccount(getUserId(principal));
+        return ResponseEntity.noContent().build();
     }
 
 

@@ -94,6 +94,37 @@ class GbeApplicationTests {
         }));
     }
 
+    /** Renouvellement : seul un jeton de rafraîchissement valide d'un compte actif donne un nouveau jeton d'accès. */
+    @Test
+    void renouvellementJeton_refuseLesJetonsInvalidesEn401() throws Exception {
+        final String refresh = jwtService.generateRefreshToken("admin@gbe.cm");
+        mockMvc.perform(post("/api/v1/auth/refresh").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"refreshToken\":\"" + refresh + "\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").isNotEmpty())
+                .andExpect(jsonPath("$.refreshToken").value(refresh));
+
+        final long expirationInitiale = jwtService.getRefreshTokenExpiration();
+        final String expire;
+        try {
+            jwtService.setRefreshTokenExpiration(-60_000);
+            expire = jwtService.generateRefreshToken("admin@gbe.cm");
+        } finally {
+            jwtService.setRefreshTokenExpiration(expirationInitiale);
+        }
+        for (String invalide : List.of("pas-un-jwt", expire,
+                jwtService.generateAccessToken("admin@gbe.cm"), jwtService.generateMfaToken("admin@gbe.cm"),
+                jwtService.generateRefreshToken("inconnu@gbe.cm"))) {
+            mockMvc.perform(post("/api/v1/auth/refresh").contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"refreshToken\":\"" + invalide + "\"}"))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.code").value("REFRESH_TOKEN_INVALIDE"));
+        }
+
+        mockMvc.perform(post("/api/v1/auth/refresh").contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isBadRequest());
+    }
+
     @Test
     void migrationsAppliquees_referentielEtRolesCharges() {
         assertThat(sectionRepository.count()).isGreaterThan(1);

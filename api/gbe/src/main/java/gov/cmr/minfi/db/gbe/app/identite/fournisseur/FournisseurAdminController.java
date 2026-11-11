@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,9 +43,8 @@ public class FournisseurAdminController {
         @ApiResponse(responseCode = "403", description = "Permission MANAGE_USERS manquante")
     })
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public FournisseurResponse createFournisseur(@Valid @RequestBody CreateFournisseurRequest request) {
-        return fournisseurService.createFournisseur(request);
+    public ResponseEntity<FournisseurResponse> createFournisseur(@Valid @RequestBody CreateFournisseurRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(fournisseurService.createFournisseur(request));
     }
 
     @Operation(
@@ -56,9 +56,8 @@ public class FournisseurAdminController {
         @ApiResponse(responseCode = "403", description = "Permission MANAGE_USERS manquante")
     })
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public List<FournisseurResponse> getAllFournisseurs() {
-        return fournisseurService.getAllFournisseurs();
+    public ResponseEntity<List<FournisseurResponse>> getAllFournisseurs() {
+        return ResponseEntity.ok(fournisseurService.getAllFournisseurs());
     }
 
     @Operation(
@@ -71,9 +70,8 @@ public class FournisseurAdminController {
         @ApiResponse(responseCode = "404", description = "Fournisseur introuvable")
     })
     @GetMapping("/{fournisseurId}")
-    @ResponseStatus(HttpStatus.OK)
-    public FournisseurResponse getFournisseur(@Parameter(description = "Identifiant du fournisseur", required = true) @PathVariable String fournisseurId) {
-        return fournisseurService.getFournisseur(fournisseurId);
+    public ResponseEntity<FournisseurResponse> getFournisseur(@Parameter(description = "Identifiant du fournisseur", required = true) @PathVariable String fournisseurId) {
+        return ResponseEntity.ok(fournisseurService.getFournisseur(fournisseurId));
     }
 
     @Operation(
@@ -88,11 +86,10 @@ public class FournisseurAdminController {
         @ApiResponse(responseCode = "404", description = "Fournisseur introuvable")
     })
     @PutMapping("/{fournisseurId}")
-    @ResponseStatus(HttpStatus.OK)
-    public FournisseurResponse updateFournisseur(
+    public ResponseEntity<FournisseurResponse> updateFournisseur(
             @Parameter(description = "Identifiant du fournisseur", required = true) @PathVariable String fournisseurId,
             @Valid @RequestBody UpdateFournisseurRequest request) {
-        return fournisseurService.updateFournisseur(fournisseurId, request);
+        return ResponseEntity.ok(fournisseurService.updateFournisseur(fournisseurId, request));
     }
 
     @Operation(
@@ -107,9 +104,8 @@ public class FournisseurAdminController {
         @ApiResponse(responseCode = "404", description = "Fournisseur introuvable")
     })
     @PostMapping("/{fournisseurId}/ribs")
-    @ResponseStatus(HttpStatus.CREATED)
-    public FournisseurResponse ajouterRib(@Parameter(description = "Identifiant du fournisseur", required = true) @PathVariable String fournisseurId, @Valid @RequestBody RibRequest request) {
-        return fournisseurService.ajouterRib(fournisseurId, request);
+    public ResponseEntity<FournisseurResponse> ajouterRib(@Parameter(description = "Identifiant du fournisseur", required = true) @PathVariable String fournisseurId, @Valid @RequestBody RibRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(fournisseurService.ajouterRib(fournisseurId, request));
     }
 
     @Operation(
@@ -123,8 +119,7 @@ public class FournisseurAdminController {
         @ApiResponse(responseCode = "404", description = "Fournisseur ou RIB introuvable")
     })
     @DeleteMapping("/{fournisseurId}/ribs/{ribId}")
-    @ResponseStatus(HttpStatus.OK)
-    public FournisseurResponse retirerRib(@Parameter(description = "Identifiant du fournisseur", required = true) @PathVariable String fournisseurId, @Parameter(description = "Identifiant du RIB (coordonnée bancaire)", required = true) @PathVariable String ribId) {
-        return fournisseurService.retirerRib(fournisseurId, ribId);
+    public ResponseEntity<FournisseurResponse> retirerRib(@Parameter(description = "Identifiant du fournisseur", required = true) @PathVariable String fournisseurId, @Parameter(description = "Identifiant du RIB (coordonnée bancaire)", required = true) @PathVariable String ribId) {
+        return ResponseEntity.ok(fournisseurService.retirerRib(fournisseurId, ribId));
     }
 }

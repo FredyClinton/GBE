@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,9 +41,8 @@ public class AdminController {
         @ApiResponse(responseCode = "403", description = "Permission MANAGE_USERS manquante")
     })
     @PostMapping("/users")
-    @ResponseStatus(HttpStatus.CREATED)
-    public UserSummaryResponse createUser(@Valid @RequestBody CreateUserRequest request) {
-        return adminService.createUser(request);
+    public ResponseEntity<UserSummaryResponse> createUser(@Valid @RequestBody CreateUserRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(adminService.createUser(request));
     }
 
     @Operation(
@@ -54,9 +54,8 @@ public class AdminController {
         @ApiResponse(responseCode = "403", description = "Permission MANAGE_USERS manquante")
     })
     @GetMapping("/users")
-    @ResponseStatus(HttpStatus.OK)
-    public List<UserSummaryResponse> getAllUsers() {
-        return adminService.getAllUsers();
+    public ResponseEntity<List<UserSummaryResponse>> getAllUsers() {
+        return ResponseEntity.ok(adminService.getAllUsers());
     }
 
     @Operation(
@@ -69,9 +68,8 @@ public class AdminController {
         @ApiResponse(responseCode = "404", description = "Utilisateur introuvable")
     })
     @GetMapping("/users/{userId}")
-    @ResponseStatus(HttpStatus.OK)
-    public UserSummaryResponse getUser(@Parameter(description = "Identifiant de l'utilisateur", required = true) @PathVariable String userId) {
-        return adminService.getUser(userId);
+    public ResponseEntity<UserSummaryResponse> getUser(@Parameter(description = "Identifiant de l'utilisateur", required = true) @PathVariable String userId) {
+        return ResponseEntity.ok(adminService.getUser(userId));
     }
 
     @Operation(
@@ -84,9 +82,9 @@ public class AdminController {
         @ApiResponse(responseCode = "404", description = "Utilisateur introuvable")
     })
     @PatchMapping("/users/{userId}/activate")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void activateUserAccount(@Parameter(description = "Identifiant de l'utilisateur", required = true) @PathVariable String userId) {
+    public ResponseEntity<Void> activateUserAccount(@Parameter(description = "Identifiant de l'utilisateur", required = true) @PathVariable String userId) {
         adminService.activeUserAccount(userId);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(
@@ -99,9 +97,9 @@ public class AdminController {
         @ApiResponse(responseCode = "404", description = "Utilisateur introuvable")
     })
     @PatchMapping("/users/{userId}/deactivate")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deactivateUserAccount(@Parameter(description = "Identifiant de l'utilisateur", required = true) @PathVariable String userId) {
+    public ResponseEntity<Void> deactivateUserAccount(@Parameter(description = "Identifiant de l'utilisateur", required = true) @PathVariable String userId) {
         adminService.deactivateUserAccount(userId);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(
@@ -115,9 +113,9 @@ public class AdminController {
         @ApiResponse(responseCode = "404", description = "Utilisateur introuvable")
     })
     @DeleteMapping("/users/{userId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUserAccount(@Parameter(description = "Identifiant de l'utilisateur", required = true) @PathVariable String userId) {
+    public ResponseEntity<Void> deleteUserAccount(@Parameter(description = "Identifiant de l'utilisateur", required = true) @PathVariable String userId) {
         adminService.deleteUserAccount(userId);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(
@@ -129,8 +127,7 @@ public class AdminController {
         @ApiResponse(responseCode = "403", description = "Permission MANAGE_USERS manquante")
     })
     @GetMapping("/users/roles")
-    @ResponseStatus(HttpStatus.OK)
-    public List<RoleResponse> getRoles() {
-        return Arrays.stream(RoleSysteme.values()).map(adminMapper::toRoleResponse).toList();
+    public ResponseEntity<List<RoleResponse>> getRoles() {
+        return ResponseEntity.ok(Arrays.stream(RoleSysteme.values()).map(adminMapper::toRoleResponse).toList());
     }
 }

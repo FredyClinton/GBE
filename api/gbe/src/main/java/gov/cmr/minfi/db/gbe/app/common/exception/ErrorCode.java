@@ -41,6 +41,8 @@ public enum ErrorCode {
     NEW_CP_AMOUNT_LESS_THAN_CONSOMME("NEW_CP_AMOUNT_LESS_THAN_CONSOMME",
             "New CP amount cannot be less than already consumed amount", BAD_REQUEST),
     INVALID_MFA_TOKEN("INVALID_MFA_TOKEN", "Invalid or expired MFA token", UNAUTHORIZED),
+    REFRESH_TOKEN_INVALIDE("REFRESH_TOKEN_INVALIDE",
+            "Jeton de rafraîchissement invalide ou expiré : reconnectez-vous", UNAUTHORIZED),
     MFA_TOKEN_EXPIRED("MFA_TOKEN_EXPIRED", "MFA token has expired, please login again", UNAUTHORIZED),
     CHAPITRE_CYCLE_DETECTED("CHAPITRE_CYCLE_DETECTED", "This requete may create a chapter cycle", BAD_REQUEST),
     TRANSITION_STATUT_INVALIDE("TRANSITION_STATUT_INVALIDE",

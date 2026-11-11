@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,9 +36,8 @@ public class ActionController {
         @ApiResponse(responseCode = "403", description = "Permission MANAGE_USERS manquante")
     })
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public ActionResponse createAction(@Valid @RequestBody ActionRequest request) {
-        return actionService.createAction(request);
+    public ResponseEntity<ActionResponse> createAction(@Valid @RequestBody ActionRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(actionService.createAction(request));
     }
 
     @Operation(
@@ -49,9 +49,8 @@ public class ActionController {
         @ApiResponse(responseCode = "403", description = "Permission MANAGE_USERS manquante")
     })
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public List<ActionResponse> getAllActions() {
-        return actionService.getAllActions();
+    public ResponseEntity<List<ActionResponse>> getAllActions() {
+        return ResponseEntity.ok(actionService.getAllActions());
     }
 
     @Operation(
@@ -64,9 +63,8 @@ public class ActionController {
         @ApiResponse(responseCode = "404", description = "Action introuvable")
     })
     @GetMapping("/{actionId}")
-    @ResponseStatus(HttpStatus.OK)
-    public ActionResponse getAction(@Parameter(description = "Identifiant de l'action", required = true) @PathVariable String actionId) {
-        return actionService.getAction(actionId);
+    public ResponseEntity<ActionResponse> getAction(@Parameter(description = "Identifiant de l'action", required = true) @PathVariable String actionId) {
+        return ResponseEntity.ok(actionService.getAction(actionId));
     }
 
     @Operation(
@@ -78,9 +76,8 @@ public class ActionController {
         @ApiResponse(responseCode = "403", description = "Permission MANAGE_USERS manquante")
     })
     @GetMapping("/programme/{programmeId}")
-    @ResponseStatus(HttpStatus.OK)
-    public List<ActionResponse> getActionsByProgramme(@Parameter(description = "Identifiant du programme", required = true) @PathVariable String programmeId) {
-        return actionService.getActionsByProgramme(programmeId);
+    public ResponseEntity<List<ActionResponse>> getActionsByProgramme(@Parameter(description = "Identifiant du programme", required = true) @PathVariable String programmeId) {
+        return ResponseEntity.ok(actionService.getActionsByProgramme(programmeId));
     }
 
     @Operation(
@@ -92,11 +89,10 @@ public class ActionController {
         @ApiResponse(responseCode = "403", description = "Permission MANAGE_USERS manquante")
     })
     @GetMapping("/programme/{programmeId}/exercice/{exerciceId}")
-    @ResponseStatus(HttpStatus.OK)
-    public List<ActionResponse> getActionsByProgrammeAndExercice(
+    public ResponseEntity<List<ActionResponse>> getActionsByProgrammeAndExercice(
             @Parameter(description = "Identifiant du programme", required = true) @PathVariable String programmeId,
             @Parameter(description = "Identifiant de l'exercice", required = true) @PathVariable String exerciceId) {
-        return actionService.getActionsByProgrammeAndExercice(programmeId, exerciceId);
+        return ResponseEntity.ok(actionService.getActionsByProgrammeAndExercice(programmeId, exerciceId));
     }
 
     @Operation(
@@ -110,9 +106,8 @@ public class ActionController {
         @ApiResponse(responseCode = "404", description = "Action introuvable")
     })
     @PutMapping("/{actionId}")
-    @ResponseStatus(HttpStatus.OK)
-    public ActionResponse updateAction(@Parameter(description = "Identifiant de l'action", required = true) @PathVariable String actionId, @Valid @RequestBody ActionRequest request) {
-        return actionService.updateAction(actionId, request);
+    public ResponseEntity<ActionResponse> updateAction(@Parameter(description = "Identifiant de l'action", required = true) @PathVariable String actionId, @Valid @RequestBody ActionRequest request) {
+        return ResponseEntity.ok(actionService.updateAction(actionId, request));
     }
 
     @Operation(
@@ -126,8 +121,8 @@ public class ActionController {
         @ApiResponse(responseCode = "404", description = "Action introuvable")
     })
     @DeleteMapping("/{actionId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAction(@Parameter(description = "Identifiant de l'action", required = true) @PathVariable String actionId) {
+    public ResponseEntity<Void> deleteAction(@Parameter(description = "Identifiant de l'action", required = true) @PathVariable String actionId) {
         actionService.deleteAction(actionId);
+        return ResponseEntity.noContent().build();
     }
 }

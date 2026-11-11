@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.http.ResponseEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -47,9 +48,8 @@ public class SoumissionController {
         @ApiResponse(responseCode = "409", description = "Le fournisseur a déjà déposé une offre sur ce besoin (SOUMISSION_DEJA_DEPOSEE)")
     })
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public SoumissionResponse deposer(@Valid @RequestBody SoumissionRequest request) {
-        return soumissionService.deposer(request);
+    public ResponseEntity<SoumissionResponse> deposer(@Valid @RequestBody SoumissionRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(soumissionService.deposer(request));
     }
 
     /** Modification jusqu'à la date limite du besoin ; nouveau sceau. */
@@ -66,10 +66,9 @@ public class SoumissionController {
         @ApiResponse(responseCode = "404", description = "Offre introuvable (y compris l'offre d'un autre fournisseur) ou RIB introuvable")
     })
     @PutMapping("/{soumissionId}")
-    @ResponseStatus(HttpStatus.OK)
-    public SoumissionResponse modifier(@Parameter(description = "Identifiant de la soumission", required = true) @PathVariable String soumissionId,
+    public ResponseEntity<SoumissionResponse> modifier(@Parameter(description = "Identifiant de la soumission", required = true) @PathVariable String soumissionId,
                                        @Valid @RequestBody SoumissionRequest request) {
-        return soumissionService.modifier(soumissionId, request);
+        return ResponseEntity.ok(soumissionService.modifier(soumissionId, request));
     }
 
     @Operation(
@@ -83,9 +82,8 @@ public class SoumissionController {
         @ApiResponse(responseCode = "403", description = "Permission SOUMISSIONNER manquante")
     })
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public PageResponse<SoumissionResponse> getMesSoumissions(@ParameterObject Pageable pageable) {
-        return soumissionService.getMesSoumissions(pageable);
+    public ResponseEntity<PageResponse<SoumissionResponse>> getMesSoumissions(@ParameterObject Pageable pageable) {
+        return ResponseEntity.ok(soumissionService.getMesSoumissions(pageable));
     }
 
     @Operation(
@@ -98,8 +96,7 @@ public class SoumissionController {
         @ApiResponse(responseCode = "404", description = "Offre introuvable (y compris l'offre d'un autre fournisseur)")
     })
     @GetMapping("/{soumissionId}")
-    @ResponseStatus(HttpStatus.OK)
-    public SoumissionResponse getMaSoumission(@Parameter(description = "Identifiant de la soumission", required = true) @PathVariable String soumissionId) {
-        return soumissionService.getMaSoumission(soumissionId);
+    public ResponseEntity<SoumissionResponse> getMaSoumission(@Parameter(description = "Identifiant de la soumission", required = true) @PathVariable String soumissionId) {
+        return ResponseEntity.ok(soumissionService.getMaSoumission(soumissionId));
     }
 }

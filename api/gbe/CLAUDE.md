@@ -35,6 +35,10 @@ order live in `common/config/OpenApiTags` + `OpenApiConfig`; every referentiel c
 (also on optional query filters). `GbeApplicationTests.documentationOpenApi_routesDocumenteesEtReferentielGroupe` fails
 if a route has no summary or an undeclared tag.
 
+**Controller return types:** every route returns `ResponseEntity<T>` (no `@ResponseStatus`): `ResponseEntity.ok(...)`,
+`ResponseEntity.status(HttpStatus.CREATED).body(...)` for creations, `ResponseEntity<Void>` +
+`ResponseEntity.noContent().build()` for 204. The JSON body is the same DTO as before.
+
 ## Architecture
 
 **Stack:** Spring Boot 4.0.3 · Java 17 · PostgreSQL · Flyway · Spring Security + JWT (jjwt, RSA) · Spring Data JPA ·
@@ -111,6 +115,9 @@ Covered by `CreditBudgetaireTest`. Keep it in sync when adding transitions.
   `ApplicatorAuditoreAware`.
 - Password login → if MFA enabled, short-lived MFA token → TOTP verification → access + refresh tokens. `firstLogin`
   forces a password change; a missing MFA secret is generated at login.
+- `POST /auth/refresh` (`JwtService.extraireSujetRefreshToken`): returns a new access token and the same refresh token.
+  A malformed, expired or wrong-type token (access/MFA), or an account deleted, disabled or locked since login, gives
+  401 `REFRESH_TOKEN_INVALIDE`; a missing token gives 400.
 
 ### Configuration and profiles
 

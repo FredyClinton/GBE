@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,9 +29,8 @@ public class NatureEconomiqueController {
         @ApiResponse(responseCode = "200", description = "Liste des natures économiques")
     })
     @GetMapping("/natures-economiques")
-    @ResponseStatus(HttpStatus.OK)
-    public List<NatureEconomiqueResponse> getAllNaturesEconomiques() {
-        return natureEconomiqueService.getAllNaturesEconomiques();
+    public ResponseEntity<List<NatureEconomiqueResponse>> getAllNaturesEconomiques() {
+        return ResponseEntity.ok(natureEconomiqueService.getAllNaturesEconomiques());
     }
 
     @Operation(
@@ -43,8 +42,7 @@ public class NatureEconomiqueController {
         @ApiResponse(responseCode = "200", description = "Liste des natures économiques")
     })
     @GetMapping("/exercice/{exerciceId}/natures-economiques")
-    @ResponseStatus(HttpStatus.OK)
-    public List<NatureEconomiqueResponse> getNaturesEconomiquesByExercice(@Parameter(description = "Identifiant de l'exercice", required = true) @PathVariable String exerciceId) {
-        return natureEconomiqueService.getNaturesEconomiquesByExercice(exerciceId);
+    public ResponseEntity<List<NatureEconomiqueResponse>> getNaturesEconomiquesByExercice(@Parameter(description = "Identifiant de l'exercice", required = true) @PathVariable String exerciceId) {
+        return ResponseEntity.ok(natureEconomiqueService.getNaturesEconomiquesByExercice(exerciceId));
     }
 }

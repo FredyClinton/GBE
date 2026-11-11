@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,10 +46,9 @@ public class ExpressionBesoinController {
         @ApiResponse(responseCode = "404", description = "Tâche, chapitre, nature économique ou matière introuvable")
     })
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('EXPRIMER_BESOIN')")
-    public ExpressionBesoinResponse creer(@Valid @RequestBody ExpressionBesoinRequest request) {
-        return besoinService.creer(request);
+    public ResponseEntity<ExpressionBesoinResponse> creer(@Valid @RequestBody ExpressionBesoinRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(besoinService.creer(request));
     }
 
     /**
@@ -66,14 +66,13 @@ public class ExpressionBesoinController {
         @ApiResponse(responseCode = "400", description = "Propriété de tri non autorisée (TRI_INVALIDE)")
     })
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public PageResponse<ExpressionBesoinResponse> rechercher(
+    public ResponseEntity<PageResponse<ExpressionBesoinResponse>> rechercher(
             @Parameter(description = "Filtre facultatif : identifiant de l'exercice") @RequestParam(required = false) String exerciceId,
             @Parameter(description = "Filtre facultatif : identifiant de la section") @RequestParam(required = false) String sectionId,
             @Parameter(description = "Filtre facultatif : identifiant du programme") @RequestParam(required = false) String programmeId,
             @Parameter(description = "Filtre facultatif : statut du besoin") @RequestParam(required = false) StatutExpression statut,
             @ParameterObject Pageable pageable) {
-        return besoinService.rechercher(exerciceId, sectionId, programmeId, statut, pageable);
+        return ResponseEntity.ok(besoinService.rechercher(exerciceId, sectionId, programmeId, statut, pageable));
     }
 
     @Operation(
@@ -82,13 +81,12 @@ public class ExpressionBesoinController {
     )
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Besoin trouvé"),
-        @ApiResponse(responseCode = "403", description = "hors du périmètre des mandats de l'utilisateur"),
+        @ApiResponse(responseCode = "403", description = "Hors du périmètre des mandats de l'utilisateur"),
         @ApiResponse(responseCode = "404", description = "Besoin introuvable")
     })
     @GetMapping("/{besoinId}")
-    @ResponseStatus(HttpStatus.OK)
-    public ExpressionBesoinResponse getBesoin(@Parameter(description = "Identifiant de l'expression de besoin", required = true) @PathVariable String besoinId) {
-        return besoinService.getBesoin(besoinId);
+    public ResponseEntity<ExpressionBesoinResponse> getBesoin(@Parameter(description = "Identifiant de l'expression de besoin", required = true) @PathVariable String besoinId) {
+        return ResponseEntity.ok(besoinService.getBesoin(besoinId));
     }
 
     @Operation(
@@ -103,11 +101,10 @@ public class ExpressionBesoinController {
         @ApiResponse(responseCode = "404", description = "Besoin, tâche, chapitre, nature économique ou matière introuvable")
     })
     @PutMapping("/{besoinId}")
-    @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('EXPRIMER_BESOIN')")
-    public ExpressionBesoinResponse modifier(@Parameter(description = "Identifiant de l'expression de besoin", required = true) @PathVariable String besoinId,
+    public ResponseEntity<ExpressionBesoinResponse> modifier(@Parameter(description = "Identifiant de l'expression de besoin", required = true) @PathVariable String besoinId,
                                              @Valid @RequestBody ExpressionBesoinRequest request) {
-        return besoinService.modifier(besoinId, request);
+        return ResponseEntity.ok(besoinService.modifier(besoinId, request));
     }
 
     @Operation(
@@ -123,10 +120,9 @@ public class ExpressionBesoinController {
         @ApiResponse(responseCode = "404", description = "Besoin introuvable")
     })
     @PatchMapping("/{besoinId}/publier")
-    @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('EXPRIMER_BESOIN')")
-    public ExpressionBesoinResponse publier(@Parameter(description = "Identifiant de l'expression de besoin", required = true) @PathVariable String besoinId) {
-        return besoinService.publier(besoinId);
+    public ResponseEntity<ExpressionBesoinResponse> publier(@Parameter(description = "Identifiant de l'expression de besoin", required = true) @PathVariable String besoinId) {
+        return ResponseEntity.ok(besoinService.publier(besoinId));
     }
 
     @Operation(
@@ -141,10 +137,9 @@ public class ExpressionBesoinController {
         @ApiResponse(responseCode = "404", description = "Besoin introuvable")
     })
     @PatchMapping("/{besoinId}/cloturer")
-    @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('EXPRIMER_BESOIN')")
-    public ExpressionBesoinResponse cloturerSoumissions(@Parameter(description = "Identifiant de l'expression de besoin", required = true) @PathVariable String besoinId) {
-        return besoinService.cloturerSoumissions(besoinId);
+    public ResponseEntity<ExpressionBesoinResponse> cloturerSoumissions(@Parameter(description = "Identifiant de l'expression de besoin", required = true) @PathVariable String besoinId) {
+        return ResponseEntity.ok(besoinService.cloturerSoumissions(besoinId));
     }
 
     @Operation(
@@ -159,11 +154,10 @@ public class ExpressionBesoinController {
         @ApiResponse(responseCode = "404", description = "Besoin introuvable")
     })
     @PatchMapping("/{besoinId}/annuler")
-    @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('EXPRIMER_BESOIN')")
-    public ExpressionBesoinResponse annuler(@Parameter(description = "Identifiant de l'expression de besoin", required = true) @PathVariable String besoinId,
+    public ResponseEntity<ExpressionBesoinResponse> annuler(@Parameter(description = "Identifiant de l'expression de besoin", required = true) @PathVariable String besoinId,
                                             @Valid @RequestBody AnnulationBesoinRequest request) {
-        return besoinService.annuler(besoinId, request);
+        return ResponseEntity.ok(besoinService.annuler(besoinId, request));
     }
 
     /** Suppression logique d'un brouillon. */
@@ -178,9 +172,9 @@ public class ExpressionBesoinController {
         @ApiResponse(responseCode = "404", description = "Besoin introuvable")
     })
     @DeleteMapping("/{besoinId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('EXPRIMER_BESOIN')")
-    public void supprimer(@Parameter(description = "Identifiant de l'expression de besoin", required = true) @PathVariable String besoinId) {
+    public ResponseEntity<Void> supprimer(@Parameter(description = "Identifiant de l'expression de besoin", required = true) @PathVariable String besoinId) {
         besoinService.supprimer(besoinId);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,9 +37,8 @@ public class TacheAdminController {
 		@ApiResponse(responseCode = "404", description = "Activité introuvable")
 	})
 	@PostMapping
-	@ResponseStatus(HttpStatus.CREATED)
-	public TacheResponse createTache(@Valid @RequestBody TacheRequest request) {
-		return tacheService.createTache(request);
+	public ResponseEntity<TacheResponse> createTache(@Valid @RequestBody TacheRequest request) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(tacheService.createTache(request));
 	}
 
 	@Operation(
@@ -52,9 +52,8 @@ public class TacheAdminController {
 		@ApiResponse(responseCode = "404", description = "Tâche ou activité introuvable")
 	})
 	@PutMapping("/{tacheId}")
-	@ResponseStatus(HttpStatus.OK)
-	public TacheResponse updateTache(@Parameter(description = "Identifiant de la tâche", required = true) @PathVariable String tacheId, @Valid @RequestBody TacheRequest request) {
-		return tacheService.updateTache(tacheId, request);
+	public ResponseEntity<TacheResponse> updateTache(@Parameter(description = "Identifiant de la tâche", required = true) @PathVariable String tacheId, @Valid @RequestBody TacheRequest request) {
+		return ResponseEntity.ok(tacheService.updateTache(tacheId, request));
 	}
 
 	@Operation(
@@ -67,8 +66,8 @@ public class TacheAdminController {
 		@ApiResponse(responseCode = "404", description = "Tâche introuvable")
 	})
 	@DeleteMapping("/{tacheId}")
-	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void deleteTache(@Parameter(description = "Identifiant de la tâche", required = true) @PathVariable String tacheId) {
+	public ResponseEntity<Void> deleteTache(@Parameter(description = "Identifiant de la tâche", required = true) @PathVariable String tacheId) {
 		tacheService.deleteTache(tacheId);
+		return ResponseEntity.noContent().build();
 	}
 }

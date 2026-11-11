@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,9 +29,8 @@ public class SectionController {
         @ApiResponse(responseCode = "200", description = "Liste des sections")
     })
     @GetMapping("/sections")
-    @ResponseStatus(HttpStatus.OK)
-    public List<SectionResponse> getAllSections() {
-        return sectionService.getAllSections();
+    public ResponseEntity<List<SectionResponse>> getAllSections() {
+        return ResponseEntity.ok(sectionService.getAllSections());
     }
 
     @Operation(
@@ -42,8 +41,7 @@ public class SectionController {
         @ApiResponse(responseCode = "200", description = "Liste des sections")
     })
     @GetMapping("/sections/exercice/{exerciceId}")
-    @ResponseStatus(HttpStatus.OK)
-    public List<SectionResponse> getSectionsByExercice(@Parameter(description = "Identifiant de l'exercice", required = true) @PathVariable String exerciceId) {
-        return sectionService.getSectionsByExercice(exerciceId);
+    public ResponseEntity<List<SectionResponse>> getSectionsByExercice(@Parameter(description = "Identifiant de l'exercice", required = true) @PathVariable String exerciceId) {
+        return ResponseEntity.ok(sectionService.getSectionsByExercice(exerciceId));
     }
 }

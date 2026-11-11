@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -36,11 +36,10 @@ public class AuthenticationController {
         @ApiResponse(responseCode = "404", description = "Utilisateur introuvable")
     })
     @PostMapping("/login")
-    @ResponseStatus(HttpStatus.OK)
-    public AuthenticationResponse login(
+    public ResponseEntity<AuthenticationResponse> login(
             @Valid @RequestBody AuthenticationRequest request
     ) {
-        return authenticationService.login(request);
+        return ResponseEntity.ok(authenticationService.login(request));
     }
 
     @Operation(
@@ -49,16 +48,15 @@ public class AuthenticationController {
     )
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Double authentification configurée"),
-        @ApiResponse(responseCode = "400", description = "Jeton MFA invalide ou double authentification déjà confirmée"),
-        @ApiResponse(responseCode = "401", description = "Code TOTP incorrect"),
+        @ApiResponse(responseCode = "400", description = "Double authentification déjà confirmée (MFA_ALREADY_CONFIRMED)"),
+        @ApiResponse(responseCode = "401", description = "Jeton MFA invalide ou expiré, ou code TOTP incorrect"),
         @ApiResponse(responseCode = "404", description = "Utilisateur introuvable")
     })
     @PostMapping("/setup-mfa")
-    @ResponseStatus(HttpStatus.OK)
-    public AuthenticationResponse setupMfa(
+    public ResponseEntity<AuthenticationResponse> setupMfa(
             @Valid @RequestBody SetupMfaRequest request
     ) {
-        return authenticationService.setupMfa(request);
+        return ResponseEntity.ok(authenticationService.setupMfa(request));
     }
 
     @Operation(
@@ -67,32 +65,32 @@ public class AuthenticationController {
     )
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Code vérifié, jetons retournés"),
-        @ApiResponse(responseCode = "400", description = "Jeton MFA invalide"),
-        @ApiResponse(responseCode = "401", description = "Code TOTP incorrect"),
+        @ApiResponse(responseCode = "401", description = "Jeton MFA invalide ou expiré, ou code TOTP incorrect"),
         @ApiResponse(responseCode = "404", description = "Utilisateur introuvable")
     })
     @PostMapping("/verify")
-    @ResponseStatus(HttpStatus.OK)
-    public AuthenticationResponse verify(
+    public ResponseEntity<AuthenticationResponse> verify(
             @Valid @RequestBody VerificationRequest request
     ) {
-        return authenticationService.verifyCode(request);
+        return ResponseEntity.ok(authenticationService.verifyCode(request));
     }
 
     @Operation(
         summary = "Renouveler les jetons",
-        description = "Route publique : échange un jeton de rafraîchissement valide contre un nouveau jeton d'accès."
+        description = "Route publique : échange un jeton de rafraîchissement valide contre un nouveau jeton d'accès. " +
+            "Le jeton de rafraîchissement est retourné inchangé et reste valable jusqu'à son expiration. " +
+            "Le renouvellement est refusé si le jeton est mal formé, expiré, d'un autre type (accès ou MFA), " +
+            "ou si le compte a été supprimé, désactivé ou verrouillé depuis la connexion."
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Jetons renouvelés"),
+        @ApiResponse(responseCode = "200", description = "Nouveau jeton d'accès retourné"),
         @ApiResponse(responseCode = "400", description = "Jeton de rafraîchissement absent"),
-        @ApiResponse(responseCode = "500", description = "Jeton de rafraîchissement invalide ou expiré (erreur pas encore typée côté serveur)")
+        @ApiResponse(responseCode = "401", description = "Jeton de rafraîchissement invalide ou expiré, ou compte inactif (REFRESH_TOKEN_INVALIDE)")
     })
     @PostMapping("/refresh")
-    @ResponseStatus(HttpStatus.OK)
-    public AuthenticationResponse refresh(
+    public ResponseEntity<AuthenticationResponse> refresh(
             @Valid @RequestBody RefreshRequest request
     ) {
-        return authenticationService.refreshToken(request);
+        return ResponseEntity.ok(authenticationService.refreshToken(request));
     }
 }

@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,12 +40,11 @@ public class MandatController {
         @ApiResponse(responseCode = "404", description = "Utilisateur, section ou programme introuvable")
     })
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public MandatSummary createMandat(
+    public ResponseEntity<MandatSummary> createMandat(
             @Parameter(description = "Identifiant de l'utilisateur", required = true) @PathVariable String userId,
             @Valid @RequestBody CreateMandatRequest request
     ) {
-        return mandatService.createMandat(userId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(mandatService.createMandat(userId, request));
     }
 
     @Operation(
@@ -56,9 +56,8 @@ public class MandatController {
         @ApiResponse(responseCode = "403", description = "Permission MANAGE_AFFECTATIONS manquante")
     })
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public List<MandatSummary> getMandats(@Parameter(description = "Identifiant de l'utilisateur", required = true) @PathVariable String userId) {
-        return mandatService.getMandats(userId);
+    public ResponseEntity<List<MandatSummary>> getMandats(@Parameter(description = "Identifiant de l'utilisateur", required = true) @PathVariable String userId) {
+        return ResponseEntity.ok(mandatService.getMandats(userId));
     }
 
     @Operation(
@@ -72,13 +71,12 @@ public class MandatController {
         @ApiResponse(responseCode = "404", description = "Mandat introuvable")
     })
     @PatchMapping("/{mandatId}")
-    @ResponseStatus(HttpStatus.OK)
-    public MandatSummary updateMandat(
+    public ResponseEntity<MandatSummary> updateMandat(
             @Parameter(description = "Identifiant de l'utilisateur", required = true) @PathVariable String userId,
             @Parameter(description = "Identifiant du mandat", required = true) @PathVariable String mandatId,
             @Valid @RequestBody UpdateMandatRequest request
     ) {
-        return mandatService.updateMandat(userId, mandatId, request);
+        return ResponseEntity.ok(mandatService.updateMandat(userId, mandatId, request));
     }
 
     @Operation(
@@ -92,12 +90,12 @@ public class MandatController {
         @ApiResponse(responseCode = "404", description = "Mandat introuvable")
     })
     @PatchMapping("/{mandatId}/activer")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void activateMandat(
+    public ResponseEntity<Void> activateMandat(
             @Parameter(description = "Identifiant de l'utilisateur", required = true) @PathVariable String userId,
             @Parameter(description = "Identifiant du mandat", required = true) @PathVariable String mandatId
     ) {
         mandatService.activateMandat(userId, mandatId);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(
@@ -111,12 +109,12 @@ public class MandatController {
         @ApiResponse(responseCode = "404", description = "Mandat introuvable")
     })
     @PatchMapping("/{mandatId}/desactiver")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deactivateMandat(
+    public ResponseEntity<Void> deactivateMandat(
             @Parameter(description = "Identifiant de l'utilisateur", required = true) @PathVariable String userId,
             @Parameter(description = "Identifiant du mandat", required = true) @PathVariable String mandatId
     ) {
         mandatService.deactivateMandat(userId, mandatId);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(
@@ -129,11 +127,11 @@ public class MandatController {
         @ApiResponse(responseCode = "404", description = "Mandat introuvable")
     })
     @DeleteMapping("/{mandatId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeMandat(
+    public ResponseEntity<Void> removeMandat(
             @Parameter(description = "Identifiant de l'utilisateur", required = true) @PathVariable String userId,
             @Parameter(description = "Identifiant du mandat", required = true) @PathVariable String mandatId
     ) {
         mandatService.removeMandat(userId, mandatId);
+        return ResponseEntity.noContent().build();
     }
 }

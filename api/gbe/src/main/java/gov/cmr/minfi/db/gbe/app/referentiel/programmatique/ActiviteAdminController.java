@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,9 +37,8 @@ public class ActiviteAdminController {
 		@ApiResponse(responseCode = "404", description = "Action introuvable")
 	})
 	@PostMapping
-	@ResponseStatus(HttpStatus.CREATED)
-	public ActiviteResponse createActivite(@Valid @RequestBody ActiviteRequest request) {
-		return activiteService.createActivite(request);
+	public ResponseEntity<ActiviteResponse> createActivite(@Valid @RequestBody ActiviteRequest request) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(activiteService.createActivite(request));
 	}
 
 	@Operation(
@@ -53,9 +53,8 @@ public class ActiviteAdminController {
 		@ApiResponse(responseCode = "404", description = "Activité ou action introuvable")
 	})
 	@PutMapping("/{activiteId}")
-	@ResponseStatus(HttpStatus.OK)
-	public ActiviteResponse updateActivite(@Parameter(description = "Identifiant de l'activité", required = true) @PathVariable String activiteId, @Valid @RequestBody ActiviteRequest request) {
-		return activiteService.updateActivite(activiteId, request);
+	public ResponseEntity<ActiviteResponse> updateActivite(@Parameter(description = "Identifiant de l'activité", required = true) @PathVariable String activiteId, @Valid @RequestBody ActiviteRequest request) {
+		return ResponseEntity.ok(activiteService.updateActivite(activiteId, request));
 	}
 
 	@Operation(
@@ -69,8 +68,8 @@ public class ActiviteAdminController {
 		@ApiResponse(responseCode = "404", description = "Activité introuvable")
 	})
 	@DeleteMapping("/{activiteId}")
-	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void deleteActivite(@Parameter(description = "Identifiant de l'activité", required = true) @PathVariable String activiteId) {
+	public ResponseEntity<Void> deleteActivite(@Parameter(description = "Identifiant de l'activité", required = true) @PathVariable String activiteId) {
 		activiteService.deleteActivite(activiteId);
+		return ResponseEntity.noContent().build();
 	}
 }

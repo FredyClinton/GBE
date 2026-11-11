@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,12 +39,11 @@ public class CreditBudgetaireController {
         @ApiResponse(responseCode = "404", description = "Élément de l'imputation introuvable")
     })
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('INSCRIRE_CREDIT')")
-    public CreditBudgetaireResponse createCredit(
+    public ResponseEntity<CreditBudgetaireResponse> createCredit(
             @Valid @RequestBody CreateCreditRequest request
     ) {
-        return creditBudgetaireService.createCredit(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(creditBudgetaireService.createCredit(request));
     }
 
 
@@ -54,15 +54,14 @@ public class CreditBudgetaireController {
     )
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Crédit trouvé"),
-        @ApiResponse(responseCode = "403", description = "hors du périmètre des mandats de l'utilisateur"),
+        @ApiResponse(responseCode = "403", description = "Hors du périmètre des mandats de l'utilisateur"),
         @ApiResponse(responseCode = "404", description = "Crédit introuvable")
     })
     @GetMapping("/{creditId}")
-    @ResponseStatus(HttpStatus.OK)
-    public CreditBudgetaireResponse getCredit(
+    public ResponseEntity<CreditBudgetaireResponse> getCredit(
             @Parameter(description = "Identifiant du crédit budgétaire", required = true) @PathVariable String creditId
     ) {
-        return creditBudgetaireService.getCredit(creditId);
+        return ResponseEntity.ok(creditBudgetaireService.getCredit(creditId));
     }
 
     @Operation(
@@ -73,11 +72,10 @@ public class CreditBudgetaireController {
         @ApiResponse(responseCode = "200", description = "Liste des crédits")
     })
     @GetMapping("/exercice/{exerciceId}")
-    @ResponseStatus(HttpStatus.OK)
-    public List<CreditBudgetaireResponse> getCreditsByExercice(
+    public ResponseEntity<List<CreditBudgetaireResponse>> getCreditsByExercice(
             @Parameter(description = "Identifiant de l'exercice", required = true) @PathVariable String exerciceId
     ) {
-        return creditBudgetaireService.getCreditsByExercice(exerciceId);
+        return ResponseEntity.ok(creditBudgetaireService.getCreditsByExercice(exerciceId));
     }
 
     @Operation(
@@ -86,15 +84,14 @@ public class CreditBudgetaireController {
     )
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Liste des crédits"),
-        @ApiResponse(responseCode = "403", description = "hors du périmètre des mandats de l'utilisateur")
+        @ApiResponse(responseCode = "403", description = "Hors du périmètre des mandats de l'utilisateur")
     })
     @GetMapping("/section/{sectionId}/exercice/{exerciceId}")
-    @ResponseStatus(HttpStatus.OK)
-    public List<CreditBudgetaireResponse> getCreditsBySection(
+    public ResponseEntity<List<CreditBudgetaireResponse>> getCreditsBySection(
             @Parameter(description = "Identifiant de la section", required = true) @PathVariable String sectionId,
             @Parameter(description = "Identifiant de l'exercice", required = true) @PathVariable String exerciceId
     ) {
-        return creditBudgetaireService.getCreditsBySection(sectionId, exerciceId);
+        return ResponseEntity.ok(creditBudgetaireService.getCreditsBySection(sectionId, exerciceId));
     }
 
     @Operation(
@@ -105,11 +102,10 @@ public class CreditBudgetaireController {
         @ApiResponse(responseCode = "200", description = "Liste des crédits")
     })
     @GetMapping("/programme/{programmeId}")
-    @ResponseStatus(HttpStatus.OK)
-    public List<CreditBudgetaireResponse> getCreditsByProgramme(
+    public ResponseEntity<List<CreditBudgetaireResponse>> getCreditsByProgramme(
             @Parameter(description = "Identifiant du programme", required = true) @PathVariable String programmeId
     ) {
-        return creditBudgetaireService.getCreditsByProgramme(programmeId);
+        return ResponseEntity.ok(creditBudgetaireService.getCreditsByProgramme(programmeId));
     }
 
 
@@ -125,13 +121,13 @@ public class CreditBudgetaireController {
         @ApiResponse(responseCode = "404", description = "Crédit introuvable")
     })
     @PatchMapping("/{creditId}/ae")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('REVISER_AE')")
-    public void updateAE(
+    public ResponseEntity<Void> updateAE(
             @Parameter(description = "Identifiant du crédit budgétaire", required = true) @PathVariable String creditId,
             @Valid @RequestBody UpdateCreditBudgetaireRequest request
     ) {
         creditBudgetaireService.updateAE(creditId, request);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(
@@ -145,13 +141,13 @@ public class CreditBudgetaireController {
         @ApiResponse(responseCode = "404", description = "Crédit introuvable")
     })
     @PatchMapping("/{creditId}/cp")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('REVISER_CP')")
-    public void updateCP(
+    public ResponseEntity<Void> updateCP(
             @Parameter(description = "Identifiant du crédit budgétaire", required = true) @PathVariable String creditId,
             @Valid @RequestBody UpdateCreditBudgetaireRequest request
     ) {
         creditBudgetaireService.updateCP(creditId, request);
+        return ResponseEntity.noContent().build();
     }
 
 
@@ -167,12 +163,12 @@ public class CreditBudgetaireController {
         @ApiResponse(responseCode = "404", description = "Crédit introuvable")
     })
     @PatchMapping("/{creditId}/suspendre")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('REVISER_AE')")
-    public void suspendreCredit(
+    public ResponseEntity<Void> suspendreCredit(
             @Parameter(description = "Identifiant du crédit budgétaire", required = true) @PathVariable String creditId
     ) {
         creditBudgetaireService.suspendreCredit(creditId);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(
@@ -186,12 +182,12 @@ public class CreditBudgetaireController {
         @ApiResponse(responseCode = "404", description = "Crédit introuvable")
     })
     @PatchMapping("/{creditId}/debloquer")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('REVISER_AE')")
-    public void debloquerCredit(
+    public ResponseEntity<Void> debloquerCredit(
             @Parameter(description = "Identifiant du crédit budgétaire", required = true) @PathVariable String creditId
     ) {
         creditBudgetaireService.debloquerCredit(creditId);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(
@@ -205,12 +201,12 @@ public class CreditBudgetaireController {
         @ApiResponse(responseCode = "404", description = "Crédit introuvable")
     })
     @PatchMapping("/{creditId}/cantonner")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('REVISER_AE')")
-    public void cantionnerCredit(
+    public ResponseEntity<Void> cantionnerCredit(
             @Parameter(description = "Identifiant du crédit budgétaire", required = true) @PathVariable String creditId
     ) {
         creditBudgetaireService.cantionnerCredit(creditId);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(
@@ -224,12 +220,12 @@ public class CreditBudgetaireController {
         @ApiResponse(responseCode = "404", description = "Crédit introuvable")
     })
     @PatchMapping("/{creditId}/decantionner")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('REVISER_AE')")
-    public void decantionnerCredit(
+    public ResponseEntity<Void> decantionnerCredit(
             @Parameter(description = "Identifiant du crédit budgétaire", required = true) @PathVariable String creditId
     ) {
         creditBudgetaireService.decantionnerCredit(creditId);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(
@@ -244,11 +240,11 @@ public class CreditBudgetaireController {
         @ApiResponse(responseCode = "404", description = "Crédit introuvable")
     })
     @PatchMapping("/{creditId}/annuler")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('REVISER_AE')")
-    public void annulerCredit(
+    public ResponseEntity<Void> annulerCredit(
             @Parameter(description = "Identifiant du crédit budgétaire", required = true) @PathVariable String creditId
     ) {
         creditBudgetaireService.annulerCredit(creditId);
+        return ResponseEntity.noContent().build();
     }
 }

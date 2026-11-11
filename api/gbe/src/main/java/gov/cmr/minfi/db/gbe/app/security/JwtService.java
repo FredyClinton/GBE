@@ -1,5 +1,7 @@
 package gov.cmr.minfi.db.gbe.app.security;
 
+import gov.cmr.minfi.db.gbe.app.common.exception.BusinessException;
+import gov.cmr.minfi.db.gbe.app.common.exception.ErrorCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -21,6 +23,7 @@ public class JwtService {
 
     private static final String TOKEN_TYPE = "token_type";
     private static final String MFA_TOKEN_TYPE = "MFA_TOKEN";
+    private static final String REFRESH_TOKEN_TYPE = "REFRESH_TOKEN";
     private final PrivateKey privateKey;
     private final PublicKey publicKey;
 
@@ -48,7 +51,7 @@ public class JwtService {
     }
 
     public String generateRefreshToken(final String username) {
-        final Map<String, Object> claims = Map.of(TOKEN_TYPE, "REFRESH_TOKEN");
+        final Map<String, Object> claims = Map.of(TOKEN_TYPE, REFRESH_TOKEN_TYPE);
         return buildToken(username, claims, this.refreshTokenExpiration);
     }
 
@@ -87,18 +90,26 @@ public class JwtService {
         }
     }
 
-    public String refreshAccessToken(final String refreshToken) {
-        final Claims claims = extractClaims(refreshToken);
-        if (!"REFRESH_TOKEN".equals(claims.get(TOKEN_TYPE))) {
-            throw new RuntimeException("Invalid  token type");
+    /**
+     * Identifiant (e-mail) porté par un jeton de rafraîchissement. Refuse avec {@code REFRESH_TOKEN_INVALIDE} (401)
+     * un jeton absent, mal formé, mal signé, expiré (le parseur vérifie l'expiration) ou d'un autre type
+     * (jeton d'accès ou jeton MFA).
+     */
+    public String extraireSujetRefreshToken(final String refreshToken) {
+        final Claims claims;
+        try {
+            claims = Jwts.parser()
+                    .verifyWith(this.publicKey)
+                    .build()
+                    .parseSignedClaims(refreshToken)
+                    .getPayload();
+        } catch (final JwtException | IllegalArgumentException e) {
+            throw new BusinessException(ErrorCode.REFRESH_TOKEN_INVALIDE);
         }
-
-        if (isTokenExpired(refreshToken)) {
-            throw new RuntimeException("Refresh Token  expired");
+        if (!REFRESH_TOKEN_TYPE.equals(claims.get(TOKEN_TYPE)) || claims.getSubject() == null) {
+            throw new BusinessException(ErrorCode.REFRESH_TOKEN_INVALIDE);
         }
-        final String username = claims.getSubject();
-
-        return generateAccessToken(username);
+        return claims.getSubject();
     }
 
     public String generateMfaToken(final String username) {

@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,9 +35,8 @@ public class ProgrammeController {
         @ApiResponse(responseCode = "200", description = "Liste des programmes")
     })
     @GetMapping("/programmes")
-    @ResponseStatus(HttpStatus.OK)
-    public List<ProgrammeResponse> getAllProgrammes() {
-        return programmeService.getAllProgrammes();
+    public ResponseEntity<List<ProgrammeResponse>> getAllProgrammes() {
+        return ResponseEntity.ok(programmeService.getAllProgrammes());
     }
 
     @Operation(
@@ -48,9 +47,8 @@ public class ProgrammeController {
         @ApiResponse(responseCode = "200", description = "Liste des programmes")
     })
     @GetMapping("/sections/{sectionId}/programmes")
-    @ResponseStatus(HttpStatus.OK)
-    public List<ProgrammeResponse> getProgrammesBySection(@Parameter(description = "Identifiant de la section", required = true) @PathVariable String sectionId) {
-        return programmeService.getProgrammesBySection(sectionId);
+    public ResponseEntity<List<ProgrammeResponse>> getProgrammesBySection(@Parameter(description = "Identifiant de la section", required = true) @PathVariable String sectionId) {
+        return ResponseEntity.ok(programmeService.getProgrammesBySection(sectionId));
     }
 
     @Operation(
@@ -61,9 +59,8 @@ public class ProgrammeController {
         @ApiResponse(responseCode = "200", description = "Liste des programmes")
     })
     @GetMapping("/exercice/{exerciceId}/programmes")
-    @ResponseStatus(HttpStatus.OK)
-    public List<ProgrammeResponse> getProgrammesByExercice(@Parameter(description = "Identifiant de l'exercice", required = true) @PathVariable String exerciceId) {
-        return programmeService.getProgrammesByExercice(exerciceId);
+    public ResponseEntity<List<ProgrammeResponse>> getProgrammesByExercice(@Parameter(description = "Identifiant de l'exercice", required = true) @PathVariable String exerciceId) {
+        return ResponseEntity.ok(programmeService.getProgrammesByExercice(exerciceId));
     }
 
     @Operation(
@@ -74,9 +71,8 @@ public class ProgrammeController {
         @ApiResponse(responseCode = "200", description = "Liste des actions")
     })
     @GetMapping("/programmes/{programmeId}/actions")
-    @ResponseStatus(HttpStatus.OK)
-    public List<ActionResponse> getActionsByProgramme(@Parameter(description = "Identifiant du programme", required = true) @PathVariable String programmeId) {
-        return actionService.getActionsByProgramme(programmeId);
+    public ResponseEntity<List<ActionResponse>> getActionsByProgramme(@Parameter(description = "Identifiant du programme", required = true) @PathVariable String programmeId) {
+        return ResponseEntity.ok(actionService.getActionsByProgramme(programmeId));
     }
 
     @Operation(
@@ -87,10 +83,9 @@ public class ProgrammeController {
         @ApiResponse(responseCode = "200", description = "Liste des actions")
     })
     @GetMapping("/exercice/{exerciceId}/programmes/{programmeId}/actions")
-    @ResponseStatus(HttpStatus.OK)
-    public List<ActionResponse> getActionsByProgrammeAndExercice(
+    public ResponseEntity<List<ActionResponse>> getActionsByProgrammeAndExercice(
             @Parameter(description = "Identifiant de l'exercice", required = true) @PathVariable String exerciceId,
             @Parameter(description = "Identifiant du programme", required = true) @PathVariable String programmeId) {
-        return actionService.getActionsByProgrammeAndExercice(programmeId, exerciceId);
+        return ResponseEntity.ok(actionService.getActionsByProgrammeAndExercice(programmeId, exerciceId));
     }
 }

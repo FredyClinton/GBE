@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,9 +36,8 @@ public class MatiereAdminController {
         @ApiResponse(responseCode = "403", description = "Permission MANAGE_USERS manquante")
     })
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public MatiereResponse createMatiere(@Valid @RequestBody MatiereRequest request) {
-        return matiereService.createMatiere(request);
+    public ResponseEntity<MatiereResponse> createMatiere(@Valid @RequestBody MatiereRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(matiereService.createMatiere(request));
     }
 
     @Operation(
@@ -51,9 +51,8 @@ public class MatiereAdminController {
         @ApiResponse(responseCode = "404", description = "Matière introuvable")
     })
     @PutMapping("/{matiereId}")
-    @ResponseStatus(HttpStatus.OK)
-    public MatiereResponse updateMatiere(@Parameter(description = "Identifiant de la matière", required = true) @PathVariable String matiereId, @Valid @RequestBody MatiereRequest request) {
-        return matiereService.updateMatiere(matiereId, request);
+    public ResponseEntity<MatiereResponse> updateMatiere(@Parameter(description = "Identifiant de la matière", required = true) @PathVariable String matiereId, @Valid @RequestBody MatiereRequest request) {
+        return ResponseEntity.ok(matiereService.updateMatiere(matiereId, request));
     }
 
     @Operation(
@@ -66,8 +65,8 @@ public class MatiereAdminController {
         @ApiResponse(responseCode = "404", description = "Matière introuvable")
     })
     @DeleteMapping("/{matiereId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteMatiere(@Parameter(description = "Identifiant de la matière", required = true) @PathVariable String matiereId) {
+    public ResponseEntity<Void> deleteMatiere(@Parameter(description = "Identifiant de la matière", required = true) @PathVariable String matiereId) {
         matiereService.deleteMatiere(matiereId);
+        return ResponseEntity.noContent().build();
     }
 }
