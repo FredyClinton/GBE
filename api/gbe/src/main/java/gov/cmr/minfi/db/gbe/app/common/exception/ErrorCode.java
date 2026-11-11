@@ -95,6 +95,19 @@ public enum ErrorCode {
             "L'activité %s contient des tâches : supprimez-les ou déplacez-les d'abord", BAD_REQUEST),
     TACHE_NOT_FOUND("TACHE_NOT_FOUND", "Tâche introuvable : %s", NOT_FOUND),
     TACHE_ALREADY_EXISTS("TACHE_ALREADY_EXISTS", "Une tâche de code %s existe déjà dans cette activité", BAD_REQUEST),
+    BESOIN_NOT_FOUND("BESOIN_NOT_FOUND", "Expression de besoin introuvable : %s", NOT_FOUND),
+    BESOIN_NON_MODIFIABLE("BESOIN_NON_MODIFIABLE",
+            "L'expression de besoin %s n'est plus modifiable (statut %s, date limite passée ou soumission déjà déposée)",
+            BAD_REQUEST),
+    BESOIN_SANS_LIGNE("BESOIN_SANS_LIGNE", "L'expression de besoin doit contenir au moins une ligne", BAD_REQUEST),
+    BESOIN_MATIERE_EN_DOUBLE("BESOIN_MATIERE_EN_DOUBLE",
+            "La matière %s figure déjà sur une autre ligne de ce besoin", BAD_REQUEST),
+    BESOIN_DATE_CLOTURE_INVALIDE("BESOIN_DATE_CLOTURE_INVALIDE",
+            "La date limite de soumission doit être renseignée et située dans le futur", BAD_REQUEST),
+    BESOIN_CLOTURE_PREMATUREE("BESOIN_CLOTURE_PREMATUREE",
+            "Les soumissions ne peuvent être clôturées qu'après la date limite (%s)", BAD_REQUEST),
+    BESOIN_CHAPITRE_HORS_SECTION("BESOIN_CHAPITRE_HORS_SECTION",
+            "Le chapitre %s n'appartient pas à la section de la tâche", BAD_REQUEST),
     MATIERE_NOT_FOUND("MATIERE_NOT_FOUND", "Matière introuvable : %s", NOT_FOUND),
     MATIERE_ALREADY_EXISTS("MATIERE_ALREADY_EXISTS", "Une matière de référence %s existe déjà", BAD_REQUEST),
     MANDAT_ALREADY_EXISTS(
@@ -126,6 +139,11 @@ public enum ErrorCode {
     ACCES_REFUSE_PERMISSION(
             "ACCES_REFUSE_PERMISSION",
             "Accès refusé : vous n'avez pas la permission requise pour cette opération",
+            FORBIDDEN
+    ),
+    ACCES_REFUSE_HORS_PERIMETRE(
+            "ACCES_REFUSE_HORS_PERIMETRE",
+            "Accès refusé : cet élément n'est pas dans le périmètre de vos mandats (ou la permission manque)",
             FORBIDDEN
     ),
     ACCES_REFUSE_AUCUN_MANDAT(

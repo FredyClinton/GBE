@@ -18,11 +18,18 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
+import com.jayway.jsonpath.JsonPath;
+import org.springframework.test.web.servlet.MvcResult;
+
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -174,6 +181,120 @@ class GbeApplicationTests {
                                 """))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("ROLE_EXTERNE_SANS_MANDAT"));
+    }
+
+    /** Crée un ordonnateur avec un mandat sur le programme et la permission EXPRIMER_BESOIN ; renvoie son jeton. */
+    private String ordonnateur(String email, String telephone, String sectionId, String programmeId) {
+        final String userId = UUID.randomUUID().toString();
+        final String mandatId = UUID.randomUUID().toString();
+        jdbcTemplate.update("""
+                INSERT INTO users (id, created_date, first_name, last_name, email, phone_number, password, role_id,
+                                   is_enabled, is_account_locked, credentials_expired, is_email_verified,
+                                   phone_verified, first_login, mfa_enabled)
+                VALUES (?, CURRENT_DATE, 'Test', 'Ordonnateur', ?, ?, 'x',
+                        (SELECT id FROM roles WHERE name = 'ROLE_ORDONNATEUR'),
+                        true, false, false, false, false, false, false)
+                """, userId, email, telephone);
+        jdbcTemplate.update("""
+                INSERT INTO mandat (id, created_by, created_date, actif, start_mandat, role_systeme,
+                                    section_id, programme_id, user_id)
+                VALUES (?, 'TEST', CURRENT_DATE, true, CURRENT_DATE, 'ORDONNATEUR', ?, ?, ?)
+                """, mandatId, sectionId, programmeId, userId);
+        jdbcTemplate.update("INSERT INTO mandat_permissions (mandat_id, permission) VALUES (?, 'EXPRIMER_BESOIN')",
+                mandatId);
+        return "Bearer " + jwtService.generateAccessToken(email);
+    }
+
+    private static String champ(MvcResult resultat, String chemin) throws Exception {
+        return JsonPath.read(resultat.getResponse().getContentAsString(), chemin);
+    }
+
+    @Test
+    void expressionBesoin_creeeEtPublieeParLOrdonnateur_dansSonPerimetre() throws Exception {
+        final Map<String, Object> imputation = jdbcTemplate.queryForMap("""
+                SELECT a.id AS action_id, a.programme_id, a.section_id,
+                       (SELECT c.id FROM chapitres c WHERE c.section_id = a.section_id LIMIT 1) AS chapitre_id,
+                       (SELECT n.id FROM natures_economiques n WHERE n.exercice_id = a.exercice_id LIMIT 1) AS nature_id
+                FROM actions a
+                WHERE a.section_id IS NOT NULL AND a.exercice_id IS NOT NULL
+                  AND EXISTS (SELECT 1 FROM chapitres c WHERE c.section_id = a.section_id)
+                ORDER BY a.id LIMIT 1
+                """);
+        final Map<String, Object> ailleurs = jdbcTemplate.queryForMap(
+                "SELECT id AS programme_id, section_id FROM programmes WHERE section_id <> ? LIMIT 1",
+                imputation.get("section_id"));
+
+        final String admin = "Bearer " + jwtService.generateAccessToken("admin@gbe.cm");
+        final String ordo = ordonnateur("ordo.besoin@minfi.cm", "+237670000001",
+                (String) imputation.get("section_id"), (String) imputation.get("programme_id"));
+        final String horsPerimetre = ordonnateur("ordo.ailleurs@minfi.cm", "+237670000002",
+                (String) ailleurs.get("section_id"), (String) ailleurs.get("programme_id"));
+
+        // Référentiel : activité, tâche, matière (par l'admin)
+        final String activiteId = champ(mockMvc.perform(post("/api/v1/admin/activites").header("Authorization", admin)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"code\":\"T01\",\"libelle\":\"Activité test\",\"actionId\":\"%s\"}"
+                                .formatted(imputation.get("action_id"))))
+                .andExpect(status().isCreated()).andReturn(), "$.id");
+        final String tacheId = champ(mockMvc.perform(post("/api/v1/admin/taches").header("Authorization", admin)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"code\":\"T01\",\"libelle\":\"Tâche test\",\"activiteId\":\"%s\"}"
+                                .formatted(activiteId)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.programmeId").value(imputation.get("programme_id")))
+                .andReturn(), "$.id");
+        final String matiereId = champ(mockMvc.perform(post("/api/v1/admin/matieres").header("Authorization", admin)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"reference\":\"PAP-A4-TEST\",\"libelle\":\"Papier A4\"}"))
+                .andExpect(status().isCreated()).andReturn(), "$.id");
+
+        final String corps = """
+                {"objet":"Fournitures de bureau","dateClotureSoumission":"2099-01-01T12:00:00",
+                 "tacheId":"%s","chapitreId":"%s","natureEconomiqueId":"%s",
+                 "lignes":[{"matiereId":"%s","quantiteDemandee":10,"specifications":"rames de 500 feuilles"}]}
+                """.formatted(tacheId, imputation.get("chapitre_id"), imputation.get("nature_id"), matiereId);
+
+        // Hors périmètre : création refusée
+        mockMvc.perform(post("/api/v1/besoins").header("Authorization", horsPerimetre)
+                        .contentType(MediaType.APPLICATION_JSON).content(corps))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("ACCES_REFUSE_HORS_PERIMETRE"));
+
+        final String besoinId = champ(mockMvc.perform(post("/api/v1/besoins").header("Authorization", ordo)
+                        .contentType(MediaType.APPLICATION_JSON).content(corps))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.statut").value("BROUILLON"))
+                .andExpect(jsonPath("$.reference").value(org.hamcrest.Matchers.startsWith("EB-2026-")))
+                .andExpect(jsonPath("$.lignes[0].numeroOrdre").value(1))
+                .andReturn(), "$.id");
+
+        mockMvc.perform(patch("/api/v1/besoins/{id}/publier", besoinId).header("Authorization", ordo))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.statut").value("PUBLIEE"));
+        mockMvc.perform(patch("/api/v1/besoins/{id}/cloturer", besoinId).header("Authorization", ordo))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("BESOIN_CLOTURE_PREMATUREE"));
+
+        // Lecture : dans le périmètre oui, ailleurs non
+        mockMvc.perform(get("/api/v1/besoins").param("statut", "PUBLIEE").header("Authorization", ordo))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.id == '%s')]".formatted(besoinId)).exists());
+        mockMvc.perform(get("/api/v1/besoins").header("Authorization", horsPerimetre))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.id == '%s')]".formatted(besoinId)).doesNotExist());
+        mockMvc.perform(get("/api/v1/besoins/{id}", besoinId).header("Authorization", horsPerimetre))
+                .andExpect(status().isForbidden());
+
+        // Brouillon supprimé logiquement : il disparaît mais reste en base
+        final String brouillonId = champ(mockMvc.perform(post("/api/v1/besoins").header("Authorization", ordo)
+                        .contentType(MediaType.APPLICATION_JSON).content(corps))
+                .andExpect(status().isCreated()).andReturn(), "$.id");
+        mockMvc.perform(delete("/api/v1/besoins/{id}", brouillonId).header("Authorization", ordo))
+                .andExpect(status().isNoContent());
+        mockMvc.perform(get("/api/v1/besoins/{id}", brouillonId).header("Authorization", ordo))
+                .andExpect(status().isNotFound());
+        assertThat(jdbcTemplate.queryForObject("SELECT supprime FROM expressions_besoin WHERE id = ?",
+                Boolean.class, brouillonId)).isTrue();
     }
 
     @Test

@@ -85,7 +85,7 @@ Chaque lot comprend sa migration, ses tests et ses routes, et peut être livré 
 | Lot | Contenu | UC | État |
 |---|---|---|---|
 | **0** | Rôles `FOURNISSEUR` et `COMPTABLE_MATIERE`, nouvelles permissions, référentiel `Matiere`, refonte du statut des crédits (§2.1), rattachement des natures à l'exercice, permissions par défaut du mandat MINISTRE | — | **livré** (2026-11-11, voir §4.1) |
-| **1** | (découpage en §4.2) Référentiels `Activite` et `Tache` (CRUD admin + consultation, migration V11), fournisseurs (création, RIB), expression de besoin rattachée à une tâche, un chapitre, un exercice et une nature économique (brouillon → publiée → clôturée), consultation des besoins ouverts, soumissions | UC01–UC03 | en cours (1a, 1b livrés) |
+| **1** | (découpage en §4.2) Référentiels `Activite` et `Tache` (CRUD admin + consultation, migration V11), fournisseurs (création, RIB), expression de besoin rattachée à une tâche, un chapitre, un exercice et une nature économique (brouillon → publiée → clôturée), consultation des besoins ouverts, soumissions | UC01–UC03 | en cours (1a, 1b, 1c livrés) |
 | **2** | Évaluation et attribution, projet d'acte et formes, contrôle CF (réservation des AE, quitus, visa ou rejet), signature | UC04–UC08 | à faire |
 | **3** | Stockage de fichiers, livraisons, PV conforme ou non conforme, information de l'ordonnateur | UC09–UC11 | à faire |
 | **4** | Demande de paiement, factures et pièces, validation, liquidation, ordonnancement, visa CF, transmission au Trésor, suivi fournisseur | UC12–UC19 | à faire |
@@ -111,7 +111,7 @@ Chaque étape est commitée séparément, avec sa migration et ses tests.
 |---|---|---|---|
 | **1a** | Référentiels `Activite` et `Tache` (V11) | — | **livré** (2026-11-11) |
 | **1b** | `Fournisseur` et `CoordonneeBancaire` (V12–V14) : création par l'admin avec un compte `ROLE_FOURNISSEUR`, RIB, permissions par défaut du rôle sans mandat | lot 0 | **livré** (2026-11-11) |
-| **1c** | `ExpressionBesoin` et `LigneBesoin` (V15), UC01 : brouillon, lignes (matière, quantité, spécifications), rattachement tâche / chapitre / exercice / nature, publication, annulation, périmètre du mandat | 1a | à faire |
+| **1c** | `ExpressionBesoin` et `LigneBesoin` (V15), UC01 : brouillon, lignes (matière, quantité, spécifications), rattachement tâche / chapitre / exercice / nature, publication, annulation, périmètre du mandat | 1a | **livré** (2026-11-11) |
 | **1d** | Consultation des besoins ouverts (UC02) : besoins publiés non échus, filtres, détail | 1c | à faire |
 | **1e** | `Soumission` et `LigneSoumission` (V16), UC03 : offre totale, choix du RIB, dépôt verrouillé à la date limite, offre non modifiable une fois déposée, récépissé horodaté | 1b, 1d | à faire |
 
@@ -135,16 +135,33 @@ Chaque étape est commitée séparément, avec sa migration et ses tests.
 - **Bug corrigé :** un refus de `@PreAuthorize` renvoyait **500** sur toutes les routes, au lieu de 403. Il renvoie maintenant **403 `ACCES_REFUSE_PERMISSION`**. **À signaler au front.**
 - **Reste :** le fournisseur ne gère pas lui-même ses RIB (l'admin le fait). Retirer un RIB déjà utilisé par une soumission devra être refusé (1e).
 
+**1c livré :**
+- **`ExpressionBesoin` :** `reference` (`EB-<année>-00001`, générée par exercice), `objet`, `dateExpression`, `dateClotureSoumission` (date **et heure**), `datePublication`, `dateClotureEffective`, `statut`, `motifAnnulation`. Elle est rattachée à une **tâche** (exercice, section et programme recopiés), à un **chapitre** de la même section (structure émettrice) et à une **nature économique** de l'exercice. Pas de montant (Q8), pas de conditions de recevabilité (décision 2026-11-11).
+- **`LigneBesoin` :** `numeroOrdre` (automatique), matière, `quantiteDemandee` > 0, `specifications`. C'est un champ libre, qui porte aussi l'unité. **Une matière ne figure qu'une fois par besoin.**
+- **Cycle de vie (dans l'entité) :**
+  - `BROUILLON` → `PUBLIEE` : au moins une ligne et une date limite future ;
+  - `PUBLIEE` → `EN_EVALUATION` : action de l'ordonnateur, **après** la date limite ;
+  - `PUBLIEE` → `ANNULEE` : motif obligatoire ;
+  - un brouillon est **supprimé logiquement** (`supprime`, exclu des requêtes).
+- **Modification :** possible en brouillon, et une fois publié **tant qu'aucune soumission n'est déposée** et que la date limite n'est pas passée. Un besoin publié doit rester complet. Le test « aucune soumission » renvoie toujours faux pour l'instant : **à brancher en 1e**.
+- **Routes `/api/v1/besoins` :**
+  - `POST`, `PUT /{id}`, `PATCH /{id}/publier|cloturer|annuler` et `DELETE /{id}` demandent `EXPRIMER_BESOIN` sur le périmètre ;
+  - `GET` (filtres `exerciceId`, `sectionId`, `programmeId`, `statut`) et `GET /{id}` sont limités au périmètre des mandats.
+- **Technique :**
+  - `MandatScopeValidator.checkAccessPerimetre` et `perimetreCourant` (contrôle générique, hors crédit), avec la nouvelle erreur `ACCES_REFUSE_HORS_PERIMETRE` ;
+  - `ReferenceGenerator` (table `compteurs_reference`) ;
+  - bean `Clock` pour les dates métier.
+
 **Questions avant 1c–1e** (hypothèse par défaut entre parenthèses) :
 
 | # | Question | Hypothèse | Décision |
 |---|---|---|---|
-| Q7 | Validation du besoin avant publication (fiche objet : Brouillon → Validée → Publiée) ? | non : l'onglet 3 montre une publication directe par l'ordonnateur | — |
+| Q7 | Validation du besoin avant publication (fiche objet : Brouillon → Validée → Publiée) ? | non : l'onglet 3 montre une publication directe par l'ordonnateur | **Décidé (2026-11-11)** : publication directe. |
 | Q8 | `montantEstime` sur le besoin ? L'onglet 3 parle d'« Estimation », alors que la règle actée dit « aucun prix ». | — | **Décidé (2026-11-11)** : pas de montant estimé. |
 | Q9 | Consultation des besoins ouverts : publique sans compte (« portail public ») ou fournisseurs connectés ? | fournisseurs connectés | — |
 | Q10 | Pièces justificatives de l'offre au lot 1, ou au lot 3 avec le stockage de fichiers ? | lot 3 | — |
 | Q11 | Une seule offre par fournisseur et par besoin ? Retrait possible avant la date limite ? | oui / oui | — |
-| Q12 | À la date limite : passage automatique à `EN_EVALUATION`, ou action de l'ordonnateur ? | dépôt bloqué automatiquement, passage par l'ordonnateur | — |
+| Q12 | À la date limite : passage automatique à `EN_EVALUATION`, ou action de l'ordonnateur ? | dépôt bloqué automatiquement, passage par l'ordonnateur | **Décidé (2026-11-11)** : comme l'hypothèse. |
 
 ### 4.3 Ce que dit le diagramme d'activité (onglet 3)
 
@@ -192,3 +209,4 @@ Point à part : le mandat MINISTRE (section MINFI) n'a aucune permission en base
 | 2026-11-11 | Lot 1 découpé en 1a–1e. **1a livré** : activités et tâches (V11). Lecture de l'onglet 3 (§4.3) : publication directe, RIB au dépôt, refus du CF renvoyé à la préparation de l'acte, liquidation par l'ordonnateur (écart avec `LIQUIDER_DEPENSE` sur `COMPTABLE`). Questions Q7–Q12 ouvertes. |
 | 2026-11-11 | **1b livré** : fournisseurs et RIB (V13), rôle externe sans mandat, `LIQUIDER_DEPENSE` déplacée vers l'ordonnateur (V12), refus d'autorisation en 403 au lieu de 500. Q8 : pas de montant estimé. |
 | 2026-11-11 | V14 : `telephone` de l'entreprise sur `Fournisseur` (déjà présent dans le diagramme de classes). Le téléphone du compte devient `telephoneRepresentant` dans l'API. |
+| 2026-11-11 | **1c livré** : expressions de besoin (V15). Décisions : unité dans les spécifications, pas de conditions de recevabilité, référence `EB-AAAA-00001`, date limite avec heure, modification autorisée tant qu'aucune soumission, matière unique par besoin, suppression logique des brouillons, clôture par l'ordonnateur après la date limite (Q7, Q12). |

@@ -47,8 +47,9 @@ Lombok · MapStruct · SpringDoc OpenAPI · TOTP (`dev.samstevens.totp`) · Test
 | `identite/iam/`         | `RoleSysteme` enum (with default permissions), `Permission` enum, `Role` entity         |
 | `referentiel/`          | Master data, one sub-package per domain: `exercice`, `administratif` (Section, Chapitre), `programmatique` (Programme → Action → Activite → Tache; an activité/tâche copies programme, section and exercice from its parent, never from the request; a parent with children cannot be deleted), `economique` (NatureEconomique), `matiere` (plain catalogue: reference + libelle, deliberately not linked to NatureEconomique; read under `/api/v1/referentiel/matieres`, CRUD under `/api/v1/admin/matieres`), `fonctionnel`. `ReferentielMapper` is shared. |
 | `budget/credit/`        | `CreditBudgetaire` — core budget entity and its state machine                           |
+| `depense/besoin/`       | `ExpressionBesoin` + `LigneBesoin` (UC01) under `/api/v1/besoins`: no price, attached to a Tache (exercice/section/programme copied), a Chapitre of the same section and a NatureEconomique; state machine in the entity; soft delete via `@SQLRestriction("supprime = false")` |
 | `admin/`                | Admin-only endpoints (user creation, role listing)                                      |
-| `common/`               | `BaseEntity` auditing, `BusinessException`/`ErrorCode`, `ApplicationExceptionHandler`, configs (CORS + beans in `BeansConfig`) |
+| `common/`               | `BaseEntity` auditing, `BusinessException`/`ErrorCode`, `ApplicationExceptionHandler`, configs (CORS + beans in `BeansConfig`, incl. a `Clock` to inject for business dates), `reference/ReferenceGenerator` (atomic `PREFIX-YEAR-00001` numbering) |
 
 ### Module conventions
 
@@ -67,7 +68,8 @@ same for `/api/v1/admin/activites`, `/api/v1/admin/taches` and `/api/v1/admin/ma
    `User.grantedPermissions` (names of `Permission` values).
 2. *Data scope level*: a `Mandat` links a `User` to a `Section` (optionally a `Programme`) with a `RoleSysteme` and a set
    of `Permission`s (initialised from `RoleSysteme.getDefaultPermissions()`). Services call `MandatScopeValidator`
-   (`checkAccessCredit`, `checkAccessCreditWithPermission`, `checkSectionAccess`, `getProgrammeIdsAutorises`).
+   (`checkAccessCredit`, `checkAccessCreditWithPermission`, `checkSectionAccess`, `getProgrammeIdsAutorises`; for
+   non-credit objects `checkAccessPerimetre(sectionId, programmeId, permission)` and `perimetreCourant()` to filter lists).
    Rule: a MINISTRE mandate without a programme covers the whole section; every other mandate covers only its programme.
 3. *External roles* (`RoleSysteme.isExterne()`, today only `FOURNISSEUR`) never hold a mandate
    (`Mandat.initialiserPermissionsDepuisRole` refuses them, `/admin/users` too): `UserServiceImpl.loadUserByUsername`
@@ -134,6 +136,7 @@ The schema is owned by Flyway (`src/main/resources/db/migration`); Hibernate onl
   `V12__liquidation_par_ordonnateur.sql`: `LIQUIDER_DEPENSE` moves from COMPTABLE to ORDONNATEUR/MINISTRE mandates.
   `V13__fournisseurs.sql`: tables `fournisseurs` (NIU unique, `user_id` unique) and `coordonnees_bancaires`.
   `V14__telephone_fournisseur.sql`: company `telephone` on `fournisseurs` (the representative's phone stays on `users`).
+  `V15__expressions_besoin.sql`: `compteurs_reference`, `expressions_besoin`, `lignes_besoin`.
 - Any entity change needs a new `V<n>__description.sql`. Never edit an applied migration.
 - Pre-Flyway databases get a baseline at version 2 (`baseline-on-migrate`), so only V3+ run on them.
 

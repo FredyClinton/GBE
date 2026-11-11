@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiPredicate;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -44,6 +45,25 @@ public class MandatScopeValidator {
     }
 
     /**
+     * Vérifie que l'utilisateur connecté a un mandat valide couvrant ce programme de cette section
+     * et portant la permission demandée ({@code null} : simple contrôle de périmètre).
+     * Utilisé par les objets du module Dépense (expression de besoin…).
+     */
+    public void checkAccessPerimetre(String sectionId, String programmeId, Permission permission) {
+        checkAccess(sectionId, programmeId, permission, ErrorCode.ACCES_REFUSE_HORS_PERIMETRE, "objet");
+    }
+
+    /**
+     * Périmètre de l'utilisateur connecté, calculé une seule fois, pour filtrer une liste :
+     * {@code perimetre.test(sectionId, programmeId)}.
+     */
+    public BiPredicate<String, String> perimetreCourant() {
+        final List<Mandat> mandats = mandatsValidesDeUtilisateurCourant();
+        return (sectionId, programmeId) -> mandats.stream()
+                .anyMatch(m -> mandatCorrespondAuCredit(m, sectionId, programmeId));
+    }
+
+    /**
      * Ids des programmes accessibles par l'utilisateur connecté dans une section.
      * L'ensemble contient {@code null} lorsqu'un mandat MINISTRE couvre toute la section.
      */
@@ -71,6 +91,12 @@ public class MandatScopeValidator {
 
     /** @param permission permission requise, ou {@code null} pour un simple contrôle de périmètre */
     private void checkAccessCredit(CreditBudgetaire credit, Permission permission) {
+        checkAccess(credit.getSection().getId(), credit.getProgramme().getId(), permission,
+                ErrorCode.ACCES_REFUSE_HORS_SCOPE, "credit=" + credit.getId());
+    }
+
+    private void checkAccess(String sectionId, String programmeId, Permission permission,
+                             ErrorCode refus, String objet) {
         final User user = getCurrentUser();
         final List<Mandat> mandats = mandatRepository.findMandatsValidesParUser(user.getId());
 
@@ -78,18 +104,15 @@ public class MandatScopeValidator {
             throw new BusinessException(ErrorCode.ACCES_REFUSE_AUCUN_MANDAT);
         }
 
-        final String sectionId = credit.getSection().getId();
-        final String programmeId = credit.getProgramme().getId();
-
         final boolean accesAutorise = mandats.stream().anyMatch(mandat ->
                 mandatCorrespondAuCredit(mandat, sectionId, programmeId)
                         && (permission == null || mandat.hasPermission(permission))
         );
 
         if (!accesAutorise) {
-            log.warn("Accès refusé : user={} credit={} section={} programme={} permission={}",
-                    user.getId(), credit.getId(), sectionId, programmeId, permission);
-            throw new BusinessException(ErrorCode.ACCES_REFUSE_HORS_SCOPE);
+            log.warn("Accès refusé : user={} {} section={} programme={} permission={}",
+                    user.getId(), objet, sectionId, programmeId, permission);
+            throw new BusinessException(refus);
         }
     }
 
