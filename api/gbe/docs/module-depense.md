@@ -261,6 +261,30 @@ rapport, section 9 ; drawio, onglets 1, 2, 3 et 4 (deux copies).
 - **Côté fournisseur :** il consulte ses actes notifiés dans son espace (`GET /api/v1/fournisseurs/moi/actes` et le détail). Seuls les actes notifiés y figurent.
 - **Pas d'e-mail ni de SMS pour l'instant :** le projet n'a aucun service d'envoi. Une table de notifications (boîte de réception dans l'application) pourra servir plus tard au PV, au paiement, etc.
 
+**Lecture d'un BCA réel** (fourni le 2026-11-11, n° BCA-A602010097) :
+
+| Zone du BCA | Exemple | Source dans GBE | État |
+|---|---|---|---|
+| N° | BCA-A602010097 | `ActeJuridique.numero` | format à préciser (Q24) |
+| Structure émettrice | 33000035 - Division de l'Informatique | chapitre du besoin (code `2033000035` en base) | ✓ |
+| Date d'émission | 03/11/2026 | absente du modèle | Q26 |
+| Délai de livraison (en mois) | 1 | `delaiLivraisonMois` (onglet 1) / `delaiLivraisonMaxMois` (onglet 4) ; l'offre a `delaiProposeJours` | Q25 |
+| Objet | Achat des préimprimés… | objet du besoin | ✓ |
+| N° contribuable, raison sociale, adresse, téléphone | M086… | `Fournisseur` (NIU…) | ✓ |
+| N° RIB | 10025… | RIB choisi dans l'offre (1e) | ✓ |
+| Programme, action, activité, tâche | 233, 7, 202337G011… | tâche du besoin → activité → action → programme | ✓ |
+| Imputation budgétaire | 60 20 233 7 33000035 0112 360140 | 20 = section, 233 = programme, 7 = action, 33000035 = chapitre, 360140 = nature (vérifié en base) ; « 60 » et « 0112 » (classe fonctionnelle ? table vide) inconnus | Q28 |
+| Bénéficiaire | 11000020 - MINFI | absent du modèle et du référentiel | Q27 |
+| Lignes : n°, référence, désignation, qté, P.U., P.T. HT | 34-004-220017… | matière, quantité (besoin) et prix (offre retenue) | ✓ |
+| Total HT, TVA (19,25 %), IR (5,5 %), NAP, total TTC | 4 120 000 ; 793 100 ; 226 600 ; 3 893 400 ; 4 913 100 | TVA et IR absents du modèle de l'acte | Q23 |
+| Arrêté à la somme de | quatre millions neuf cent treize mille cent | `montantEnLettres` = TTC en lettres | ✓ |
+| Code-barres, QR code | — | `codeBarres`, `qrCodeSecurite` (onglet 1) | impression, plus tard |
+| Fait à …, le …, l'Ordonnateur | (vierge) | `dateSignature` (Q6) ; lieu absent du modèle | Q29 |
+| Talon : visa du CF, RIB, Paierie générale du Trésor | — | visa (2c) ; poste comptable absent du modèle | lot 4 |
+
+Calculs constatés : TVA = HT × 19,25 % ; IR = HT × 5,5 % ; **TTC = HT + TVA** ; **NAP = TTC − TVA − IR** (= HT − IR). Le
+montant arrêté en lettres est le TTC. Conséquence pour Q17 : le net à payer n'est pas le TTC.
+
 **Écarts relevés dans la conception (à trancher, voir Q13–Q22) :**
 - `ActeJuridique → ReservationCredit` est en **0..1** (onglets 1 et 4) alors que la fiche objet dit « adossé à **1..*** crédits ». Proposition : une seule réservation, sur une seule ligne.
 - `ReservationCredit` n'est **relié à aucune ligne de crédit** dans les diagrammes. Il faut ajouter `ReservationCredit → CreditBudgetaire`.
@@ -301,6 +325,13 @@ Elles bloquent les lots 1 et 2. Les hypothèses s'appliquent tant qu'il n'y a pa
 | Q20 | Notification : automatique à la signature (UC05) et visible dans l'espace du fournisseur ? | oui : signature puis `NOTIFIE_PRESTATAIRE` dans la même opération, et le fournisseur consulte ses actes | **Décidé (2026-11-11)** : oui. Mise en œuvre proposée en §4.5 (2d). |
 | Q21 | Champs propres à chaque forme (référence du devis, n° d'appel d'offres, lot, retenue de garantie, pénalités, dates et loyer du bail) et documents générés | champs facultatifs saisis au lot 2 ; documents (BCA imprimé, modèle) au lot 3, avec le stockage de fichiers | **Décidé (2026-11-11)** : **seule la forme BCA** est traitée jusqu'à la fin du module ; les autres formes viendront plus tard, selon les informations disponibles. Le bas du BCA sera fourni par l'utilisateur pour en fixer les champs. |
 | Q22 | Imputation : ligne de crédit déduite du besoin, ou choisie par l'ordonnateur ? | déduite du besoin ; soumission au CF refusée si la ligne n'existe pas | **Décidé (2026-11-11)** : déduite du besoin. |
+| Q23 | Taxes du BCA : TVA 19,25 % et IR 5,5 % calculés par le serveur sur le HT (TTC = HT + TVA, NAP = TTC − TVA − IR) ? Le fournisseur cesse-t-il de saisir le TTC dans son offre ? Les taux varient-ils (régime fiscal du fournisseur, exonérations) ? | taux en table de paramétrage ; TTC et NAP calculés par le serveur, à l'offre comme à l'acte ; exonérations plus tard | — |
+| Q24 | Format du numéro (BCA-A602010097) | provisoire : `BCA-<année>-00001` | — |
+| Q25 | Délai de livraison en mois : saisi par l'ordonnateur au projet, ou déduit du délai de l'offre (jours) ? | saisi au projet, proposé à partir de l'offre (jours ÷ 30, arrondi au supérieur) | — |
+| Q26 | Date d'émission : création du projet, envoi au CF ou signature ? | date de création du projet | — |
+| Q27 | Bénéficiaire (11000020 - MINFI) : de quoi s'agit-il, d'où vient-il ? | — | — |
+| Q28 | Imputation : sens de « 60 » et origine de « 0112 » (classe fonctionnelle, table vide) | sert seulement à l'impression, peut attendre | — |
+| Q29 | « Fait à » : lieu saisi sur l'acte ou fixé par structure ? | sert à l'impression, peut attendre | — |
 
 Autres questions du rapport (section 9), pour les lots 3 et 4 : livraisons partielles et paiements partiels, procédure en cas de non-conformité, liste des pièces justificatives obligatoires, rôle exact du comptable public (prise en charge, rejet, statut de paiement), limite du suivi fournisseur.
 
@@ -334,3 +365,4 @@ Point à part : le mandat MINISTRE (section MINFI) n'a aucune permission en base
 | 2026-11-11 | Sécurité, corrigé avant le lot 2 : le filtre JWT n'accepte plus que les jetons d'accès (un jeton MFA contournait la double authentification, un jeton de rafraîchissement servait de jeton d'accès). Un jeton invalide rend la requête anonyme (403 sur route protégée) au lieu d'une exception non gérée. |
 | 2026-11-11 | Lot 2 : conception relue (UC04–UC08, fiches objet, §9, onglets 1–4). Découpage 2a–2d proposé (§4.5), écarts relevés, questions Q13–Q22 ouvertes. |
 | 2026-11-11 | Q13–Q22 décidées (seule la forme BCA jusqu'à la fin). **2a livré** (V17) : attribution d'un besoin à une offre, infructuosité, consultation des offres par l'ordonnateur à tout moment. |
+| 2026-11-11 | BCA réel analysé (§4.5) : imputation décodée par le référentiel, taxes TVA 19,25 % et IR 5,5 %, NAP = HT − IR. Questions Q23–Q29 ouvertes avant 2b. |
