@@ -174,8 +174,8 @@ Chaque étape est commitée séparément, avec sa migration et ses tests.
 | Q7 | Validation du besoin avant publication (fiche objet : Brouillon → Validée → Publiée) ? | non : l'onglet 3 montre une publication directe par l'ordonnateur | **Décidé (2026-11-11)** : publication directe. |
 | Q8 | `montantEstime` sur le besoin ? L'onglet 3 parle d'« Estimation », alors que la règle actée dit « aucun prix ». | — | **Décidé (2026-11-11)** : pas de montant estimé. |
 | Q9 | Consultation des besoins ouverts : publique sans compte (« portail public ») ou fournisseurs connectés ? | fournisseurs connectés | **Décidé (2026-11-11)** : consultation publique sans compte ; connexion obligatoire pour soumissionner. |
-| Q10 | Pièces justificatives de l'offre au lot 1, ou au lot 3 avec le stockage de fichiers ? | lot 3 | — |
-| Q11 | Une seule offre par fournisseur et par besoin ? Retrait possible avant la date limite ? | oui / oui | — |
+| Q10 | Pièces justificatives de l'offre au lot 1, ou au lot 3 avec le stockage de fichiers ? | pas de pièce jointe en 1e | **Écart constaté (2026-11-11)** : la fiche UC03 parle de « justificatifs légaux, administratifs et techniques », mais le diagramme de classes ne rattache aucun document à `Soumission` (les pièces ne concernent que la demande de paiement, UC13). À confirmer, et à clarifier avec l'analyse fonctionnelle : pièces par fournisseur ou par offre. |
+| Q11 | Une seule offre par fournisseur et par besoin ? Retrait possible avant la date limite ? | oui / oui | **Décidé (2026-11-11)** : le fournisseur peut **modifier** son offre jusqu'à la clôture des soumissions (date limite) ; une offre par fournisseur et par besoin. Retrait : à confirmer. |
 | Q12 | À la date limite : passage automatique à `EN_EVALUATION`, ou action de l'ordonnateur ? | dépôt bloqué automatiquement, passage par l'ordonnateur | **Décidé (2026-11-11)** : comme l'hypothèse. |
 
 ### 4.3 Ce que dit le diagramme d'activité (onglet 3)
@@ -226,3 +226,4 @@ Point à part : le mandat MINISTRE (section MINFI) n'a aucune permission en base
 | 2026-11-11 | V14 : `telephone` de l'entreprise sur `Fournisseur` (déjà présent dans le diagramme de classes). Le téléphone du compte devient `telephoneRepresentant` dans l'API. |
 | 2026-11-11 | **1c livré** : expressions de besoin (V15). Décisions : unité dans les spécifications, pas de conditions de recevabilité, référence `EB-AAAA-00001`, date limite avec heure, modification autorisée tant qu'aucune soumission, matière unique par besoin, suppression logique des brouillons, clôture par l'ordonnateur après la date limite (Q7, Q12). |
 | 2026-11-11 | **1d livré** : consultation publique des besoins ouverts (Q9 : public, connexion pour soumissionner). Pagination `PageResponse` sur les listes de besoins, périmètre filtré en base. |
+| 2026-11-11 | Q11 : offre modifiable jusqu'à la date limite. Q10 : écart entre la fiche UC03 (justificatifs) et le diagramme de classes (aucun document sur `Soumission`). Restent avant 1e : Q10, retrait de l'offre, calcul HT/TTC (TVA), délai unique sur l'offre. |
