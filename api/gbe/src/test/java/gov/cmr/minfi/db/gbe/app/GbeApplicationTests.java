@@ -544,6 +544,54 @@ class GbeApplicationTests {
         mockMvc.perform(delete("/api/v1/admin/fournisseurs/{f}/ribs/{r}", fournisseurId, frs[1]).header("Authorization", admin))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("RIB_UTILISE"));
+
+        // Lot 2a — un second fournisseur dépose ; l'ordonnateur voit les offres à tout moment (Q14)
+        final String offreAutre = champ(mockMvc.perform(post("/api/v1/soumissions").header("Authorization", autre[0])
+                        .contentType(MediaType.APPLICATION_JSON).content(offre.formatted(besoinId, autre[1], "43000", l1, ligne2)))
+                .andExpect(status().isCreated()).andReturn(), "$.id");
+        mockMvc.perform(get("/api/v1/besoins/{id}/soumissions", besoinId).header("Authorization", ordo)
+                        .param("sort", "montantProposeTTC,asc"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(2))
+                .andExpect(jsonPath("$.content[0].id").value(offreAutre))
+                .andExpect(jsonPath("$.content[0].fournisseurNiu").value("M000000000012S"))
+                .andExpect(jsonPath("$.content[0].lignes").doesNotExist());
+        mockMvc.perform(get("/api/v1/besoins/{id}/soumissions/{s}", besoinId, soumissionId).header("Authorization", ordo))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.lignes.length()").value(2));
+
+        // Attribution impossible avant la clôture ; après la date limite, clôture puis attribution globale
+        final String attribution = "{\"soumissionId\":\"%s\"}".formatted(offreAutre);
+        mockMvc.perform(patch("/api/v1/besoins/{id}/attribuer", besoinId).header("Authorization", ordo)
+                        .contentType(MediaType.APPLICATION_JSON).content(attribution))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("TRANSITION_STATUT_INVALIDE"));
+        jdbcTemplate.update("UPDATE expressions_besoin SET date_cloture_soumission = now() - interval '1 hour' WHERE id = ?",
+                besoinId);
+        mockMvc.perform(patch("/api/v1/besoins/{id}/cloturer", besoinId).header("Authorization", ordo))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.statut").value("EN_EVALUATION"));
+        mockMvc.perform(patch("/api/v1/besoins/{id}/attribuer", besoinId).header("Authorization", frs[0])
+                        .contentType(MediaType.APPLICATION_JSON).content(attribution))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(patch("/api/v1/besoins/{id}/attribuer", besoinId).header("Authorization", ordo)
+                        .contentType(MediaType.APPLICATION_JSON).content(attribution))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.statut").value("ATTRIBUEE"))
+                .andExpect(jsonPath("$.dateDecision").isNotEmpty());
+
+        // Chaque fournisseur voit la décision au statut de son offre (Q16)
+        mockMvc.perform(get("/api/v1/soumissions/{id}", offreAutre).header("Authorization", autre[0]))
+                .andExpect(jsonPath("$.statut").value("RETENUE"));
+        mockMvc.perform(get("/api/v1/soumissions/{id}", soumissionId).header("Authorization", frs[0]))
+                .andExpect(jsonPath("$.statut").value("NON_RETENUE"))
+                .andExpect(jsonPath("$.dateDecision").isNotEmpty());
+        // Décision définitive
+        mockMvc.perform(patch("/api/v1/besoins/{id}/attribuer", besoinId).header("Authorization", ordo)
+                        .contentType(MediaType.APPLICATION_JSON).content(attribution))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(patch("/api/v1/besoins/{id}/infructueux", besoinId).header("Authorization", ordo))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

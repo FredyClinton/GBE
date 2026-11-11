@@ -9,7 +9,11 @@ import gov.cmr.minfi.db.gbe.app.depense.besoin.ExpressionBesoinRepository;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.StatutExpression;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.ExpressionBesoinRequest;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.LigneBesoinRequest;
+import gov.cmr.minfi.db.gbe.app.depense.soumission.Soumission;
+import gov.cmr.minfi.db.gbe.app.depense.soumission.SoumissionMapper;
 import gov.cmr.minfi.db.gbe.app.depense.soumission.SoumissionRepository;
+import gov.cmr.minfi.db.gbe.app.depense.soumission.StatutSoumission;
+import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.AttributionBesoinRequest;
 import gov.cmr.minfi.db.gbe.app.identite.iam.permission.Permission;
 import gov.cmr.minfi.db.gbe.app.identite.mandat.MandatScopeValidator;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.Chapitre;
@@ -64,6 +68,7 @@ class ExpressionBesoinServiceImplTest {
     @Mock private MandatScopeValidator mandatScopeValidator;
     @Mock private ReferenceGenerator referenceGenerator;
     @Mock private ExpressionBesoinMapper besoinMapper;
+    @Mock private SoumissionMapper soumissionMapper;
 
     private ExpressionBesoinServiceImpl service;
 
@@ -96,7 +101,7 @@ class ExpressionBesoinServiceImplTest {
     void init() {
         service = new ExpressionBesoinServiceImpl(besoinRepository, tacheRepository, chapitreRepository,
                 natureEconomiqueRepository, matiereRepository, soumissionRepository, mandatScopeValidator, referenceGenerator,
-                besoinMapper, HORLOGE);
+                besoinMapper, soumissionMapper, HORLOGE);
         when(tacheRepository.findById("T")).thenReturn(Optional.of(tache));
         when(chapitreRepository.findById("C")).thenReturn(Optional.of(chapitre));
         when(natureEconomiqueRepository.findById("N")).thenReturn(Optional.of(nature));
@@ -182,5 +187,40 @@ class ExpressionBesoinServiceImplTest {
         assertThat(brouillon.getStatut()).isEqualTo(StatutExpression.PUBLIEE);
         assertThat(brouillon.getDatePublication()).isEqualTo(LocalDateTime.now(HORLOGE));
         verify(mandatScopeValidator).checkAccessPerimetre("S", "P", Permission.EXPRIMER_BESOIN);
+    }
+
+    private ExpressionBesoin besoinEnEvaluation() {
+        final ExpressionBesoin b = ExpressionBesoin.builder().id("B").reference("EB-2026-00001")
+                .statut(StatutExpression.EN_EVALUATION).dateClotureSoumission(DATE_LIMITE).build();
+        b.rattacherA(tache);
+        when(besoinRepository.findById("B")).thenReturn(Optional.of(b));
+        return b;
+    }
+
+    @Test
+    void attribution_retientLOffreEtEcarteLesAutres() {
+        final ExpressionBesoin b = besoinEnEvaluation();
+        final Soumission retenue = Soumission.builder().id("S1").numero("SO-1").expressionBesoin(b).build();
+        final Soumission autre = Soumission.builder().id("S2").numero("SO-2").expressionBesoin(b).build();
+        when(soumissionRepository.findByIdAndExpressionBesoinId("S1", "B")).thenReturn(Optional.of(retenue));
+        when(soumissionRepository.findAllByExpressionBesoinId("B")).thenReturn(List.of(retenue, autre));
+
+        service.attribuer("B", new AttributionBesoinRequest("S1"));
+
+        assertThat(b.getStatut()).isEqualTo(StatutExpression.ATTRIBUEE);
+        assertThat(retenue.getStatut()).isEqualTo(StatutSoumission.RETENUE);
+        assertThat(autre.getStatut()).isEqualTo(StatutSoumission.NON_RETENUE);
+        assertThat(autre.getDateDecision()).isEqualTo(LocalDateTime.now(HORLOGE));
+        verify(mandatScopeValidator).checkAccessPerimetre("S", "P", Permission.EXPRIMER_BESOIN);
+    }
+
+    @Test
+    void attribution_aUneOffreDUnAutreBesoin_refusee() {
+        final ExpressionBesoin b = besoinEnEvaluation();
+        when(soumissionRepository.findByIdAndExpressionBesoinId("S9", "B")).thenReturn(Optional.empty());
+
+        assertThat(code(() -> service.attribuer("B", new AttributionBesoinRequest("S9"))))
+                .isEqualTo(ErrorCode.SOUMISSION_NOT_FOUND);
+        assertThat(b.getStatut()).isEqualTo(StatutExpression.EN_EVALUATION);
     }
 }

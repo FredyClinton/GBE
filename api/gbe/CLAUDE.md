@@ -61,7 +61,7 @@ Lombok · MapStruct · SpringDoc OpenAPI · TOTP (`dev.samstevens.totp`) · Test
 | `budget/credit/`        | `CreditBudgetaire` — core budget entity and its state machine                           |
 | `depense/soumission/`   | `Soumission` + `LigneSoumission` (UC03) under `/api/v1/soumissions` (`SOUMISSIONNER`, supplier sees only his own via `FournisseurConnecte`): full offer (one price per need line), HT computed, one per supplier and need, editable until the deadline, chosen RIB, SHA-256 seal |
 | `depense/taxe/`         | `CalculTaxe` extension point for TTC (future tax methods by need type, plan §4.4); today `TtcSaisiParFournisseur` (TTC ≥ HT) |
-| `depense/besoin/`       | `ExpressionBesoin` + `LigneBesoin` (UC01) under `/api/v1/besoins` (paginated list, filtered by mandate scope in SQL); public read-only consultation of open needs (UC02) under `/api/v1/public/besoins`; no price, attached to a Tache (exercice/section/programme copied), a Chapitre of the same section and a NatureEconomique; state machine in the entity; soft delete via `@SQLRestriction("supprime = false")` |
+| `depense/besoin/`       | `ExpressionBesoin` + `LigneBesoin` (UC01) under `/api/v1/besoins` (paginated list, filtered by mandate scope in SQL); public read-only consultation of open needs (UC02) under `/api/v1/public/besoins`; no price, attached to a Tache (exercice/section/programme copied), a Chapitre of the same section and a NatureEconomique; state machine in the entity; soft delete via `@SQLRestriction("supprime = false")`; lot 2a: after closing, `PATCH /{id}/attribuer` (one offer RETENUE, the others NON_RETENUE, unique partial index) or `/{id}/infructueux` (offers stay DEPOSEE); the ordonnateur reads the offers under `/{id}/soumissions` at any time |
 | `admin/`                | Admin-only endpoints (user creation, role listing)                                      |
 | `common/`               | `BaseEntity` auditing, `BusinessException`/`ErrorCode`, `ApplicationExceptionHandler`, configs (CORS + beans in `BeansConfig`, incl. a `Clock` to inject for business dates), `reference/ReferenceGenerator` (atomic `PREFIX-YEAR-00001` numbering) |
 
@@ -167,6 +167,7 @@ The schema is owned by Flyway (`src/main/resources/db/migration`); Hibernate onl
   `V14__telephone_fournisseur.sql`: company `telephone` on `fournisseurs` (the representative's phone stays on `users`).
   `V15__expressions_besoin.sql`: `compteurs_reference`, `expressions_besoin`, `lignes_besoin`.
   `V16__soumissions.sql`: `soumissions`, `lignes_soumission`.
+  `V17__attribution_besoin.sql`: `date_decision` on needs and offers, one `RETENUE` offer per need.
 - Any entity change needs a new `V<n>__description.sql`. Never edit an applied migration.
 - Pre-Flyway databases get a baseline at version 2 (`baseline-on-migrate`), so only V3+ run on them.
 

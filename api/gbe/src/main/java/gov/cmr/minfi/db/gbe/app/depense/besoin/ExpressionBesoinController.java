@@ -1,6 +1,8 @@
 package gov.cmr.minfi.db.gbe.app.depense.besoin;
 
 import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.AnnulationBesoinRequest;
+import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.AttributionBesoinRequest;
+import gov.cmr.minfi.db.gbe.app.depense.soumission.dto.SoumissionResponse;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.ExpressionBesoinRequest;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.ExpressionBesoinResponse;
 import gov.cmr.minfi.db.gbe.app.common.config.OpenApiTags;
@@ -176,5 +178,81 @@ public class ExpressionBesoinController {
     public ResponseEntity<Void> supprimer(@Parameter(description = "Identifiant de l'expression de besoin", required = true) @PathVariable String besoinId) {
         besoinService.supprimer(besoinId);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+        summary = "Lister les offres déposées sur un besoin",
+        description = "Retourne les offres déposées sur un besoin du périmètre, sans le détail des lignes, avec le fournisseur, " +
+            "les montants HT et TTC, le délai proposé et le statut. " +
+            "Les offres sont consultables à tout moment, y compris avant la clôture des soumissions. " +
+            "Tri possible sur numero, dateSoumission (par défaut, croissant), montantProposeHT, montantProposeTTC, " +
+            "delaiProposeJours, statut."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Page d'offres"),
+        @ApiResponse(responseCode = "400", description = "Propriété de tri non autorisée (TRI_INVALIDE)"),
+        @ApiResponse(responseCode = "403", description = "Hors du périmètre des mandats de l'utilisateur"),
+        @ApiResponse(responseCode = "404", description = "Besoin introuvable")
+    })
+    @GetMapping("/{besoinId}/soumissions")
+    public ResponseEntity<PageResponse<SoumissionResponse>> getSoumissions(
+            @Parameter(description = "Identifiant de l'expression de besoin", required = true) @PathVariable String besoinId,
+            @ParameterObject Pageable pageable) {
+        return ResponseEntity.ok(besoinService.getSoumissions(besoinId, pageable));
+    }
+
+    @Operation(
+        summary = "Consulter une offre déposée sur un besoin",
+        description = "Retourne le détail d'une offre (lignes, prix unitaires, sous-totaux, RIB, récépissé) déposée sur un besoin du périmètre."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Offre trouvée"),
+        @ApiResponse(responseCode = "403", description = "Hors du périmètre des mandats de l'utilisateur"),
+        @ApiResponse(responseCode = "404", description = "Besoin introuvable, ou offre introuvable sur ce besoin")
+    })
+    @GetMapping("/{besoinId}/soumissions/{soumissionId}")
+    public ResponseEntity<SoumissionResponse> getSoumission(
+            @Parameter(description = "Identifiant de l'expression de besoin", required = true) @PathVariable String besoinId,
+            @Parameter(description = "Identifiant de la soumission", required = true) @PathVariable String soumissionId) {
+        return ResponseEntity.ok(besoinService.getSoumission(besoinId, soumissionId));
+    }
+
+    @Operation(
+        summary = "Attribuer un besoin à une offre",
+        description = "Enregistre l'offre retenue par la commission : le besoin passe de EN_EVALUATION à ATTRIBUEE, " +
+            "l'offre retenue passe à RETENUE et toutes les autres offres du besoin à NON_RETENUE, " +
+            "ce qui informe les fournisseurs non retenus. " +
+            "L'attribution est globale : une seule offre retenue par besoin."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Besoin attribué"),
+        @ApiResponse(responseCode = "400", description = "Besoin pas en évaluation ou offre déjà décidée (TRANSITION_STATUT_INVALIDE), ou soumission absente"),
+        @ApiResponse(responseCode = "403", description = "Permission EXPRIMER_BESOIN manquante ou hors du périmètre des mandats de l'utilisateur"),
+        @ApiResponse(responseCode = "404", description = "Besoin introuvable, ou offre introuvable sur ce besoin")
+    })
+    @PatchMapping("/{besoinId}/attribuer")
+    @PreAuthorize("hasAuthority('EXPRIMER_BESOIN')")
+    public ResponseEntity<ExpressionBesoinResponse> attribuer(
+            @Parameter(description = "Identifiant de l'expression de besoin", required = true) @PathVariable String besoinId,
+            @Valid @RequestBody AttributionBesoinRequest request) {
+        return ResponseEntity.ok(besoinService.attribuer(besoinId, request));
+    }
+
+    @Operation(
+        summary = "Déclarer un besoin infructueux",
+        description = "Clôt sans engagement un besoin en évaluation dont aucune offre n'est retenue : il passe de EN_EVALUATION " +
+            "à INFRUCTUEUSE, statut terminal. Les offres déposées restent DEPOSEE, figées."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Besoin déclaré infructueux"),
+        @ApiResponse(responseCode = "400", description = "Besoin pas en évaluation (TRANSITION_STATUT_INVALIDE)"),
+        @ApiResponse(responseCode = "403", description = "Permission EXPRIMER_BESOIN manquante ou hors du périmètre des mandats de l'utilisateur"),
+        @ApiResponse(responseCode = "404", description = "Besoin introuvable")
+    })
+    @PatchMapping("/{besoinId}/infructueux")
+    @PreAuthorize("hasAuthority('EXPRIMER_BESOIN')")
+    public ResponseEntity<ExpressionBesoinResponse> declarerInfructueux(
+            @Parameter(description = "Identifiant de l'expression de besoin", required = true) @PathVariable String besoinId) {
+        return ResponseEntity.ok(besoinService.declarerInfructueux(besoinId));
     }
 }

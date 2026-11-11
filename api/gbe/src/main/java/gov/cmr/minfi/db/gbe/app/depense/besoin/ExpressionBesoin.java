@@ -66,6 +66,10 @@ public class ExpressionBesoin extends BaseEntity {
     @Builder.Default
     private StatutExpression statut = StatutExpression.BROUILLON;
 
+    /** Date de l'attribution (ATTRIBUEE) ou du constat d'infructuosité (INFRUCTUEUSE). */
+    @Column(name = "date_decision")
+    private LocalDateTime dateDecision;
+
     @Column(name = "motif_annulation", columnDefinition = "TEXT")
     private String motifAnnulation;
 
@@ -181,6 +185,25 @@ public class ExpressionBesoin extends BaseEntity {
         }
         this.statut = StatutExpression.EN_EVALUATION;
         this.dateClotureEffective = maintenant;
+    }
+
+    /**
+     * EN_EVALUATION → ATTRIBUEE (retenirSoumission de l'onglet 2). Le service retient l'offre choisie et écarte les
+     * autres ; attribution globale à un seul prestataire (rapport, section 9).
+     */
+    public void attribuer(LocalDateTime maintenant) {
+        validerTransition(Set.of(StatutExpression.EN_EVALUATION), StatutExpression.ATTRIBUEE,
+                "Une offre ne peut être retenue qu'après la clôture des soumissions");
+        this.statut = StatutExpression.ATTRIBUEE;
+        this.dateDecision = maintenant;
+    }
+
+    /** EN_EVALUATION → INFRUCTUEUSE (infructueux() de l'onglet 2, « déclarer sans suite » de l'onglet 3). */
+    public void declarerInfructueux(LocalDateTime maintenant) {
+        validerTransition(Set.of(StatutExpression.EN_EVALUATION), StatutExpression.INFRUCTUEUSE,
+                "Seul un besoin en évaluation peut être déclaré infructueux");
+        this.statut = StatutExpression.INFRUCTUEUSE;
+        this.dateDecision = maintenant;
     }
 
     // PUBLIEE → ANNULEE

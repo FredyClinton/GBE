@@ -11,10 +11,14 @@ import gov.cmr.minfi.db.gbe.app.depense.besoin.ExpressionBesoinRepository;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.ExpressionBesoinService;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.StatutExpression;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.AnnulationBesoinRequest;
+import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.AttributionBesoinRequest;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.ExpressionBesoinRequest;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.ExpressionBesoinResponse;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.dto.LigneBesoinRequest;
 import gov.cmr.minfi.db.gbe.app.depense.soumission.SoumissionRepository;
+import gov.cmr.minfi.db.gbe.app.depense.soumission.Soumission;
+import gov.cmr.minfi.db.gbe.app.depense.soumission.SoumissionMapper;
+import gov.cmr.minfi.db.gbe.app.depense.soumission.dto.SoumissionResponse;
 import gov.cmr.minfi.db.gbe.app.identite.iam.permission.Permission;
 import gov.cmr.minfi.db.gbe.app.identite.mandat.MandatScopeValidator;
 import gov.cmr.minfi.db.gbe.app.identite.mandat.MandatScopeValidator.Perimetre;
@@ -49,6 +53,8 @@ public class ExpressionBesoinServiceImpl implements ExpressionBesoinService {
     static final String PREFIXE_REFERENCE = "EB";
     static final Set<String> TRIS_AUTORISES =
             Set.of("reference", "dateExpression", "datePublication", "dateClotureSoumission", "statut");
+    static final Set<String> TRIS_SOUMISSIONS_AUTORISES =
+            Set.of("numero", "dateSoumission", "montantProposeHT", "montantProposeTTC", "delaiProposeJours", "statut");
     private static final String AUCUN_ID = "-";
 
     private final ExpressionBesoinRepository besoinRepository;
@@ -60,6 +66,7 @@ public class ExpressionBesoinServiceImpl implements ExpressionBesoinService {
     private final MandatScopeValidator mandatScopeValidator;
     private final ReferenceGenerator referenceGenerator;
     private final ExpressionBesoinMapper besoinMapper;
+    private final SoumissionMapper soumissionMapper;
     private final Clock clock;
 
     @Override
@@ -131,6 +138,48 @@ public class ExpressionBesoinServiceImpl implements ExpressionBesoinService {
         final ExpressionBesoin besoin = findBesoin(besoinId);
         mandatScopeValidator.checkAccessPerimetre(besoin.getSection().getId(), besoin.getProgramme().getId(), null);
         return besoinMapper.toResponse(besoin);
+    }
+
+    @Override
+    @Transactional
+    public ExpressionBesoinResponse attribuer(String besoinId, AttributionBesoinRequest request) {
+        final ExpressionBesoin besoin = findBesoinAvecDroit(besoinId);
+        final Soumission retenue = soumissionRepository.findByIdAndExpressionBesoinId(request.soumissionId(), besoinId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.SOUMISSION_NOT_FOUND, request.soumissionId()));
+        final LocalDateTime maintenant = maintenant();
+        besoin.attribuer(maintenant);
+        retenue.retenir(maintenant);
+        // Q16 : les fournisseurs non retenus le voient au statut de leur offre
+        soumissionRepository.findAllByExpressionBesoinId(besoinId).stream()
+                .filter(s -> !s.getId().equals(retenue.getId()))
+                .forEach(s -> s.ecarter(maintenant));
+        log.info("Besoin {} attribué à l'offre {}", besoin.getReference(), retenue.getNumero());
+        return besoinMapper.toResponse(besoin);
+    }
+
+    @Override
+    @Transactional
+    public ExpressionBesoinResponse declarerInfructueux(String besoinId) {
+        final ExpressionBesoin besoin = findBesoinAvecDroit(besoinId);
+        besoin.declarerInfructueux(maintenant());
+        log.info("Besoin {} déclaré infructueux", besoin.getReference());
+        return besoinMapper.toResponse(besoin);
+    }
+
+    @Override
+    public PageResponse<SoumissionResponse> getSoumissions(String besoinId, Pageable pageable) {
+        final ExpressionBesoin besoin = findBesoin(besoinId);
+        mandatScopeValidator.checkAccessPerimetre(besoin.getSection().getId(), besoin.getProgramme().getId(), null);
+        final Pageable page = Tris.verifier(pageable, TRIS_SOUMISSIONS_AUTORISES, Sort.by("dateSoumission"));
+        return PageResponse.of(soumissionRepository.findByExpressionBesoinId(besoinId, page), soumissionMapper::toResume);
+    }
+
+    @Override
+    public SoumissionResponse getSoumission(String besoinId, String soumissionId) {
+        final ExpressionBesoin besoin = findBesoin(besoinId);
+        mandatScopeValidator.checkAccessPerimetre(besoin.getSection().getId(), besoin.getProgramme().getId(), null);
+        return soumissionMapper.toResponse(soumissionRepository.findByIdAndExpressionBesoinId(soumissionId, besoinId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.SOUMISSION_NOT_FOUND, soumissionId)));
     }
 
     @Override

@@ -180,4 +180,37 @@ class ExpressionBesoinTest {
             assertThat(b.isSupprime()).isFalse();
         }
     }
+
+    @Nested
+    @DisplayName("Attribution (lot 2a)")
+    class Attribution {
+
+        @Test
+        void attribuer_besoinEnEvaluation() {
+            final ExpressionBesoin b = besoin(EN_EVALUATION);
+            b.attribuer(MAINTENANT);
+            assertThat(b.getStatut()).isEqualTo(ATTRIBUEE);
+            assertThat(b.getDateDecision()).isEqualTo(MAINTENANT);
+        }
+
+        @Test
+        void attribuer_avantLaCloture_refuse() {
+            assertErreur(() -> besoin(PUBLIEE).attribuer(MAINTENANT), ErrorCode.TRANSITION_STATUT_INVALIDE);
+            assertErreur(() -> besoin(ATTRIBUEE).attribuer(MAINTENANT), ErrorCode.TRANSITION_STATUT_INVALIDE);
+        }
+
+        @Test
+        void declarerInfructueux_besoinEnEvaluation() {
+            final ExpressionBesoin b = besoin(EN_EVALUATION);
+            b.declarerInfructueux(MAINTENANT);
+            assertThat(b.getStatut()).isEqualTo(INFRUCTUEUSE);
+            assertThat(b.getDateDecision()).isEqualTo(MAINTENANT);
+        }
+
+        @Test
+        void declarerInfructueux_horsEvaluation_refuse() {
+            assertErreur(() -> besoin(PUBLIEE).declarerInfructueux(MAINTENANT), ErrorCode.TRANSITION_STATUT_INVALIDE);
+            assertErreur(() -> besoin(ATTRIBUEE).declarerInfructueux(MAINTENANT), ErrorCode.TRANSITION_STATUT_INVALIDE);
+        }
+    }
 }

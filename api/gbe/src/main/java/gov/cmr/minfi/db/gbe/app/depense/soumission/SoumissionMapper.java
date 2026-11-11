@@ -8,6 +8,9 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface SoumissionMapper {
 
+    @Mapping(target = "fournisseurId", source = "fournisseur.id")
+    @Mapping(target = "fournisseurRaisonSociale", source = "fournisseur.raisonSociale")
+    @Mapping(target = "fournisseurNiu", source = "fournisseur.niu")
     @Mapping(target = "besoinId", source = "expressionBesoin.id")
     @Mapping(target = "besoinReference", source = "expressionBesoin.reference")
     @Mapping(target = "besoinObjet", source = "expressionBesoin.objet")
@@ -16,6 +19,9 @@ public interface SoumissionMapper {
     @Mapping(target = "rib", source = "coordonneeBancaire.rib")
     SoumissionResponse toResponse(Soumission soumission);
 
+    @Mapping(target = "fournisseurId", source = "fournisseur.id")
+    @Mapping(target = "fournisseurRaisonSociale", source = "fournisseur.raisonSociale")
+    @Mapping(target = "fournisseurNiu", source = "fournisseur.niu")
     @Mapping(target = "besoinId", source = "expressionBesoin.id")
     @Mapping(target = "besoinReference", source = "expressionBesoin.reference")
     @Mapping(target = "besoinObjet", source = "expressionBesoin.objet")

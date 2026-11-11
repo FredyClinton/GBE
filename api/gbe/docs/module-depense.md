@@ -234,17 +234,32 @@ Lu le 2026-11-11. Il complète le rapport sur plusieurs points :
 - **Proposition :** **ne pas ajouter de champ** ; s'appuyer d'abord sur la nature économique du besoin. N'introduire un vrai « type de besoin » que si elle ne suffit pas, et **d'abord dans le drawio**. Calcul par **stratégie** (même principe que `FormeActeStrategie`), avec des paramètres en table plutôt que dans le code.
 - **Préparation dès 1e :** le calcul du TTC d'une offre passe par une seule interface (`CalculTaxe`), qui reçoit le besoin (donc sa nature), pour pouvoir brancher plus tard une méthode par type de besoin sans toucher au reste du code. En attendant, le comportement provisoire est celui du modèle : le fournisseur saisit le TTC, et le serveur vérifie seulement que TTC ≥ HT.
 
-### 4.5 Lot 2 — découpage proposé (2026-11-11, en attente des réponses Q13–Q22)
+### 4.5 Lot 2 — découpage (2026-11-11, Q13–Q22 décidées)
 
 Sources relues : fiches UC04–UC08 et fiches objet (`ActeJuridique`, `Credit`, `QuitusNatureEconomique`, `Visa`) du
 rapport, section 9 ; drawio, onglets 1, 2, 3 et 4 (deux copies).
 
 | Étape | Contenu | Source | Dépend de |
 |---|---|---|---|
-| **2a** | **Attribution** : saisie du résultat de la commission (Q4), `EN_EVALUATION → ATTRIBUEE` (`retenirSoumission`) ou `→ INFRUCTUEUSE` (`infructueux()`, « déclarer sans suite ») ; offre retenue `RETENUE`, les autres `NON_RETENUE` ; consultation des offres par l'ordonnateur | onglet 2, onglet 3 (« Évaluer les offres », « Offre valide ? »), Q4 | 1e |
+| **2a** (**livré**) | **Attribution** : saisie du résultat de la commission (Q4), `EN_EVALUATION → ATTRIBUEE` (`retenirSoumission`) ou `→ INFRUCTUEUSE` (`infructueux()`, « déclarer sans suite ») ; offre retenue `RETENUE`, les autres `NON_RETENUE` ; consultation des offres par l'ordonnateur | onglet 2, onglet 3 (« Évaluer les offres », « Offre valide ? »), Q4 | 1e |
 | **2b** | **Projet d'acte** (UC04) : `ActeJuridique` créé par `ActeJuridiqueFactory` à partir du besoin et de l'offre retenue ; `TypeActe` et une `FormeActeStrategie` par type (BCA, LC, marché, bail) ; forme minimale proposée, forme inférieure refusée (Q3) ; table des seuils (vide → choix libre) ; `PROJET` modifiable → `SOUMIS_CONTROLE` (plus modifiable) | UC04, onglet 4 (factory, stratégies), onglet 1 (`type : TypeActe`), §9 « forme de l'acte » | 2a |
 | **2c** | **Contrôle CF** (UC06 « include » UC07, UC08) : une seule décision transactionnelle (Q1) ; `Visa` (`ENGAGEMENT_JURIDIQUE`) ; si favorable : quitus + `ReservationCredit` + `consommerAE` sur la ligne + acte `VISE_CF` ; sinon rien n'est réservé (Q2) et le dossier revient à l'ordonnateur | UC06–UC08, onglet 2 (`viser`, `rejeter(motif)`), onglet 3 (« refus / rejet » → préparer le projet d'acte), onglet 4 (`Visa`, `ReservationCredit`) | 2b |
 | **2d** | **Signature et notification** (UC05) : `VISE_CF → SIGNE_ORDONNATEUR` (validation tracée : signataire, date, Q6) puis `NOTIFIE_PRESTATAIRE` ; le fournisseur voit l'acte dans son espace ; annulation d'un acte visé ou signé avec `libererAE` (Q2) | UC05, onglet 2 (`signer`, `notifierFournisseur`), onglet 3 (« Notifier le BCA signé ») | 2c |
+
+**2a livré (V17) :**
+- **Besoin :** `attribuer` (`EN_EVALUATION → ATTRIBUEE`) et `declarerInfructueux` (`EN_EVALUATION → INFRUCTUEUSE`), avec `dateDecision`.
+- **Soumission :** `retenir` (`DEPOSEE → RETENUE`) et `ecarter` (`DEPOSEE → NON_RETENUE`), avec `dateDecision`. L'index unique partiel `uk_soumission_retenue_par_besoin` garantit une seule offre retenue par besoin (attribution globale).
+- **Routes**, toutes contrôlées sur le périmètre du besoin :
+  - `GET /api/v1/besoins/{id}/soumissions` : liste paginée, triable par montant, délai ou statut ;
+  - `GET /api/v1/besoins/{id}/soumissions/{sid}` : détail d'une offre ;
+  - `PATCH /api/v1/besoins/{id}/attribuer`, corps `{soumissionId}`, permission `EXPRIMER_BESOIN` ;
+  - `PATCH /api/v1/besoins/{id}/infructueux`, permission `EXPRIMER_BESOIN`.
+- **Réponses :** `SoumissionResponse` gagne `fournisseurId`, `fournisseurRaisonSociale`, `fournisseurNiu` et `dateDecision`, et `ExpressionBesoinResponse` gagne `dateDecision`. Ce sont des ajouts : aucun champ existant ne change.
+
+**Mise en œuvre prévue de la notification (Q20, étape 2d) :**
+- **Signature :** `signer` fait passer l'acte à `SIGNE_ORDONNATEUR` (signataire, `dateSignature`), puis à `NOTIFIE_PRESTATAIRE` (`dateNotification`) dans la même transaction.
+- **Côté fournisseur :** il consulte ses actes notifiés dans son espace (`GET /api/v1/fournisseurs/moi/actes` et le détail). Seuls les actes notifiés y figurent.
+- **Pas d'e-mail ni de SMS pour l'instant :** le projet n'a aucun service d'envoi. Une table de notifications (boîte de réception dans l'application) pourra servir plus tard au PV, au paiement, etc.
 
 **Écarts relevés dans la conception (à trancher, voir Q13–Q22) :**
 - `ActeJuridique → ReservationCredit` est en **0..1** (onglets 1 et 4) alors que la fiche objet dit « adossé à **1..*** crédits ». Proposition : une seule réservation, sur une seule ligne.
@@ -276,16 +291,16 @@ Elles bloquent les lots 1 et 2. Les hypothèses s'appliquent tant qu'il n'y a pa
 
 | # | Question | Hypothèse | Décision |
 |---|---|---|---|
-| Q13 | Attribution : que saisit-on du résultat de la commission ? | offre retenue, référence et date du PV de commission (texte, le fichier viendra au lot 3) ; les autres offres passent `NON_RETENUE` ; `RECEVABLE`, `EN_EXAMEN` et `REJETEE` ne sont pas utilisés pour l'instant | — |
-| Q14 | Quand l'ordonnateur peut-il voir les offres ? | seulement après la clôture (`EN_EVALUATION`) | — |
-| Q15 | Que deviennent les offres d'un besoin annulé ou infructueux ? | elles restent `DEPOSEE`, figées ; le fournisseur voit le statut du besoin | — |
-| Q16 | Les fournisseurs non retenus sont-ils informés dans l'application (§9) ? | oui, par le statut `NON_RETENUE` de leur offre | — |
-| Q17 | Quel montant réserver sur les AE, et que vaut `montantNetAPayer` au lot 2 ? | le TTC de l'acte (donc de l'offre retenue) ; net à payer = TTC, les retenues viennent au lot 4 | — |
-| Q18 | Sens des trois décisions du CF : `FAVORABLE`, `DEFAVORABLE_REJET`, `SUSPENDU_RESERVES` ; à quoi sert `StatutActe.REJETE` ? | rejet → l'acte revient en `PROJET` (corrigeable, comme dans les onglets 2 et 3) ; réserves → l'acte reste `SOUMIS_CONTROLE` en attente de compléments ; `REJETE` n'est pas utilisé | — |
-| Q19 | Quitus : objet à part (fiche `QuitusNatureEconomique`) ou porté par le visa (onglet 4, `referenceQuitus`) ? | porté par le visa | — |
-| Q20 | Notification : automatique à la signature (UC05) et visible dans l'espace du fournisseur ? | oui : signature puis `NOTIFIE_PRESTATAIRE` dans la même opération, et le fournisseur consulte ses actes | — |
-| Q21 | Champs propres à chaque forme (référence du devis, n° d'appel d'offres, lot, retenue de garantie, pénalités, dates et loyer du bail) et documents générés | champs facultatifs saisis au lot 2 ; documents (BCA imprimé, modèle) au lot 3, avec le stockage de fichiers | — |
-| Q22 | Imputation : ligne de crédit déduite du besoin, ou choisie par l'ordonnateur ? | déduite du besoin ; soumission au CF refusée si la ligne n'existe pas | — |
+| Q13 | Attribution : que saisit-on du résultat de la commission ? | offre retenue, référence et date du PV de commission (texte, le fichier viendra au lot 3) ; les autres offres passent `NON_RETENUE` ; `RECEVABLE`, `EN_EXAMEN` et `REJETEE` ne sont pas utilisés pour l'instant | **Décidé (2026-11-11)** : l'ordonnateur sélectionne seulement l'offre retenue, rien d'autre n'est saisi (la date est tracée automatiquement). L'offre retenue passe `RETENUE`, les autres `NON_RETENUE`. `RECEVABLE`, `EN_EXAMEN` et `REJETEE` ne sont pas utilisés. |
+| Q14 | Quand l'ordonnateur peut-il voir les offres ? | seulement après la clôture (`EN_EVALUATION`) | **Décidé (2026-11-11)** : à tout moment, y compris avant la clôture. À noter : les prix sont visibles de l'ordonnateur pendant la consultation. |
+| Q15 | Que deviennent les offres d'un besoin annulé ou infructueux ? | elles restent `DEPOSEE`, figées ; le fournisseur voit le statut du besoin | **Décidé (2026-11-11)** : elles restent `DEPOSEE`, figées. |
+| Q16 | Les fournisseurs non retenus sont-ils informés dans l'application (§9) ? | oui, par le statut `NON_RETENUE` de leur offre | **Décidé (2026-11-11)** : oui, par le statut `NON_RETENUE` de leur offre. |
+| Q17 | Quel montant réserver sur les AE, et que vaut `montantNetAPayer` au lot 2 ? | le TTC de l'acte (donc de l'offre retenue) ; net à payer = TTC, les retenues viennent au lot 4 | **Décidé (2026-11-11)** : le TTC pour le moment ; **à revoir éventuellement** (montant réservé et net à payer). |
+| Q18 | Sens des trois décisions du CF : `FAVORABLE`, `DEFAVORABLE_REJET`, `SUSPENDU_RESERVES` ; à quoi sert `StatutActe.REJETE` ? | rejet → l'acte revient en `PROJET` (corrigeable, comme dans les onglets 2 et 3) ; réserves → l'acte reste `SOUMIS_CONTROLE` en attente de compléments ; `REJETE` n'est pas utilisé | **Décidé (2026-11-11)** : comme l'hypothèse. |
+| Q19 | Quitus : objet à part (fiche `QuitusNatureEconomique`) ou porté par le visa (onglet 4, `referenceQuitus`) ? | porté par le visa | **Décidé (2026-11-11)** : porté par le visa. |
+| Q20 | Notification : automatique à la signature (UC05) et visible dans l'espace du fournisseur ? | oui : signature puis `NOTIFIE_PRESTATAIRE` dans la même opération, et le fournisseur consulte ses actes | **Décidé (2026-11-11)** : oui. Mise en œuvre proposée en §4.5 (2d). |
+| Q21 | Champs propres à chaque forme (référence du devis, n° d'appel d'offres, lot, retenue de garantie, pénalités, dates et loyer du bail) et documents générés | champs facultatifs saisis au lot 2 ; documents (BCA imprimé, modèle) au lot 3, avec le stockage de fichiers | **Décidé (2026-11-11)** : **seule la forme BCA** est traitée jusqu'à la fin du module ; les autres formes viendront plus tard, selon les informations disponibles. Le bas du BCA sera fourni par l'utilisateur pour en fixer les champs. |
+| Q22 | Imputation : ligne de crédit déduite du besoin, ou choisie par l'ordonnateur ? | déduite du besoin ; soumission au CF refusée si la ligne n'existe pas | **Décidé (2026-11-11)** : déduite du besoin. |
 
 Autres questions du rapport (section 9), pour les lots 3 et 4 : livraisons partielles et paiements partiels, procédure en cas de non-conformité, liste des pièces justificatives obligatoires, rôle exact du comptable public (prise en charge, rejet, statut de paiement), limite du suivi fournisseur.
 
@@ -318,3 +333,4 @@ Point à part : le mandat MINISTRE (section MINFI) n'a aucune permission en base
 | 2026-11-11 | Tous les contrôleurs retournent `ResponseEntity` (corps JSON inchangé). Renouvellement de jeton : 401 `REFRESH_TOKEN_INVALIDE` au lieu de 500 (jeton invalide, expiré, d'un autre type, ou compte inactif), 400 si absent. |
 | 2026-11-11 | Sécurité, corrigé avant le lot 2 : le filtre JWT n'accepte plus que les jetons d'accès (un jeton MFA contournait la double authentification, un jeton de rafraîchissement servait de jeton d'accès). Un jeton invalide rend la requête anonyme (403 sur route protégée) au lieu d'une exception non gérée. |
 | 2026-11-11 | Lot 2 : conception relue (UC04–UC08, fiches objet, §9, onglets 1–4). Découpage 2a–2d proposé (§4.5), écarts relevés, questions Q13–Q22 ouvertes. |
+| 2026-11-11 | Q13–Q22 décidées (seule la forme BCA jusqu'à la fin). **2a livré** (V17) : attribution d'un besoin à une offre, infructuosité, consultation des offres par l'ordonnateur à tout moment. |

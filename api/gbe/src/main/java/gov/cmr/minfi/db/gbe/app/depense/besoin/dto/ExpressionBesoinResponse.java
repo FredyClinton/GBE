@@ -18,6 +18,7 @@ public record ExpressionBesoinResponse(
         LocalDateTime dateClotureSoumission,
         LocalDateTime datePublication,
         LocalDateTime dateClotureEffective,
+        LocalDateTime dateDecision,
         String motifAnnulation,
         String tacheId,
         String tacheCode,

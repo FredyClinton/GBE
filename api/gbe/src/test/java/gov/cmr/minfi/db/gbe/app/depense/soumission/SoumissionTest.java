@@ -120,4 +120,18 @@ class SoumissionTest {
         s.sceller(MAINTENANT);
         assertThat(s.getEmpreinte()).isNotEqualTo(premier);
     }
+
+    @Test
+    void retenirEtEcarter_seulementUneOffreDeposee() {
+        final Soumission retenue = soumission();
+        retenue.retenir(MAINTENANT);
+        assertThat(retenue.getStatut()).isEqualTo(StatutSoumission.RETENUE);
+        assertThat(retenue.getDateDecision()).isEqualTo(MAINTENANT);
+        assertErreur(() -> retenue.ecarter(MAINTENANT), ErrorCode.TRANSITION_STATUT_INVALIDE);
+
+        final Soumission ecartee = soumission();
+        ecartee.ecarter(MAINTENANT);
+        assertThat(ecartee.getStatut()).isEqualTo(StatutSoumission.NON_RETENUE);
+        assertErreur(() -> ecartee.retenir(MAINTENANT), ErrorCode.TRANSITION_STATUT_INVALIDE);
+    }
 }

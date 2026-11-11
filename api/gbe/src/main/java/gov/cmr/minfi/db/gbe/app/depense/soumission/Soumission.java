@@ -63,6 +63,10 @@ public class Soumission extends BaseEntity {
     @Builder.Default
     private StatutSoumission statut = StatutSoumission.DEPOSEE;
 
+    /** Date à laquelle l'offre a été retenue ou écartée (lot 2a). */
+    @Column(name = "date_decision")
+    private LocalDateTime dateDecision;
+
     /** Sceau SHA-256 (hexadécimal) du contenu de l'offre, recalculé à chaque modification. */
     @Column(name = "empreinte", nullable = false, length = 64)
     private String empreinte;
@@ -144,6 +148,27 @@ public class Soumission extends BaseEntity {
         if (statut != StatutSoumission.DEPOSEE || !expressionBesoin.isOuverteAuxSoumissions(maintenant)) {
             throw new BusinessException(ErrorCode.SOUMISSION_NON_MODIFIABLE, numero);
         }
+    }
+
+    // ── Attribution (lot 2a) ──────────────────────────
+
+    /** DEPOSEE → RETENUE (retenirCommeAdjudicataire de l'onglet 4). */
+    public void retenir(LocalDateTime maintenant) {
+        decider(StatutSoumission.RETENUE, maintenant);
+    }
+
+    /** DEPOSEE → NON_RETENUE : une autre offre a été retenue sur le même besoin. */
+    public void ecarter(LocalDateTime maintenant) {
+        decider(StatutSoumission.NON_RETENUE, maintenant);
+    }
+
+    private void decider(StatutSoumission cible, LocalDateTime maintenant) {
+        if (statut != StatutSoumission.DEPOSEE) {
+            throw new BusinessException(ErrorCode.TRANSITION_STATUT_INVALIDE, statut, cible,
+                    "Seule une offre DEPOSEE peut être retenue ou écartée");
+        }
+        this.statut = cible;
+        this.dateDecision = maintenant;
     }
 
     // ── Sceau ─────────────────────────────────────────
