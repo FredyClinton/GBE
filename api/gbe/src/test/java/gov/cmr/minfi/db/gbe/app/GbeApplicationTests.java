@@ -77,11 +77,11 @@ class GbeApplicationTests {
 
         final List<String> tagsDeclares = JsonPath.read(json, "$.tags[*].name");
         assertThat(tagsDeclares).startsWith("Authentification", "Mon compte");
-        assertThat(tagsDeclares.stream().filter(t -> t.startsWith("Référentiel · "))).hasSize(6);
+        assertThat(tagsDeclares.stream().filter(t -> t.startsWith("Référentiel · "))).hasSize(7);
 
         final Map<String, Map<String, Map<String, Object>>> paths = JsonPath.read(json, "$.paths");
         final List<String> referentielAdmin = List.of("/api/v1/admin/actions", "/api/v1/admin/activites",
-                "/api/v1/admin/taches", "/api/v1/admin/matieres");
+                "/api/v1/admin/taches", "/api/v1/admin/matieres", "/api/v1/admin/taxes");
         paths.forEach((chemin, operations) -> operations.forEach((methode, operation) -> {
             final String route = methode.toUpperCase() + " " + chemin;
             assertThat(operation.get("summary")).as("résumé de %s", route).isNotNull();
@@ -186,6 +186,11 @@ class GbeApplicationTests {
             assertThat(statuts).contains("'" + st.name() + "'");
         }
         assertThat(statuts).doesNotContain("'ENGAGE'", "'SOLDE'");
+        final String taxes = jdbcTemplate.queryForObject(
+                "SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname = 'taxes_code_check'", String.class);
+        for (gov.cmr.minfi.db.gbe.app.referentiel.taxe.CodeTaxe c : gov.cmr.minfi.db.gbe.app.referentiel.taxe.CodeTaxe.values()) {
+            assertThat(taxes).contains("'" + c.name() + "'");
+        }
     }
 
     @Test
@@ -488,20 +493,21 @@ class GbeApplicationTests {
                         .content(offre.formatted(besoinId, autre[1], "50000", l1, ligne2)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("RIB_NOT_FOUND"));
-        // TTC inférieur au HT refusé
-        mockMvc.perform(post("/api/v1/soumissions").header("Authorization", frs[0]).contentType(MediaType.APPLICATION_JSON)
-                        .content(offre.formatted(besoinId, frs[1], "100", l1, ligne2)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("MONTANT_TTC_INVALIDE"));
-
-        // Dépôt : récépissé numéroté, horodaté, scellé ; HT calculé par le serveur
+        // Dépôt : récépissé numéroté, horodaté, scellé ; HT et taxes calculés par le serveur (Q23). Un TTC envoyé
+        // par un ancien client est ignoré (ici 100).
+        final String depotIgnorantTtc = offre.formatted(besoinId, frs[1], "100", l1, ligne2);
         final MvcResult depot = mockMvc.perform(post("/api/v1/soumissions").header("Authorization", frs[0])
-                        .contentType(MediaType.APPLICATION_JSON).content(offre.formatted(besoinId, frs[1], "44700", l1, ligne2)))
+                        .contentType(MediaType.APPLICATION_JSON).content(depotIgnorantTtc))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.numero").value(org.hamcrest.Matchers.startsWith("SO-2026-")))
                 .andExpect(jsonPath("$.statut").value("DEPOSEE"))
                 .andExpect(jsonPath("$.montantProposeHT").value(37501.00))
-                .andExpect(jsonPath("$.montantProposeTTC").value(44700))
+                .andExpect(jsonPath("$.tauxTva").value(19.25))
+                .andExpect(jsonPath("$.montantTva").value(7218.94))
+                .andExpect(jsonPath("$.montantProposeTTC").value(44719.94))
+                .andExpect(jsonPath("$.tauxIr").value(5.5))
+                .andExpect(jsonPath("$.montantIr").value(2062.56))
+                .andExpect(jsonPath("$.montantNetAPayer").value(35438.44))
                 .andExpect(jsonPath("$.rib").value("10005000010000000001112"))
                 .andExpect(jsonPath("$.empreinte").value(org.hamcrest.Matchers.matchesPattern("[0-9a-f]{64}")))
                 .andReturn();
@@ -547,7 +553,7 @@ class GbeApplicationTests {
 
         // Lot 2a — un second fournisseur dépose ; l'ordonnateur voit les offres à tout moment (Q14)
         final String offreAutre = champ(mockMvc.perform(post("/api/v1/soumissions").header("Authorization", autre[0])
-                        .contentType(MediaType.APPLICATION_JSON).content(offre.formatted(besoinId, autre[1], "43000", l1, ligne2)))
+                        .contentType(MediaType.APPLICATION_JSON).content(offre.formatted(besoinId, autre[1], "0", l1, ligne2).replace("3500", "3300")))
                 .andExpect(status().isCreated()).andReturn(), "$.id");
         mockMvc.perform(get("/api/v1/besoins/{id}/soumissions", besoinId).header("Authorization", ordo)
                         .param("sort", "montantProposeTTC,asc"))

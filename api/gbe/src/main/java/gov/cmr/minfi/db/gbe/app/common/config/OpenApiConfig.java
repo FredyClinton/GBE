@@ -50,6 +50,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
                 @Tag(name = OpenApiTags.REF_ACTIVITES_TACHES, description = "Activités et tâches (Programme → Action → Activité → Tâche). Consultation sous `/referentiel`, gestion sous `/admin/activites` et `/admin/taches` (`MANAGE_USERS`)."),
                 @Tag(name = OpenApiTags.REF_NATURES_ECONOMIQUES, description = "Natures économiques de la dépense."),
                 @Tag(name = OpenApiTags.REF_MATIERES, description = "Catalogue des matières (biens et services). Consultation sous `/referentiel/matieres`, gestion sous `/admin/matieres` (`MANAGE_USERS`)."),
+                @Tag(name = OpenApiTags.REF_TAXES, description = "Taux de TVA et d'IR appliqués par le serveur aux offres et aux actes. Consultation sous `/referentiel/taxes`, modification sous `/admin/taxes` (`MANAGE_USERS`)."),
                 @Tag(name = OpenApiTags.BUDGET_CREDITS, description = "Lignes de crédit (AE/CP) : inscription, consultation dans le périmètre du mandat, révision et changements de statut."),
                 @Tag(name = OpenApiTags.DEPENSE_BESOINS, description = "Expression, publication et suivi des besoins par l'ordonnateur (UC01), dans le périmètre de ses mandats."),
                 @Tag(name = OpenApiTags.DEPENSE_BESOINS_OUVERTS, description = "Consultation sans compte des besoins ouverts aux soumissions (UC02)."),

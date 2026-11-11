@@ -5,6 +5,7 @@ import gov.cmr.minfi.db.gbe.app.common.exception.BusinessException;
 import gov.cmr.minfi.db.gbe.app.common.exception.ErrorCode;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.ExpressionBesoin;
 import gov.cmr.minfi.db.gbe.app.depense.besoin.LigneBesoin;
+import gov.cmr.minfi.db.gbe.app.depense.taxe.MontantsTaxes;
 import gov.cmr.minfi.db.gbe.app.identite.fournisseur.CoordonneeBancaire;
 import gov.cmr.minfi.db.gbe.app.identite.fournisseur.Fournisseur;
 import jakarta.persistence.*;
@@ -52,8 +53,25 @@ public class Soumission extends BaseEntity {
     @Column(name = "montant_propose_ht", nullable = false, precision = 20, scale = 2)
     private BigDecimal montantProposeHT;
 
+    /** TTC = HT + TVA, calculé par le serveur (Q23). */
     @Column(name = "montant_propose_ttc", nullable = false, precision = 20, scale = 2)
     private BigDecimal montantProposeTTC;
+
+    @Column(name = "taux_tva", nullable = false, precision = 5, scale = 2)
+    private BigDecimal tauxTva;
+
+    @Column(name = "montant_tva", nullable = false, precision = 20, scale = 2)
+    private BigDecimal montantTva;
+
+    @Column(name = "taux_ir", nullable = false, precision = 5, scale = 2)
+    private BigDecimal tauxIr;
+
+    @Column(name = "montant_ir", nullable = false, precision = 20, scale = 2)
+    private BigDecimal montantIr;
+
+    /** Net à payer = TTC − TVA − IR. */
+    @Column(name = "montant_net_a_payer", nullable = false, precision = 20, scale = 2)
+    private BigDecimal montantNetAPayer;
 
     @Column(name = "delai_propose_jours", nullable = false)
     private Integer delaiProposeJours;
@@ -133,6 +151,16 @@ public class Soumission extends BaseEntity {
             total = total.add(sousTotal);
         }
         this.montantProposeHT = total;
+    }
+
+    /** Reprend les montants calculés par le serveur à partir du total HT de l'offre. */
+    public void appliquerTaxes(MontantsTaxes montants) {
+        this.montantProposeTTC = montants.montantTTC();
+        this.tauxTva = montants.tauxTva();
+        this.montantTva = montants.montantTva();
+        this.tauxIr = montants.tauxIr();
+        this.montantIr = montants.montantIr();
+        this.montantNetAPayer = montants.montantNetAPayer();
     }
 
     /** RIB du fournisseur sur lequel il sera payé ; doit lui appartenir. */

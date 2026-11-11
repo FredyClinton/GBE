@@ -113,8 +113,7 @@ public class SoumissionServiceImpl implements SoumissionService {
                 .map(l -> new OffreLigne(l.ligneBesoinId(), l.prixUnitairePropose(), l.remarquesTechniques()))
                 .toList();
         soumission.definirOffre(offre);
-        soumission.setMontantProposeTTC(calculTaxe.calculerTTC(
-                soumission.getExpressionBesoin(), soumission.getMontantProposeHT(), request.montantProposeTTC()));
+        soumission.appliquerTaxes(calculTaxe.calculer(soumission.getExpressionBesoin(), soumission.getMontantProposeHT()));
     }
 
     /** Une soumission d'un autre fournisseur répond 404, comme un identifiant inconnu. */

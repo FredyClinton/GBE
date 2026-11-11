@@ -5,17 +5,16 @@ import gov.cmr.minfi.db.gbe.app.depense.besoin.ExpressionBesoin;
 import java.math.BigDecimal;
 
 /**
- * Calcul du montant TTC d'une offre. Point d'extension prévu (plan §4.4) : les méthodes de calcul des taxes
- * dépendront du type de besoin — d'abord de sa nature économique — et seront introduites plus tard sous forme
- * de stratégies. Une seule implémentation pour l'instant : {@link TtcSaisiParFournisseur}.
+ * Calcul des taxes d'une offre à partir de son total HT (décision Q23 : c'est le serveur qui calcule).
+ * Point d'extension prévu (plan §4.4) : les méthodes dépendront du type de besoin — d'abord de sa nature
+ * économique — et du régime fiscal du fournisseur ; elles seront ajoutées sous forme de stratégies.
+ * Implémentation actuelle : {@link TvaEtIrParametres}.
  */
 public interface CalculTaxe {
 
     /**
-     * @param besoin     besoin auquel l'offre répond (nature économique…)
-     * @param montantHT  total HT calculé à partir des prix unitaires
-     * @param ttcSaisi   TTC saisi par le fournisseur, éventuellement null selon la méthode
-     * @return le TTC à retenir
+     * @param besoin    besoin auquel l'offre répond (nature économique…), pour les méthodes à venir
+     * @param montantHT total HT calculé à partir des prix unitaires
      */
-    BigDecimal calculerTTC(ExpressionBesoin besoin, BigDecimal montantHT, BigDecimal ttcSaisi);
+    MontantsTaxes calculer(ExpressionBesoin besoin, BigDecimal montantHT);
 }

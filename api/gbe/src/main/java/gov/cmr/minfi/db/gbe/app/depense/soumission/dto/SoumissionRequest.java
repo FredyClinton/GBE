@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -18,7 +17,5 @@ public record SoumissionRequest(
         @NotBlank @Schema(description = "Ignoré en modification") String besoinId,
         @NotBlank @Schema(description = "Un des RIB du fournisseur, sur lequel il sera payé") String coordonneeBancaireId,
         @NotNull @Positive Integer delaiProposeJours,
-        @Schema(description = "TTC de l'offre, au moins égal au total HT (méthode de calcul provisoire)")
-        BigDecimal montantProposeTTC,
         @NotEmpty @Valid List<LigneSoumissionRequest> lignes
 ) {}

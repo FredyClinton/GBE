@@ -21,6 +21,7 @@ public final class OpenApiTags {
     public static final String REF_ACTIVITES_TACHES = "Référentiel · Activités et tâches";
     public static final String REF_NATURES_ECONOMIQUES = "Référentiel · Natures économiques";
     public static final String REF_MATIERES = "Référentiel · Matières";
+    public static final String REF_TAXES = "Référentiel · Taxes";
 
     public static final String BUDGET_CREDITS = "Budget · Crédits budgétaires";
 

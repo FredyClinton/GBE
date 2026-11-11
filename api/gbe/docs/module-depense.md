@@ -232,7 +232,8 @@ Lu le 2026-11-11. Il complète le rapport sur plusieurs points :
   - pour chaque type, la ou les taxes, leur taux ou leur règle, et les exonérations éventuelles ;
   - les objets concernés : TTC de la soumission, TVA de la facture (lot 4), retenues à l'ordonnancement.
 - **Proposition :** **ne pas ajouter de champ** ; s'appuyer d'abord sur la nature économique du besoin. N'introduire un vrai « type de besoin » que si elle ne suffit pas, et **d'abord dans le drawio**. Calcul par **stratégie** (même principe que `FormeActeStrategie`), avec des paramètres en table plutôt que dans le code.
-- **Préparation dès 1e :** le calcul du TTC d'une offre passe par une seule interface (`CalculTaxe`), qui reçoit le besoin (donc sa nature), pour pouvoir brancher plus tard une méthode par type de besoin sans toucher au reste du code. En attendant, le comportement provisoire est celui du modèle : le fournisseur saisit le TTC, et le serveur vérifie seulement que TTC ≥ HT.
+- **Préparation dès 1e :** le calcul du TTC d'une offre passe par une seule interface (`CalculTaxe`), qui reçoit le besoin (donc sa nature), pour pouvoir brancher plus tard une méthode par type de besoin sans toucher au reste du code.
+- **Depuis 2b (V18, Q23) :** `TvaEtIrParametres` remplace le TTC saisi par le fournisseur. TVA et IR sont appliqués au HT avec les taux de la table `taxes` ; TTC = HT + TVA ; NAP = TTC − TVA − IR. Les méthodes par type de besoin et par régime fiscal restent à faire (§7).
 
 ### 4.5 Lot 2 — découpage (2026-11-11, Q13–Q22 décidées)
 
@@ -273,7 +274,7 @@ rapport, section 9 ; drawio, onglets 1, 2, 3 et 4 (deux copies).
 | N° contribuable, raison sociale, adresse, téléphone | M086… | `Fournisseur` (NIU…) | ✓ |
 | N° RIB | 10025… | RIB choisi dans l'offre (1e) | ✓ |
 | Programme, action, activité, tâche | 233, 7, 202337G011… | tâche du besoin → activité → action → programme | ✓ |
-| Imputation budgétaire | 60 20 233 7 33000035 0112 360140 | 20 = section, 233 = programme, 7 = action, 33000035 = chapitre, 360140 = nature (vérifié en base) ; 0112 = classification fonctionnelle (Q28) ; « 60 » inconnu | Q28 |
+| Imputation budgétaire | 60 20 233 7 33000035 0112 360140 | 60 = exercice (`code_exercice`), 20 = section, 233 = programme, 7 = action, 33000035 = chapitre, 360140 = nature (vérifié en base) ; 0112 = classification fonctionnelle (Q28) | origine de la fonction à définir |
 | Bénéficiaire | 11000020 - MINFI | absent du modèle et du référentiel | Q27 |
 | Lignes : n°, référence, désignation, qté, P.U., P.T. HT | 34-004-220017… | matière, quantité (besoin) et prix (offre retenue) | ✓ |
 | Total HT, TVA (19,25 %), IR (5,5 %), NAP, total TTC | 4 120 000 ; 793 100 ; 226 600 ; 3 893 400 ; 4 913 100 | TVA et IR absents du modèle de l'acte | Q23 |
@@ -325,12 +326,12 @@ Elles bloquent les lots 1 et 2. Les hypothèses s'appliquent tant qu'il n'y a pa
 | Q20 | Notification : automatique à la signature (UC05) et visible dans l'espace du fournisseur ? | oui : signature puis `NOTIFIE_PRESTATAIRE` dans la même opération, et le fournisseur consulte ses actes | **Décidé (2026-11-11)** : oui. Mise en œuvre proposée en §4.5 (2d). |
 | Q21 | Champs propres à chaque forme (référence du devis, n° d'appel d'offres, lot, retenue de garantie, pénalités, dates et loyer du bail) et documents générés | champs facultatifs saisis au lot 2 ; documents (BCA imprimé, modèle) au lot 3, avec le stockage de fichiers | **Décidé (2026-11-11)** : **seule la forme BCA** est traitée jusqu'à la fin du module ; les autres formes viendront plus tard, selon les informations disponibles. Le bas du BCA sera fourni par l'utilisateur pour en fixer les champs. |
 | Q22 | Imputation : ligne de crédit déduite du besoin, ou choisie par l'ordonnateur ? | déduite du besoin ; soumission au CF refusée si la ligne n'existe pas | **Décidé (2026-11-11)** : déduite du besoin. |
-| Q23 | Taxes du BCA : TVA 19,25 % et IR 5,5 % calculés par le serveur sur le HT (TTC = HT + TVA, NAP = TTC − TVA − IR) ? Le fournisseur cesse-t-il de saisir le TTC dans son offre ? Les taux varient-ils (régime fiscal du fournisseur, exonérations) ? | taux en table de paramétrage ; TTC et NAP calculés par le serveur, à l'offre comme à l'acte ; exonérations plus tard | — |
-| Q24 | Format du numéro (BCA-A602010097) | provisoire : `BCA-<année>-00001` | **Décidé (2026-11-11)** : `BCA-A<EXERCICE><SECTION><TROUVE><NUMÉRO D'ORDRE>`. Sur l'exemple `BCA-A602010097` : `6` = exercice 2026 ?, `20` = section MINFI. **À préciser** : le segment « TROUVE », la longueur de chaque segment et la portée du numéro d'ordre (par exercice et section ?). |
+| Q23 | Taxes du BCA : TVA 19,25 % et IR 5,5 % calculés par le serveur sur le HT (TTC = HT + TVA, NAP = TTC − TVA − IR) ? Le fournisseur cesse-t-il de saisir le TTC dans son offre ? Les taux varient-ils (régime fiscal du fournisseur, exonérations) ? | taux en table de paramétrage ; TTC et NAP calculés par le serveur, à l'offre comme à l'acte ; exonérations plus tard | **Décidé (2026-11-11)** : le serveur calcule les taxes. Taux en table `taxes` (TVA 19,25 %, IR 5,5 %), modifiables par l'admin. L'offre porte TVA, IR, TTC et net à payer, et le fournisseur ne saisit plus le TTC. **Livré (V18).** |
+| Q24 | Format du numéro (BCA-A602010097) | provisoire : `BCA-<année>-00001` | **Décidé (2026-11-11)** : `BCA-A` + code de l'exercice (`exercice.code_exercice`, 60 pour 2026) + code de la section (20 pour le MINFI) + numéro d'ordre. Exemple : `BCA-A602010097` = A, 60, 20, 10097. **Hypothèse à confirmer** : numéro d'ordre sur 5 chiffres, qui repart à 1 pour chaque exercice et chaque section. |
 | Q25 | Délai de livraison en mois : saisi par l'ordonnateur au projet, ou déduit du délai de l'offre (jours) ? | saisi au projet, proposé à partir de l'offre (jours ÷ 30, arrondi au supérieur) | **Décidé (2026-11-11)** : comme l'hypothèse. |
 | Q26 | Date d'émission : création du projet, envoi au CF ou signature ? | date de création du projet | **Décidé (2026-11-11)** : date de création du projet. |
 | Q27 | Bénéficiaire (11000020 - MINFI) : de quoi s'agit-il, d'où vient-il ? | — | **À vérifier par l'utilisateur** : probablement `<CODE CHAPITRE>-<SIGLE SECTION>` (ex. `11000020 - MINFI`). Ce n'est pas le chapitre du besoin (structure émettrice 33000035), d'où vient-il ? |
-| Q28 | Imputation : sens de « 60 » et origine de « 0112 » (classe fonctionnelle, table vide) | sert seulement à l'impression, peut attendre | **Partiellement décidé (2026-11-11)** : `0112` = classification fonctionnelle. Restent : le sens de `60` et le rattachement de la classe fonctionnelle (table `classe_fonctionnelle` vide). Reporté avec l'impression (§7). |
+| Q28 | Imputation : sens de « 60 » et origine de « 0112 » (classe fonctionnelle, table vide) | sert seulement à l'impression, peut attendre | **Décidé (2026-11-11)** : `60` = code de l'exercice (2026), `0112` = classification fonctionnelle. Reste : d'où vient la classification fonctionnelle (table `classe_fonctionnelle` vide). Reporté avec l'impression (§7). |
 | Q29 | « Fait à » : lieu saisi sur l'acte ou fixé par structure ? | sert à l'impression, peut attendre | Reporté avec l'impression (§7). |
 
 Autres questions du rapport (section 9), pour les lots 3 et 4 : livraisons partielles et paiements partiels, procédure en cas de non-conformité, liste des pièces justificatives obligatoires, rôle exact du comptable public (prise en charge, rejet, statut de paiement), limite du suivi fournisseur.
@@ -347,7 +348,7 @@ Ce qui a été volontairement laissé de côté, avec sa source et le moment pr�
 - **BCA imprimé** : `genererModele` / `imprimerBCA` (onglet 4), mise en page du BCA réel (§4.5).
 - **Code-barres et QR code** : `codeBarres`, `qrCodeSecurite` (onglet 1, `BonDeCommandeAdministratif`), `codeBarresSecurite` (onglet 4). Leur contenu est à définir.
 - **Imputation imprimée complète** `60 20 233 7 33000035 0112 360140` (Q28) :
-  - le sens du préfixe « 60 » est inconnu ;
+  - « 60 » est le code de l'exercice (Q28) ;
   - `0112` est la classification fonctionnelle, mais la table `classe_fonctionnelle` est vide et rattachée à rien : il faut définir d'où vient la fonction d'un besoin ou d'une ligne de crédit.
 - **« Fait à … »** (Q29) : lieu de signature, saisi sur l'acte ou fixé par structure.
 - **Talon du BCA :** case du visa du CF, RIB, « Paierie générale du Trésor ». Ce poste comptable assignataire est absent du modèle et concerne le comptable public (lot 4).
@@ -359,11 +360,12 @@ Ce qui a été volontairement laissé de côté, avec sa source et le moment pr�
 - La table des seuils (Q3) reste vide, et le choix de la forme est libre.
 
 ### Taxes et montants
-- Méthodes de calcul par type de besoin (§4.4), exonérations, et taux selon le régime fiscal du fournisseur (Q23).
+- Méthodes de calcul par type de besoin (§4.4), exonérations, et taux selon le régime fiscal du fournisseur. Aujourd'hui, les mêmes taux TVA et IR (table `taxes`) s'appliquent à toutes les offres (Q23).
+- Arrondi : au centime (demi supérieur). Le franc CFA n'a pas de centimes : il faudra peut-être arrondir à l'unité.
 - Montant réservé et net à payer (Q17) : décision provisoire « TTC », à revoir ; le BCA montre que NAP = HT − IR.
 
 ### Numérotation et référentiel
-- Numéro du BCA (Q24) : segment « TROUVE », longueur des segments, portée du numéro d'ordre.
+- Numéro du BCA (Q24) : confirmer la longueur du numéro d'ordre (5 chiffres ?) et sa portée (par exercice et section ?).
 - Bénéficiaire (Q27) : à vérifier par l'utilisateur (`<CODE CHAPITRE>-<SIGLE SECTION>` ?).
 
 ### Soumissions et fournisseurs
@@ -388,6 +390,7 @@ Ce qui a été volontairement laissé de côté, avec sa source et le moment pr�
 - Tags Swagger renommés, ce qui compte si le client est généré à partir des tags. Le passage à `ResponseEntity` ne change rien à l'API.
 - Jeton de rafraîchissement invalide : 401 `REFRESH_TOKEN_INVALIDE` au lieu de 500.
 - Nouveaux champs (ajouts) dans `SoumissionResponse` et `ExpressionBesoinResponse`.
+- Offre : le fournisseur ne saisit plus `montantProposeTTC` (ignoré s'il est envoyé). La réponse donne `tauxTva`, `montantTva`, `tauxIr`, `montantIr` et `montantNetAPayer`. Le code d'erreur `MONTANT_TTC_INVALIDE` disparaît.
 
 ---
 
@@ -419,3 +422,4 @@ Ce qui a été volontairement laissé de côté, avec sa source et le moment pr�
 | 2026-11-11 | Q13–Q22 décidées (seule la forme BCA jusqu'à la fin). **2a livré** (V17) : attribution d'un besoin à une offre, infructuosité, consultation des offres par l'ordonnateur à tout moment. |
 | 2026-11-11 | BCA réel analysé (§4.5) : imputation décodée par le référentiel, taxes TVA 19,25 % et IR 5,5 %, NAP = HT − IR. Questions Q23–Q29 ouvertes avant 2b. |
 | 2026-11-11 | Q24 (format du n° BCA), Q25, Q26 décidées ; 0112 = classification fonctionnelle ; Q27 à vérifier. Nouvelle section §7 : tout ce qui est reporté, avec sa source. |
+| 2026-11-11 | Q23, Q24 et Q28 (« 60 » = code de l'exercice) décidées. **2b, partie taxes** (V18) : table `taxes` (TVA 19,25 %, IR 5,5 %), `CalculTaxe` → `TvaEtIrParametres`, l'offre porte TVA, IR, TTC et NAP calculés par le serveur. |

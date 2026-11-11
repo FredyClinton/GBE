@@ -28,6 +28,11 @@ public record SoumissionResponse(
         String rib,
         Integer delaiProposeJours,
         BigDecimal montantProposeHT,
+        BigDecimal tauxTva,
+        BigDecimal montantTva,
         BigDecimal montantProposeTTC,
+        BigDecimal tauxIr,
+        BigDecimal montantIr,
+        BigDecimal montantNetAPayer,
         List<LigneSoumissionResponse> lignes
 ) {}
