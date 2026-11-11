@@ -108,6 +108,7 @@ The schema is owned by Flyway (`src/main/resources/db/migration`); Hibernate onl
   `V5__nature_economique_credit.sql`: adds `credit_budgetaire.nature_economique_id`. The imputation becomes
   exercice + section + programme + action + chapitre + nature économique (`UNIQUE NULLS NOT DISTINCT`). The column is
   NULL for credits created before V5, and the API requires it on creation.
+  `V6__supprimer_table_engagement_orpheline.sql`: drops the orphan `engagement` table left by an abandoned draft.
 - Any entity change needs a new `V<n>__description.sql`. Never edit an applied migration.
 - Pre-Flyway databases get a baseline at version 2 (`baseline-on-migrate`), so only V3+ run on them.
 
