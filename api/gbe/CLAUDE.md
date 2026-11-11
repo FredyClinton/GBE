@@ -27,6 +27,14 @@ file (`spring.config.import: optional:file:.env[.properties]`); see `.env.exampl
 
 Swagger UI: `http://localhost:8080/swagger-ui.html`.
 
+**API documentation (required on every route):** each controller has `@Tag(name = OpenApiTags.X)` (names and display
+order live in `common/config/OpenApiTags` + `OpenApiConfig`; every referentiel controller, read or admin, uses a
+`Référentiel · …` tag). Each route has `@Operation(summary = "...", description = "phrase. " + "phrase.")` in French,
+`@ApiResponses({ @ApiResponse(responseCode = "...", description = "...") })` with the success code and each error case
+(403 = permission / scope, 404 = not found, …), and `@Parameter(description = ..., required = true)` on path variables
+(also on optional query filters). `GbeApplicationTests.documentationOpenApi_routesDocumenteesEtReferentielGroupe` fails
+if a route has no summary or an undeclared tag.
+
 ## Architecture
 
 **Stack:** Spring Boot 4.0.3 · Java 17 · PostgreSQL · Flyway · Spring Security + JWT (jjwt, RSA) · Spring Data JPA ·

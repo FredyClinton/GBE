@@ -2,6 +2,11 @@ package gov.cmr.minfi.db.gbe.app.referentiel.matiere;
 
 import gov.cmr.minfi.db.gbe.app.referentiel.matiere.dto.MatiereRequest;
 import gov.cmr.minfi.db.gbe.app.referentiel.matiere.dto.MatiereResponse;
+import gov.cmr.minfi.db.gbe.app.common.config.OpenApiTags;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,26 +19,55 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/admin/matieres")
 @RequiredArgsConstructor
 @PreAuthorize("hasAuthority('MANAGE_USERS')")
-@Tag(name = "Matières", description = "Gestion du catalogue des matières")
+@Tag(name = OpenApiTags.REF_MATIERES)
 public class MatiereAdminController {
 
     private final MatiereService matiereService;
 
+    @Operation(
+        summary = "Créer une matière",
+        description = "Ajoute une matière au catalogue : référence unique et libellé. " +
+            "Une matière n'est pas liée à une nature économique."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Matière créée"),
+        @ApiResponse(responseCode = "400", description = "Référence déjà utilisée ou données invalides"),
+        @ApiResponse(responseCode = "403", description = "Permission MANAGE_USERS manquante")
+    })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public MatiereResponse createMatiere(@Valid @RequestBody MatiereRequest request) {
         return matiereService.createMatiere(request);
     }
 
+    @Operation(
+        summary = "Modifier une matière",
+        description = "Met à jour la référence et le libellé d'une matière."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Matière modifiée"),
+        @ApiResponse(responseCode = "400", description = "Référence déjà utilisée ou données invalides"),
+        @ApiResponse(responseCode = "403", description = "Permission MANAGE_USERS manquante"),
+        @ApiResponse(responseCode = "404", description = "Matière introuvable")
+    })
     @PutMapping("/{matiereId}")
     @ResponseStatus(HttpStatus.OK)
-    public MatiereResponse updateMatiere(@PathVariable String matiereId, @Valid @RequestBody MatiereRequest request) {
+    public MatiereResponse updateMatiere(@Parameter(description = "Identifiant de la matière", required = true) @PathVariable String matiereId, @Valid @RequestBody MatiereRequest request) {
         return matiereService.updateMatiere(matiereId, request);
     }
 
+    @Operation(
+        summary = "Supprimer une matière",
+        description = "Retire une matière du catalogue."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "204", description = "Matière supprimée"),
+        @ApiResponse(responseCode = "403", description = "Permission MANAGE_USERS manquante"),
+        @ApiResponse(responseCode = "404", description = "Matière introuvable")
+    })
     @DeleteMapping("/{matiereId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteMatiere(@PathVariable String matiereId) {
+    public void deleteMatiere(@Parameter(description = "Identifiant de la matière", required = true) @PathVariable String matiereId) {
         matiereService.deleteMatiere(matiereId);
     }
 }

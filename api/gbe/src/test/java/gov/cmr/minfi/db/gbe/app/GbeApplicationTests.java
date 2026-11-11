@@ -65,6 +65,35 @@ class GbeApplicationTests {
     @Autowired
     private JwtService jwtService;
 
+    /**
+     * Documentation Swagger : chaque route a un résumé et un tag déclaré dans OpenApiConfig (ordre d'affichage),
+     * et toutes les routes du référentiel, consultation comme administration, sont groupées sous « Référentiel · ».
+     */
+    @Test
+    void documentationOpenApi_routesDocumenteesEtReferentielGroupe() throws Exception {
+        final String json = mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        final List<String> tagsDeclares = JsonPath.read(json, "$.tags[*].name");
+        assertThat(tagsDeclares).startsWith("Authentification", "Mon compte");
+        assertThat(tagsDeclares.stream().filter(t -> t.startsWith("Référentiel · "))).hasSize(6);
+
+        final Map<String, Map<String, Map<String, Object>>> paths = JsonPath.read(json, "$.paths");
+        final List<String> referentielAdmin = List.of("/api/v1/admin/actions", "/api/v1/admin/activites",
+                "/api/v1/admin/taches", "/api/v1/admin/matieres");
+        paths.forEach((chemin, operations) -> operations.forEach((methode, operation) -> {
+            final String route = methode.toUpperCase() + " " + chemin;
+            assertThat(operation.get("summary")).as("résumé de %s", route).isNotNull();
+            @SuppressWarnings("unchecked") final List<String> tags = (List<String>) operation.get("tags");
+            assertThat(tags).as("tags de %s", route).hasSize(1);
+            assertThat(tagsDeclares).as("tag déclaré pour %s", route).contains(tags.get(0));
+            if (chemin.startsWith("/api/v1/referentiel") || referentielAdmin.stream().anyMatch(chemin::startsWith)) {
+                assertThat(tags.get(0)).as("groupe de %s", route).startsWith("Référentiel · ");
+            }
+        }));
+    }
+
     @Test
     void migrationsAppliquees_referentielEtRolesCharges() {
         assertThat(sectionRepository.count()).isGreaterThan(1);

@@ -4,6 +4,11 @@ import gov.cmr.minfi.db.gbe.app.admin.dto.CreateUserRequest;
 import gov.cmr.minfi.db.gbe.app.admin.dto.RoleResponse;
 import gov.cmr.minfi.db.gbe.app.admin.dto.UserSummaryResponse;
 import gov.cmr.minfi.db.gbe.app.identite.iam.role.RoleSysteme;
+import gov.cmr.minfi.db.gbe.app.common.config.OpenApiTags;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,48 +23,111 @@ import java.util.List;
 @RequestMapping("/api/v1/admin")
 @RequiredArgsConstructor
 @PreAuthorize("hasAuthority('MANAGE_USERS')")
-@Tag(name = "Admin", description = "Admin API")
+@Tag(name = OpenApiTags.ADMIN_UTILISATEURS)
 public class AdminController {
 
     private final AdminService adminService;
     private final AdminMapper adminMapper;
 
+    @Operation(
+        summary = "Créer un compte agent",
+        description = "Crée le compte d'un agent interne. " +
+            "Les rôles externes (fournisseur) sont refusés : leur compte se crée avec le fournisseur."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Compte créé"),
+        @ApiResponse(responseCode = "400", description = "Données invalides, e-mail déjà utilisé ou rôle externe"),
+        @ApiResponse(responseCode = "403", description = "Permission MANAGE_USERS manquante")
+    })
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
     public UserSummaryResponse createUser(@Valid @RequestBody CreateUserRequest request) {
         return adminService.createUser(request);
     }
 
+    @Operation(
+        summary = "Lister les comptes",
+        description = "Retourne tous les comptes utilisateurs."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Liste des comptes"),
+        @ApiResponse(responseCode = "403", description = "Permission MANAGE_USERS manquante")
+    })
     @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
     public List<UserSummaryResponse> getAllUsers() {
         return adminService.getAllUsers();
     }
 
+    @Operation(
+        summary = "Consulter un compte",
+        description = "Retourne un compte utilisateur."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Compte trouvé"),
+        @ApiResponse(responseCode = "403", description = "Permission MANAGE_USERS manquante"),
+        @ApiResponse(responseCode = "404", description = "Utilisateur introuvable")
+    })
     @GetMapping("/users/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public UserSummaryResponse getUser(@PathVariable String userId) {
+    public UserSummaryResponse getUser(@Parameter(description = "Identifiant de l'utilisateur", required = true) @PathVariable String userId) {
         return adminService.getUser(userId);
     }
 
+    @Operation(
+        summary = "Activer un compte",
+        description = "Active un compte utilisateur."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "204", description = "Compte activé"),
+        @ApiResponse(responseCode = "403", description = "Permission MANAGE_USERS manquante"),
+        @ApiResponse(responseCode = "404", description = "Utilisateur introuvable")
+    })
     @PatchMapping("/users/{userId}/activate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void activateUserAccount(@PathVariable String userId) {
+    public void activateUserAccount(@Parameter(description = "Identifiant de l'utilisateur", required = true) @PathVariable String userId) {
         adminService.activeUserAccount(userId);
     }
 
+    @Operation(
+        summary = "Désactiver un compte",
+        description = "Désactive un compte utilisateur."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "204", description = "Compte désactivé"),
+        @ApiResponse(responseCode = "403", description = "Permission MANAGE_USERS manquante"),
+        @ApiResponse(responseCode = "404", description = "Utilisateur introuvable")
+    })
     @PatchMapping("/users/{userId}/deactivate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deactivateUserAccount(@PathVariable String userId) {
+    public void deactivateUserAccount(@Parameter(description = "Identifiant de l'utilisateur", required = true) @PathVariable String userId) {
         adminService.deactivateUserAccount(userId);
     }
 
+    @Operation(
+        summary = "Supprimer un compte",
+        description = "Supprime un compte utilisateur ; refusé pour le compte d'un fournisseur."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "204", description = "Compte supprimé"),
+        @ApiResponse(responseCode = "400", description = "Compte rattaché à un fournisseur (FOURNISSEUR_LIE_AU_COMPTE)"),
+        @ApiResponse(responseCode = "403", description = "Permission MANAGE_USERS manquante"),
+        @ApiResponse(responseCode = "404", description = "Utilisateur introuvable")
+    })
     @DeleteMapping("/users/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUserAccount(@PathVariable String userId) {
+    public void deleteUserAccount(@Parameter(description = "Identifiant de l'utilisateur", required = true) @PathVariable String userId) {
         adminService.deleteUserAccount(userId);
     }
 
+    @Operation(
+        summary = "Lister les rôles",
+        description = "Retourne les rôles système et leurs permissions par défaut."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Liste des rôles"),
+        @ApiResponse(responseCode = "403", description = "Permission MANAGE_USERS manquante")
+    })
     @GetMapping("/users/roles")
     @ResponseStatus(HttpStatus.OK)
     public List<RoleResponse> getRoles() {
