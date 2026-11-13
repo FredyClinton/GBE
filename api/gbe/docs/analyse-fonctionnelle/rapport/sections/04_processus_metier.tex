@@ -1,0 +1,115 @@
+\section{Présentation du processus métier}
+
+\subsection{Vue d'ensemble et structuration du cycle de la dépense}
+
+L'analyse des opérations décrites lors de la réunion de cadrage permet de structurer le traitement d'une dépense budgétaire en quatre grandes phases successives :
+
+\begin{enumerate}
+  \item \textbf{Phase 1 — Expression du besoin et soumission :} formalisation du besoin par l'ordonnateur, consultation des besoins ouverts par les fournisseurs et dépôt des soumissions.
+  \item \textbf{Phase 2 — Engagement juridique et contrôle budgétaire préalable :} préparation du projet d'acte juridique par l'ordonnateur, examen et contrôles par le contrôleur financier (réservation des crédits, quitus sur le classement en nature économique, visa), puis signature de l'acte juridique par l'ordonnateur.
+  \item \textbf{Phase 3 — Exécution des livraisons et réception matière :} réalisation des livraisons par le fournisseur, prise en charge et constatation des produits livrés par le comptable matière, délivrance du procès-verbal de réception au fournisseur et information de l'ordonnateur.
+  \item \textbf{Phase 4 — Facturation, liquidation et ordonnancement :} introduction de la demande de paiement accompagnée des factures et pièces justificatives par le fournisseur, enregistrement et validation des factures par l'ordonnateur, liquidation de la dépense, génération et signature du projet d'ordonnancement par l'ordonnateur, puis contrôle, signature et transmission du dossier d'ordonnancement par le contrôleur financier au comptable public.
+\end{enumerate}
+
+\subsection{Description détaillée des étapes de traitement}
+
+\subsubsection{Étape 1 : Expression du besoin et mise en concurrence}
+Le processus débute lorsque l'\textbf{ordonnateur} exprime un besoin au sein du système sous la forme de lignes de besoin précisant la matière, les quantités demandées et les spécifications techniques (sans fixation de prix unitaire au niveau des lignes, cette valorisation incombant exclusivement aux prestataires). Les expressions de besoin ouvertes à la soumission sont rendues accessibles aux \textbf{fournisseurs}. Ces derniers consultent les besoins publiés et déposent une soumission totale en renseignant leur prix unitaire proposé pour chaque ligne de besoin, consolidant ainsi le montant financier global de leur offre.
+
+\subsubsection{Étape 2 : Préparation, contrôle préalable et signature de l'acte juridique}
+L'\textbf{ordonnateur} prépare le projet d'acte juridique matérialisant l'engagement de la dépense et le soumet au \textbf{contrôleur financier}.
+
+À la réception de ce projet, le \textbf{contrôleur financier} intervient à trois niveaux :
+\begin{itemize}
+  \item il effectue la réservation des crédits correspondants ;
+  \item il donne le quitus sur le classement des matières dans les natures économiques ;
+  \item il examine et vise le projet d'acte juridique.
+\end{itemize}
+Une fois les contrôles requis effectués et le visa obtenu, l'\textbf{ordonnateur} signe l'acte juridique.
+
+\subsubsection{Étape 3 : Livraison et réception par le comptable matière}
+En exécution de l'engagement, le \textbf{fournisseur} effectue les livraisons. Le \textbf{comptable matière} prend en charge ces livraisons et constate les produits effectivement livrés. À l'issue de cette constatation, le comptable matière réalise deux opérations de communication :
+\begin{itemize}
+  \item il établit et délivre au \textbf{fournisseur} un procès-verbal de réception ;
+  \item il informe l'\textbf{ordonnateur} des livraisons effectuées (l'ordonnateur reçoit ainsi les informations relatives aux livraisons).
+\end{itemize}
+
+\subsubsection{Étape 4 : Demande de paiement, liquidation et projet d'ordonnancement}
+Le \textbf{fournisseur} introduit une demande de paiement dans le système en soumettant les factures ainsi que les pièces justificatives requises. Il dispose par ailleurs de la capacité de suivre l'évolution de ses demandes tout au long du traitement.
+
+Sur la base des informations de livraison reçues du comptable matière et des éléments soumis par le fournisseur, l'\textbf{ordonnateur} :
+\begin{itemize}
+  \item enregistre et valide les factures ;
+  \item procède à la liquidation de la dépense ;
+  \item génère un projet d'ordonnancement de paiement ;
+  \item signe ce projet d'ordonnancement et le transmet au \textbf{contrôleur financier}.
+\end{itemize}
+
+\subsubsection{Étape 5 : Contrôle de l'ordonnancement et transmission au comptable public}
+Le \textbf{contrôleur financier} reçoit le projet d'ordonnancement transmis par l'ordonnateur. Il effectue les contrôles nécessaires sur le dossier, puis signe et transmet le dossier d'ordonnancement au \textbf{comptable public}.
+
+Le \textbf{comptable public} reçoit le dossier d'ordonnancement transmis par le contrôleur financier, ce qui clôt le périmètre fonctionnel décrit à ce stade.
+
+\subsection{Synthèse des interactions entre acteurs}
+
+Le tableau \ref{tab:interactions} récapitule les flux d'échanges fonctionnels identifiés entre les acteurs tout au long du circuit de la dépense.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Principales interactions entre les acteurs du processus}
+\label{tab:interactions}
+\begin{tabularx}{\linewidth}{L{1.1cm} L{3.2cm} L{3.2cm} Y}
+\toprule
+\textbf{\sffamily Réf.} & \textbf{\sffamily Acteur émetteur} & \textbf{\sffamily Acteur récepteur} & \textbf{\sffamily Objet de l'interaction} \\
+\midrule
+I01 & Ordonnateur & Fournisseur & Mise à disposition des expressions de besoin ouvertes à la soumission. \\
+I02 & Fournisseur & Ordonnateur & Dépôt d'une soumission en réponse à une expression de besoin. \\
+I03 & Ordonnateur & Contrôleur financier & Transmission du projet d'acte juridique pour examen et visa. \\
+I04 & Contrôleur financier & Ordonnateur & Retour du projet d'acte juridique visé (après réservation des crédits et quitus sur le classement économique) pour signature. \\
+I05 & Fournisseur & Comptable matière & Réalisation physique de la livraison des produits commandés. \\
+I06 & Comptable matière & Fournisseur & Délivrance du procès-verbal de réception constatant les produits livrés. \\
+I07 & Comptable matière & Ordonnateur & Transmission des informations relatives aux livraisons constatées. \\
+I08 & Fournisseur & Ordonnateur & Introduction de la demande de paiement accompagnée des factures et pièces justificatives. \\
+I09 & Ordonnateur & Contrôleur financier & Transmission du projet d'ordonnancement de paiement signé. \\
+I10 & Contrôleur financier & Comptable public & Transmission du dossier d'ordonnancement contrôlé et signé. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Documents et dossiers explicitement mentionnés}
+
+L'analyse stricte des notes de cadrage met en évidence sept supports documentaires ou dossiers échangés au cours du processus :
+
+\begin{table}[H]
+\centering
+\small
+\caption{Documents et dossiers mentionnés dans l'expression de besoin initiale}
+\label{tab:documents}
+\begin{tabularx}{\linewidth}{L{4.2cm} L{3.3cm} L{3.3cm} Y}
+\toprule
+\textbf{\sffamily Document / Dossier} & \textbf{\sffamily Producteur / Émetteur} & \textbf{\sffamily Destinataire(s)} & \textbf{\sffamily Étape associée} \\
+\midrule
+Expression de besoin & Ordonnateur & Fournisseurs & Expression du besoin \\
+Projet d'acte juridique / Acte juridique signé & Ordonnateur (visé par le Contrôleur financier) & Contrôleur financier, Fournisseur & Engagement juridique \\
+Procès-verbal de réception & Comptable matière & Fournisseur (et information de l'Ordonnateur) & Réception des livraisons \\
+Demande de paiement & Fournisseur & Ordonnateur & Facturation \\
+Factures & Fournisseur & Ordonnateur & Facturation et liquidation \\
+Pièces justificatives & Fournisseur & Ordonnateur & Facturation et liquidation \\
+Projet / Dossier d'ordonnancement & Ordonnateur, puis Contrôleur financier & Contrôleur financier, puis Comptable public & Ordonnancement \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Première identification des zones d'ombre et ambiguïtés du processus}
+
+La reconstitution du circuit global fait apparaître plusieurs discontinuités ou imprécisions dans les notes initiales, qui devront être levées avec le responsable du projet :
+
+\begin{itemize}
+  \item \textbf{Transition entre les soumissions et le projet d'acte juridique :} le fournisseur soumissionne à une expression de besoin et l'ordonnateur prépare ensuite un projet d'acte juridique, mais l'étape intermédiaire d'évaluation des offres et de sélection du fournisseur retenu n'est pas décrite.
+  \item \textbf{Ordonnancement chronologique des actes du contrôleur financier lors de l'engagement :} les notes mentionnent la réservation des crédits, le quitus sur le classement des matières dans les natures économiques et l'examen/visa du projet d'acte juridique, sans préciser si ces trois opérations sont réalisées simultanément lors de la soumission du projet d'acte juridique ou lors de jalons distincts.
+  \item \textbf{Notification de l'acte juridique signé au fournisseur :} les notes indiquent que l'ordonnateur signe l'acte juridique après les contrôles requis et que le fournisseur effectue les livraisons, sans expliciter la manière dont l'acte signé (bon de commande, marché ou contrat) est notifié au fournisseur pour déclencher la livraison.
+  \item \textbf{Articulation entre le procès-verbal de réception et la demande de paiement :} le comptable matière délivre un procès-verbal de réception au fournisseur et informe l'ordonnateur des livraisons ; de son côté, le fournisseur soumet une demande de paiement avec factures et pièces justificatives. Il convient de confirmer si le procès-verbal de réception fait partie des pièces justificatives jointes par le fournisseur ou s'il est directement rattaché au dossier par le système.
+  \item \textbf{Absence de circuits de rejet ou de demande de régularisation :} le processus décrit uniquement le scénario nominal (validation à chaque étape). Le comportement attendu en cas de refus de visa, de livraison non conforme ou de facture erronée n'est pas encore spécifié.
+  \item \textbf{Fin du processus chez le comptable public :} le comptable public reçoit le dossier d'ordonnancement, mais aucune opération de prise en charge, de contrôle de régularité, de paiement ou de retour d'information vers l'ordonnateur et le fournisseur n'est mentionnée.
+\end{itemize}

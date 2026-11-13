@@ -1,0 +1,1209 @@
+<mxfile host="65bd71144e">
+    <diagram id="page-1-classes-metier" name="1. Diagramme de Classes Métier (UML)">
+        <mxGraphModel dx="3047" dy="3624" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="4200" pageHeight="2400" math="0" shadow="0">
+            <root>
+                <mxCell id="0" />
+                <mxCell id="1" parent="0" />
+                <mxCell id="title_p1" parent="1" style="text;html=1;align=center;verticalAlign=middle;rounded=1;fillColor=#F8FAFC;strokeColor=#94A3B8;strokeWidth=1.2;shadow=0;" value="&lt;b style='font-size:18px;color:#1E293B;'&gt;SYSTÈME DE GESTION DES DÉPENSES BUDGÉTAIRES (GBE+ MINFI) - MODÈLE DE DOMAINE MÉTIER UML&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:12px;color:#64748B;'&gt;Architecture Complète : Nomenclature Budgétaire • Expressions de Besoin &amp;amp; Spécialisation BCA • Engagement Juridique • Contrôle Financier&lt;/span&gt;" vertex="1">
+                    <mxGeometry height="54" width="2900" x="100" y="30" as="geometry" />
+                </mxCell>
+                <mxCell id="Exercice" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;Exercice&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- annee : Integer&lt;br&gt;- code : Integer&lt;br&gt;- actif : Boolean&lt;br&gt;- dateDebut : Date&lt;br&gt;- dateFin : Date&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ getAnnee() : Integer&lt;/p&gt;" vertex="1">
+                    <mxGeometry height="160" width="200" x="110" y="110.5" as="geometry" />
+                </mxCell>
+                <mxCell id="Section" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;Section&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- code : String&lt;br&gt;- sigle : String&lt;br&gt;- libelle : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ getCode() : String&lt;br&gt;+ getSigle() : String&lt;/p&gt;" vertex="1">
+                    <mxGeometry height="141" width="220" x="460" y="120" as="geometry" />
+                </mxCell>
+                <mxCell id="Chapitre" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;Chapitre&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- code : String&lt;br&gt;- sigle : String&lt;br&gt;- libelle : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ getCode() : String&lt;/p&gt;" vertex="1">
+                    <mxGeometry height="122" width="220" x="460" y="340" as="geometry" />
+                </mxCell>
+                <mxCell id="Programme" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;Programme&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- code : String&lt;br&gt;- sigle : String&lt;br&gt;- libelle : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ getCode() : String&lt;/p&gt;" vertex="1">
+                    <mxGeometry height="122" width="210" x="840" y="120" as="geometry" />
+                </mxCell>
+                <mxCell id="Action" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;Action&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- code : String&lt;br&gt;- sigle : String&lt;br&gt;- libelle : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ getCode() : String&lt;/p&gt;" vertex="1">
+                    <mxGeometry height="122" width="210" x="1200" y="120" as="geometry" />
+                </mxCell>
+                <mxCell id="Activite" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;Activite&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- code : String&lt;br&gt;- sigle : String&lt;br&gt;- libelle : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ getCode() : String&lt;/p&gt;" vertex="1">
+                    <mxGeometry height="122" width="210" x="1560" y="120" as="geometry" />
+                </mxCell>
+                <mxCell id="Tache" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;Tache&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- code : String&lt;br&gt;- sigle : String&lt;br&gt;- libelle : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ getCode() : String&lt;/p&gt;" vertex="1">
+                    <mxGeometry height="122" width="210" x="1920" y="120" as="geometry" />
+                </mxCell>
+                <mxCell id="NatureEconomique" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;NatureEconomique&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- code : String&lt;br&gt;- sigle : String&lt;br&gt;- libelle : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ getCode() : String&lt;/p&gt;" vertex="1">
+                    <mxGeometry height="122" width="230" x="2280" y="120" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_ex_sec" edge="1" parent="1" source="Exercice" style="rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;" target="Section" value="">
+                    <mxGeometry relative="1" x="0.0001" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_ex_sec_src_lbl" connectable="0" parent="rel_ex_sec" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.7994" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_ex_sec_tgt_lbl" connectable="0" parent="rel_ex_sec" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1..*" vertex="1">
+                    <mxGeometry relative="1" x="0.8053" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_sec_prog" edge="1" parent="1" source="Section" style="rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;" target="Programme" value="">
+                    <mxGeometry relative="1" x="0.0001" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_sec_prog_src_lbl" connectable="0" parent="rel_sec_prog" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.7994" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_sec_prog_tgt_lbl" connectable="0" parent="rel_sec_prog" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1..*" vertex="1">
+                    <mxGeometry relative="1" x="0.8053" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_prog_act" edge="1" parent="1" source="Programme" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="Action" value="">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_prog_act_src_lbl" connectable="0" parent="rel_prog_act" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_prog_act_tgt_lbl" connectable="0" parent="rel_prog_act" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1..*" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_act_actv" edge="1" parent="1" source="Action" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="Activite" value="">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_act_actv_src_lbl" connectable="0" parent="rel_act_actv" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_act_actv_tgt_lbl" connectable="0" parent="rel_act_actv" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1..*" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_actv_tch" edge="1" parent="1" source="Activite" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="Tache" value="">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_actv_tch_src_lbl" connectable="0" parent="rel_actv_tch" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_actv_tch_tgt_lbl" connectable="0" parent="rel_actv_tch" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1..*" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_sec_chap" edge="1" parent="1" source="Section" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="Chapitre" value="tutelle de">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_sec_chap_src_lbl" connectable="0" parent="rel_sec_chap" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_sec_chap_tgt_lbl" connectable="0" parent="rel_sec_chap" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1..*" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="Utilisateur" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;i style='font-size:11px;color:#475569;'&gt;«abstract»&lt;/i&gt;&lt;br&gt;&lt;i&gt;&lt;b&gt;Utilisateur&lt;/b&gt;&lt;/i&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- matricule : String&lt;br&gt;- email : String&lt;br&gt;- telephone : String&lt;br&gt;- motDePasse : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ seConnecter() : Boolean&lt;br&gt;+ seDeconnecter() : void&lt;/p&gt;" vertex="1">
+                    <mxGeometry height="174" width="240" x="1390" y="522" as="geometry" />
+                </mxCell>
+                <mxCell id="Fournisseur" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;Fournisseur&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- raisonSociale : String&lt;br&gt;- niu : String&lt;br&gt;- rccm : String&lt;br&gt;- adresse : String&lt;br&gt;- telephone : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ soumissionner(e : ExpressionBesoin)&lt;br&gt;+ enregistrerFacture(f : Facture)&lt;/p&gt;" vertex="1">
+                    <mxGeometry height="179" width="260" x="100" y="780" as="geometry" />
+                </mxCell>
+                <mxCell id="ComptableMatiere" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;ComptableMatiere&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- codePoste : String&lt;br&gt;- structure : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ verifierBesoin(b : ExpressionBesoin)&lt;br&gt;+ classerMatieres()&lt;br&gt;+ dresserPVReception()&lt;/p&gt;" vertex="1">
+                    <mxGeometry height="141" width="250" x="600" y="780" as="geometry" />
+                </mxCell>
+                <mxCell id="Ordonnateur" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;Ordonnateur&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- codeOrdonnateur : String&lt;br&gt;- structure : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ enregistrerExpressionBesoin()&lt;br&gt;+ preparerProjetActe()&lt;br&gt;+ signerActe(electronique : Boolean)&lt;br&gt;+ genererProjetOrdonnancement()&lt;br&gt;+ liquider(d : DemandePaiement)&lt;/p&gt;" vertex="1">
+                    <mxGeometry height="179" width="260" x="1380" y="780" as="geometry" />
+                </mxCell>
+                <mxCell id="ControleurFinancier" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;ControleurFinancier&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- zoneCompetence : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ afficherFicheAccreditation()&lt;br&gt;+ reserverCredits(a : ActeJuridique)&lt;br&gt;+ donnerQuitusClassement()&lt;br&gt;+ viserActe(a : ActeJuridique)&lt;br&gt;+ viserOrdonnancement(o : Ordonnance)&lt;br&gt;+ transmettreAuComptable(o : Ordonnateur)&lt;/p&gt;" vertex="1">
+                    <mxGeometry height="179" width="260" x="2720" y="780" as="geometry" />
+                </mxCell>
+                <mxCell id="inh_fournisseur" edge="1" parent="1" source="Fournisseur" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=0;endSize=14;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="Utilisateur" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="230" y="730" />
+                            <mxPoint x="1510" y="730" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="inh_cm" edge="1" parent="1" source="ComptableMatiere" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=0;endSize=14;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="Utilisateur" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="725" y="730" />
+                            <mxPoint x="1510" y="730" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="inh_ordonnateur" edge="1" parent="1" source="Ordonnateur" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=0;endSize=14;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="Utilisateur" value="">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="inh_cf" edge="1" parent="1" source="ControleurFinancier" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=0;endSize=14;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="Utilisateur" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="2850" y="730" />
+                            <mxPoint x="1510" y="730" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="CoordonneeBancaire" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style=&#x27;margin:0;margin-top:5px;text-align:center;&#x27;&gt;&lt;b&gt;CoordonneeBancaire&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;- rib : String&lt;/p&gt;" vertex="1">
+                    <mxGeometry height="60" width="260" x="100" y="1080" as="geometry" />
+                </mxCell>
+                <mxCell id="comp_rib" edge="1" parent="1" source="Fournisseur" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;startArrow=diamond;startFill=1;startSize=12;endArrow=open;endFill=0;endSize=8;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="CoordonneeBancaire" value="possède">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="comp_rib_src_lbl" connectable="0" parent="comp_rib" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="comp_rib_tgt_lbl" connectable="0" parent="comp_rib" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1..*" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="Soumission" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style=&#x27;margin:0;margin-top:5px;text-align:center;&#x27;&gt;&lt;b&gt;Soumission&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;- numero : String&lt;br&gt;- dateSoumission : Date&lt;br&gt;- dateDerniereModification : Date&lt;br&gt;- montantProposeHT : Double&lt;br&gt;- tauxTva : Double&lt;br&gt;- montantTva : Double&lt;br&gt;- montantProposeTTC : Double&lt;br&gt;- tauxIr : Double&lt;br&gt;- montantIr : Double&lt;br&gt;- montantNetAPayer : Double&lt;br&gt;- delaiProposeJours : Integer&lt;br&gt;- statut : StatutSoumission&lt;br&gt;- empreinte : String&lt;br&gt;- dateDecision : Date&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;+ ajouterLigneOffre(l : LigneSoumission)&lt;br&gt;+ validerCompletude() : Boolean&lt;br&gt;+ estRetenue() : Boolean&lt;br&gt;+ retenirCommeAdjudicataire()&lt;br&gt;+ ecarter()&lt;br&gt;+ sceller()&lt;/p&gt;" vertex="1">
+                    <mxGeometry height="430" width="260" x="100" y="1290" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_frs_soum" edge="1" parent="1" source="Fournisseur" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="Soumission" value="dépose">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="50" y="865" />
+                            <mxPoint x="50" y="1375" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="rel_frs_soum_src_lbl" connectable="0" parent="rel_frs_soum" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_frs_soum_tgt_lbl" connectable="0" parent="rel_frs_soum" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="LigneBesoin" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;LigneBesoin&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- numeroOrdre : Integer&lt;br&gt;- quantiteDemandee : Double&lt;br&gt;- specifications : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ getMatiere() : Matiere&lt;/p&gt;" vertex="1">
+                    <mxGeometry height="140" width="250" x="600" y="1080" as="geometry" />
+                </mxCell>
+                <mxCell id="Matiere" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style=&#x27;margin:0;margin-top:5px;text-align:center;&#x27;&gt;&lt;b&gt;Matiere&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;- reference : String&lt;br&gt;- libelle : String&lt;/p&gt;" vertex="1">
+                    <mxGeometry height="79" width="250" x="600" y="1300" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_ligne_matiere" edge="1" parent="1" source="LigneBesoin" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="Matiere" value="se rapporte à">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_ligne_matiere_src_lbl" connectable="0" parent="rel_ligne_matiere" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="*" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_ligne_matiere_tgt_lbl" connectable="0" parent="rel_ligne_matiere" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_mat_nat" edge="1" parent="1" source="Matiere" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="NatureEconomique" value="classé dans (quitus CF) — non relié pour l&#x27;instant (décision 2026-11-11)">
+                    <mxGeometry relative="1" x="0.1435" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="850" y="1360" />
+                            <mxPoint x="900" y="1360" />
+                            <mxPoint x="900" y="400" />
+                            <mxPoint x="2330" y="400" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="rel_mat_nat_src_lbl" connectable="0" parent="rel_mat_nat" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="*" vertex="1">
+                    <mxGeometry relative="1" x="-0.7715" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_mat_nat_tgt_lbl" connectable="0" parent="rel_mat_nat" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="0.8038" as="geometry" />
+                </mxCell>
+                <mxCell id="ExpressionBesoin" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style=&#x27;margin:0;margin-top:5px;text-align:center;&#x27;&gt;&lt;i style=&#x27;font-size:11px;color:#475569;&#x27;&gt;«abstract»&lt;/i&gt;&lt;br&gt;&lt;i&gt;&lt;b&gt;ExpressionBesoin&lt;/b&gt;&lt;/i&gt;&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;- reference : String&lt;br&gt;- objet : String&lt;br&gt;- dateExpression : Date&lt;br&gt;- dateClotureSoumission : Date&lt;br&gt;- datePublication : Date&lt;br&gt;- dateClotureEffective : Date&lt;br&gt;- dateDecision : Date&lt;br&gt;- statut : StatutExpression&lt;br&gt;- motifAnnulation : String&lt;br&gt;- supprime : Boolean&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;+ ajouterLigne(l : LigneBesoin)&lt;br&gt;+ publier()&lt;br&gt;+ cloturerSoumissions()&lt;br&gt;+ retenirSoumission(s : Soumission)&lt;br&gt;+ declarerInfructueux()&lt;br&gt;+ annuler(motif : String)&lt;br&gt;+ supprimer()&lt;/p&gt;" vertex="1">
+                    <mxGeometry height="389" width="360" x="1330" y="1060" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_eb_chapitre" edge="1" parent="1" source="ExpressionBesoin" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="Chapitre" value="émise par (structure émettrice)">
+                    <mxGeometry relative="1" x="-0.0451" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1050" y="1120" />
+                            <mxPoint x="1050" y="480" />
+                            <mxPoint x="570" y="480" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="rel_eb_chapitre_src_lbl" connectable="0" parent="rel_eb_chapitre" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+                    <mxGeometry relative="1" x="-0.8829" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_eb_chapitre_tgt_lbl" connectable="0" parent="rel_eb_chapitre" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="0.7913" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_eb_exercice" edge="1" parent="1" source="ExpressionBesoin" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;" target="Exercice" value="au titre de (exercice)">
+                    <mxGeometry relative="1" x="-0.0178" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1410" y="1000" />
+                            <mxPoint x="1000" y="1000" />
+                            <mxPoint x="1000" y="520" />
+                            <mxPoint x="200" y="520" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="rel_eb_exercice_src_lbl" connectable="0" parent="rel_eb_exercice" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+                    <mxGeometry relative="1" x="-0.913" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_eb_exercice_tgt_lbl" connectable="0" parent="rel_eb_exercice" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="0.8045" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_eb_tache" edge="1" parent="1" source="ExpressionBesoin" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="Tache" value="s'inscrit dans (tâche/activité)">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1780" y="1120" />
+                            <mxPoint x="1780" y="480" />
+                            <mxPoint x="2025" y="480" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="rel_eb_tache_src_lbl" connectable="0" parent="rel_eb_tache" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_eb_tache_tgt_lbl" connectable="0" parent="rel_eb_tache" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_eb_nature" edge="1" parent="1" source="ExpressionBesoin" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="NatureEconomique" value="consomme (nature économique)">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1830" y="1160" />
+                            <mxPoint x="1830" y="520" />
+                            <mxPoint x="2395" y="520" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="rel_eb_nature_src_lbl" connectable="0" parent="rel_eb_nature" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_eb_nature_tgt_lbl" connectable="0" parent="rel_eb_nature" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_ord_eb" edge="1" parent="1" source="Ordonnateur" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="ExpressionBesoin" value="enregistre">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1510" y="1000" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="rel_ord_eb_src_lbl" connectable="0" parent="rel_ord_eb" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_ord_eb_tgt_lbl" connectable="0" parent="rel_ord_eb" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_cm_eb" edge="1" parent="1" source="ComptableMatiere" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="ExpressionBesoin" value="vérifie">
+                    <mxGeometry relative="1" x="0.1097" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="725" y="1020" />
+                            <mxPoint x="1250" y="1020" />
+                            <mxPoint x="1250" y="1100" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="rel_cm_eb_src_lbl" connectable="0" parent="rel_cm_eb" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.7781" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_cm_eb_tgt_lbl" connectable="0" parent="rel_cm_eb" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+                    <mxGeometry relative="1" x="0.8981" as="geometry" />
+                </mxCell>
+                <mxCell id="comp_eb_lignes" edge="1" parent="1" source="ExpressionBesoin" style="rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;startArrow=diamond;startFill=1;startSize=12;endArrow=open;endFill=0;endSize=8;" target="LigneBesoin" value="contient">
+                    <mxGeometry relative="1" x="-0.001" as="geometry" />
+                </mxCell>
+                <mxCell id="comp_eb_lignes_src_lbl" connectable="0" parent="comp_eb_lignes" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.7897" as="geometry" />
+                </mxCell>
+                <mxCell id="comp_eb_lignes_tgt_lbl" connectable="0" parent="comp_eb_lignes" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1..*" vertex="1">
+                    <mxGeometry relative="1" x="0.7998" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_soum_eb" edge="1" parent="1" source="Soumission" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;" target="ExpressionBesoin" value="répond à">
+                    <mxGeometry relative="1" x="0.1088" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1360" y="1589" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="rel_soum_eb_src_lbl" connectable="0" parent="rel_soum_eb" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+                    <mxGeometry relative="1" x="-0.8754" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_soum_eb_tgt_lbl" connectable="0" parent="rel_soum_eb" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="0.8474" as="geometry" />
+                </mxCell>
+                <mxCell id="ActeJuridique" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style=&#x27;margin:0;margin-top:5px;text-align:center;&#x27;&gt;&lt;b&gt;ActeJuridique&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;- numero : String&lt;br&gt;- type : TypeActe&lt;br&gt;- objet : String&lt;br&gt;- dateEmission : Date&lt;br&gt;- montantTotalHT : Double&lt;br&gt;- tauxTva : Double&lt;br&gt;- montantTva : Double&lt;br&gt;- tauxIr : Double&lt;br&gt;- montantIr : Double&lt;br&gt;- montantTTC : Double&lt;br&gt;- montantNetAPayer : Double&lt;br&gt;- montantEnLettres : String&lt;br&gt;- dateSoumissionControle : Date&lt;br&gt;- dateSignature : Date&lt;br&gt;- signatureElectronique : Boolean&lt;br&gt;- statut : StatutActe&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;+ modifier(objet : String)&lt;br&gt;+ soumettreAuVisa()&lt;br&gt;+ viser()&lt;br&gt;+ renvoyerEnProjet()&lt;br&gt;+ signer(electronique : Boolean)&lt;/p&gt;" vertex="1">
+                    <mxGeometry height="449" width="340" x="2050" y="1060" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_eb_acte" edge="1" parent="1" source="ExpressionBesoin" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="ActeJuridique" value="donne lieu à">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_eb_acte_src_lbl" connectable="0" parent="rel_eb_acte" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_eb_acte_tgt_lbl" connectable="0" parent="rel_eb_acte" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="0..1" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_ord_acte" edge="1" parent="1" source="Ordonnateur" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="ActeJuridique" value="prépare et signe">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="2220" y="865" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="rel_ord_acte_src_lbl" connectable="0" parent="rel_ord_acte" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_ord_acte_tgt_lbl" connectable="0" parent="rel_ord_acte" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_soum_retenue_acte" edge="1" parent="1" source="Soumission" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=0;exitY=0.7;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="ActeJuridique" value="titulaire retenu">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array><mxPoint x="50" y="1416" /><mxPoint x="50" y="2100" /><mxPoint x="2220" y="1987" /></Array></mxGeometry>
+                </mxCell>
+                <mxCell id="rel_soum_retenue_acte_src_lbl" connectable="0" parent="rel_soum_retenue_acte" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="0..1" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_soum_retenue_acte_tgt_lbl" connectable="0" parent="rel_soum_retenue_acte" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="Visa" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style=&#x27;margin:0;margin-top:5px;text-align:center;&#x27;&gt;&lt;b&gt;Visa&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;- numero : String&lt;br&gt;- typeVisa : TypeVisa&lt;br&gt;- dateReception : Date&lt;br&gt;- dateVisa : Date&lt;br&gt;- decision : StatutVisa&lt;br&gt;- observations : String&lt;br&gt;- referenceQuitus : String&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;+ estFavorable() : Boolean&lt;br&gt;+ notifierDecision() : void&lt;/p&gt;" vertex="1">
+                    <mxGeometry height="215" width="250" x="2720" y="1060" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_cf_visa" edge="1" parent="1" source="ControleurFinancier" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="Visa" value="émet">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_cf_visa_src_lbl" connectable="0" parent="rel_cf_visa" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_cf_visa_tgt_lbl" connectable="0" parent="rel_cf_visa" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_acte_visa" edge="1" parent="1" source="ActeJuridique" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;" target="Visa" value="visé par">
+                    <mxGeometry relative="1" x="0.0012" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_acte_visa_src_lbl" connectable="0" parent="rel_acte_visa" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.7978" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_acte_visa_tgt_lbl" connectable="0" parent="rel_acte_visa" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+                    <mxGeometry relative="1" x="0.8002" as="geometry" />
+                </mxCell>
+                <mxCell id="ReservationCredit" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style=&#x27;margin:0;margin-top:5px;text-align:center;&#x27;&gt;&lt;b&gt;ReservationCredit&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;- numero : String&lt;br&gt;- montant : Double&lt;br&gt;- dateReservation : Date&lt;br&gt;- statut : StatutReservation&lt;br&gt;- dateAnnulation : Date&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;+ bloquer()&lt;br&gt;+ annuler()&lt;/p&gt;" vertex="1">
+                    <mxGeometry height="176" width="250" x="2720" y="1374" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_cf_res" edge="1" parent="1" source="ControleurFinancier" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="ReservationCredit" value="réserve">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="3030" y="865" />
+                            <mxPoint x="3030" y="1449" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="rel_cf_res_src_lbl" connectable="0" parent="rel_cf_res" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_cf_res_tgt_lbl" connectable="0" parent="rel_cf_res" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_acte_res" edge="1" parent="1" source="ActeJuridique" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="ReservationCredit" value="bloque crédits">
+                    <mxGeometry relative="1" x="-0.0143" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="2390" y="1280" />
+                            <mxPoint x="2490" y="1280" />
+                            <mxPoint x="2490" y="1375" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="rel_acte_res_src_lbl" connectable="0" parent="rel_acte_res" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.7964" as="geometry" />
+                </mxCell>
+                <mxCell id="rel_acte_res_tgt_lbl" connectable="0" parent="rel_acte_res" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="0..1" vertex="1">
+                    <mxGeometry relative="1" x="0.8119" as="geometry" />
+                </mxCell>
+                <mxCell id="BonDeCommandeAdministratif" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style=&#x27;margin:0;margin-top:5px;text-align:center;&#x27;&gt;&lt;b&gt;BonDeCommandeAdministratif&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;- delaiLivraisonMois : Integer&lt;br&gt;- referenceDevis : String&lt;br&gt;- codeBarresSecurite : String&lt;br&gt;- qrCodeSecurite : String&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;+ genererTitreDeCreance()&lt;br&gt;+ imprimerBCA()&lt;/p&gt;" vertex="1">
+                    <mxGeometry height="157" width="280" x="1050" y="1560" as="geometry" />
+                </mxCell>
+                <mxCell id="LettreCommande" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;LettreCommande&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- numeroEnregistrement : String&lt;br&gt;- dureeExecutionMois : Integer&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ verifierCaution()&lt;/p&gt;" vertex="1">
+                    <mxGeometry height="103" width="240" x="1420" y="1560" as="geometry" />
+                </mxCell>
+                <mxCell id="MarchePublic" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;MarchePublic&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- numeroAppelOffres : String&lt;br&gt;- cautionnementProvisoire : Double&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ soumettreCommission()&lt;/p&gt;" vertex="1">
+                    <mxGeometry height="103" width="240" x="1740" y="1560" as="geometry" />
+                </mxCell>
+                <mxCell id="inh_bca" edge="1" parent="1" source="BonDeCommandeAdministratif" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=0;endSize=14;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="ExpressionBesoin" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1190" y="1480" />
+                            <mxPoint x="1510" y="1619" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="inh_lc" edge="1" parent="1" source="LettreCommande" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=0;endSize=14;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="ExpressionBesoin" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1540" y="1480" />
+                            <mxPoint x="1510" y="1480" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="inh_marche" edge="1" parent="1" source="MarchePublic" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=0;endSize=14;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="ExpressionBesoin" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1860" y="1480" />
+                            <mxPoint x="1510" y="1619" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+            <mxCell id="LigneSoumission" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style=&#x27;margin:0;margin-top:5px;text-align:center;&#x27;&gt;&lt;b&gt;LigneSoumission&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;- numeroOrdre : Integer&lt;br&gt;- prixUnitairePropose : Double&lt;br&gt;- montantTotalLigneHT : Double&lt;br&gt;- remarquesTechniques : String&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;+ calculerSousTotalHT() : Double&lt;br&gt;+ getLigneBesoin() : LigneBesoin&lt;/p&gt;" vertex="1"><mxGeometry x="100" y="1790" width="260" height="157" as="geometry" /></mxCell><mxCell id="comp_soum_lignes" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;startArrow=diamond;startFill=1;startSize=12;endArrow=open;endFill=0;endSize=8;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" value="détaille (offre complète)" edge="1" source="Soumission" target="LigneSoumission"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="comp_soum_lignes_src" connectable="0" parent="comp_soum_lignes" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1"><mxGeometry relative="1" x="-0.8" as="geometry" /></mxCell><mxCell id="comp_soum_lignes_tgt" connectable="0" parent="comp_soum_lignes" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1..*" vertex="1"><mxGeometry relative="1" x="0.8" as="geometry" /></mxCell><mxCell id="rel_lignesoum_lignebesoin" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" value="se réfère à" edge="1" source="LigneSoumission" target="LigneBesoin"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="480" y="1627" /><mxPoint x="480" y="1160" /></Array></mxGeometry></mxCell><mxCell id="rel_lignesoum_lignebesoin_src" connectable="0" parent="rel_lignesoum_lignebesoin" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1..*" vertex="1"><mxGeometry relative="1" x="-0.8" as="geometry" /></mxCell><mxCell id="rel_lignesoum_lignebesoin_tgt" connectable="0" parent="rel_lignesoum_lignebesoin" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1"><mxGeometry relative="1" x="0.8" as="geometry" /></mxCell><mxCell id="panel_enums" parent="1" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#FAF5FF;strokeColor=#D8B4FE;strokeWidth=1.5;dashed=1;shadow=0;" value="" vertex="1"><mxGeometry x="3060" y="80" width="550" height="680" as="geometry" /></mxCell><mxCell id="title_enums" parent="1" style="text;html=1;align=center;verticalAlign=middle;rounded=0;fontSize=13;fontStyle=1;fontColor=#6B21A8;" value="RÉFÉRENTIELS ET ÉNUMÉRATIONS DU DOMAINE (UML)" vertex="1"><mxGeometry x="3060" y="85" width="550" height="30" as="geometry" /></mxCell><mxCell id="enum_StatutExpression" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#1E293B;shadow=0;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;i style='font-size:10px;color:#6b21a8;'&gt;«enumeration»&lt;/i&gt;&lt;br&gt;&lt;b&gt;StatutExpression&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;font-size:11px;'&gt;+ BROUILLON&lt;br&gt;+ PUBLIEE&lt;br&gt;+ EN_EVALUATION&lt;br&gt;+ ATTRIBUEE&lt;br&gt;+ ANNULEE&lt;br&gt;+ INFRUCTUEUSE&lt;/p&gt;" vertex="1"><mxGeometry x="3080" y="125" width="240" height="155" as="geometry" /></mxCell><mxCell id="enum_StatutSoumission" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#1E293B;shadow=0;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;i style='font-size:10px;color:#6b21a8;'&gt;«enumeration»&lt;/i&gt;&lt;br&gt;&lt;b&gt;StatutSoumission&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;font-size:11px;'&gt;+ DEPOSEE&lt;br&gt;+ RECEVABLE&lt;br&gt;+ EN_EXAMEN&lt;br&gt;+ RETENUE&lt;br&gt;+ NON_RETENUE&lt;br&gt;+ REJETEE&lt;/p&gt;" vertex="1"><mxGeometry x="3080" y="295" width="240" height="155" as="geometry" /></mxCell><mxCell id="enum_TypeActe" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#1E293B;shadow=0;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;i style='font-size:10px;color:#6b21a8;'&gt;«enumeration»&lt;/i&gt;&lt;br&gt;&lt;b&gt;TypeActe&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;font-size:11px;'&gt;+ BON_DE_COMMANDE (BCA)&lt;br&gt;+ LETTRE_COMMANDE (LC)&lt;br&gt;+ MARCHE_PUBLIC&lt;br&gt;+ CONVENTION_BAIL&lt;/p&gt;" vertex="1"><mxGeometry x="3080" y="465" width="240" height="145" as="geometry" /></mxCell><mxCell id="enum_StatutActe" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#1E293B;shadow=0;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;i style='font-size:10px;color:#6b21a8;'&gt;«enumeration»&lt;/i&gt;&lt;br&gt;&lt;b&gt;StatutActe&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;font-size:11px;'&gt;+ PROJET&lt;br&gt;+ SOUMIS_CONTROLE&lt;br&gt;+ VISE_CF&lt;br&gt;+ SIGNE_ORDONNATEUR&lt;br&gt;+ NOTIFIE_PRESTATAIRE&lt;br&gt;+ REJETE&lt;br&gt;+ ANNULE&lt;/p&gt;" vertex="1"><mxGeometry x="3350" y="125" width="240" height="170" as="geometry" /></mxCell><mxCell id="enum_StatutVisa" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#1E293B;shadow=0;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;i style='font-size:10px;color:#6b21a8;'&gt;«enumeration»&lt;/i&gt;&lt;br&gt;&lt;b&gt;StatutVisa&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;font-size:11px;'&gt;+ FAVORABLE&lt;br&gt;+ DEFAVORABLE_REJET&lt;br&gt;+ SUSPENDU_RESERVES&lt;/p&gt;" vertex="1"><mxGeometry x="3350" y="310" width="240" height="135" as="geometry" /></mxCell><mxCell id="enum_TypeVisa" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#1E293B;shadow=0;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;i style='font-size:10px;color:#6b21a8;'&gt;«enumeration»&lt;/i&gt;&lt;br&gt;&lt;b&gt;TypeVisa&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;font-size:11px;'&gt;+ ENGAGEMENT_JURIDIQUE&lt;br&gt;+ ORDONNANCEMENT_PAIEMENT&lt;/p&gt;" vertex="1"><mxGeometry x="3350" y="465" width="240" height="135" as="geometry" /></mxCell><mxCell id="Beneficiaire" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;Beneficiaire&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- code : String&lt;br&gt;- libelle : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ getCode() : String&lt;/p&gt;" vertex="1"><mxGeometry x="460" y="540" width="220" height="110" as="geometry" /></mxCell><mxCell id="rel_eb_beneficiaire" edge="1" parent="1" source="ExpressionBesoin" target="Beneficiaire" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=0;exitY=0.7;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" value="au profit de (bénéficiaire)"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="CreditBudgetaire" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style=&#x27;margin:0;margin-top:5px;text-align:center;&#x27;&gt;&lt;b&gt;CreditBudgetaire&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;- codeImputation : String&lt;br&gt;- montantAE : Double&lt;br&gt;- montantAEConsomme : Double&lt;br&gt;- montantAEDisponible : Double&lt;br&gt;- montantCP : Double&lt;br&gt;- montantCPConsomme : Double&lt;br&gt;- montantCPDisponible : Double&lt;br&gt;- statut : StatutCredit&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;+ consommerAE(m : Double)&lt;br&gt;+ libererAE(m : Double)&lt;br&gt;+ consommerCP(m : Double)&lt;br&gt;+ libererCP(m : Double)&lt;/p&gt;" vertex="1"><mxGeometry x="3090.0" y="1374.0" width="260" height="274" as="geometry" /></mxCell><mxCell id="rel_reservation_credit" edge="1" parent="1" source="ReservationCredit" target="CreditBudgetaire" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" value="sur la ligne de crédit"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell><mxCell id="rel_soumission_rib" edge="1" parent="1" source="Soumission" target="CoordonneeBancaire" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=0.75;exitY=0;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;" value="payée sur (RIB choisi)"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell><mxCell id="Taxe" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="&lt;p style=&#x27;margin:0;margin-top:5px;text-align:center;&#x27;&gt;&lt;b&gt;Taxe&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;- code : CodeTaxe&lt;br&gt;- libelle : String&lt;br&gt;- taux : Double&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;+ appliquer(baseHT : Double) : Double&lt;/p&gt;" vertex="1"><mxGeometry x="500" y="1410" width="230" height="118" as="geometry" /></mxCell><mxCell id="rel_soumission_taxe" edge="1" parent="1" source="Soumission" target="Taxe" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;dashed=1;exitX=1;exitY=0.35;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" value="taxes appliquées (TVA, IR)"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell><mxCell id="enum_StatutReservation" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#1E293B;shadow=0;" value="&lt;p style=&#x27;margin:0;margin-top:5px;text-align:center;&#x27;&gt;&lt;i style=&#x27;font-size:10px;color:#6b21a8;&#x27;&gt;«enumeration»&lt;/i&gt;&lt;br&gt;&lt;b&gt;StatutReservation&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;font-size:11px;&#x27;&gt;+ ACTIVE&lt;br&gt;+ ANNULEE&lt;/p&gt;" vertex="1"><mxGeometry x="3080" y="630" width="240" height="100" as="geometry" /></mxCell><mxCell id="enum_CodeTaxe" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#1E293B;shadow=0;" value="&lt;p style=&#x27;margin:0;margin-top:5px;text-align:center;&#x27;&gt;&lt;i style=&#x27;font-size:10px;color:#6b21a8;&#x27;&gt;«enumeration»&lt;/i&gt;&lt;br&gt;&lt;b&gt;CodeTaxe&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;font-size:11px;&#x27;&gt;+ TVA&lt;br&gt;+ IR&lt;/p&gt;" vertex="1"><mxGeometry x="3350" y="630" width="240" height="100" as="geometry" /></mxCell></root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="page-2-cycle-de-vie" name="2. Cycle de Vie Complet (États UML)">
+        <mxGraphModel dx="2527" dy="1502" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="3200" pageHeight="2000" math="0" shadow="0">
+            <root>
+                <mxCell id="0" />
+                <mxCell id="1" parent="0" />
+                <mxCell id="title_p2" parent="1" style="text;html=1;align=center;verticalAlign=middle;rounded=1;fillColor=#F8FAFC;strokeColor=#94A3B8;strokeWidth=1.2;shadow=0;" value="&lt;b style='font-size:16px;color:#1E293B;'&gt;DIAGRAMME D'ÉTATS UML - CYCLE DE VIE COMPLET D'UNE DÉPENSE PUBLIQUE (GBE+)&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:11px;color:#64748B;'&gt;De l'Expression du Besoin initiale jusqu'au Paiement effectif par virement bancaire sur RIB&lt;/span&gt;" vertex="1">
+                    <mxGeometry height="46" width="2400" x="100" y="30" as="geometry" />
+                </mxCell>
+                <mxCell id="st_init" parent="1" style="ellipse;shape=startState;fillColor=#000000;strokeColor=#000000;strokeWidth=2;" value="" vertex="1">
+                    <mxGeometry height="30" width="30" x="50" y="135" as="geometry" />
+                </mxCell>
+                <mxCell id="st_brouillon" parent="1" style="rounded=1;arcSize=14;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;BROUILLON&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Expression créée par ordonnateur&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="70" width="240" x="130" y="115" as="geometry" />
+                </mxCell>
+                <mxCell id="st_publiee" parent="1" style="rounded=1;arcSize=14;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;PUBLIEE&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Consultation ouverte prestataires&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="70" width="240" x="460" y="115" as="geometry" />
+                </mxCell>
+                <mxCell id="st_evaluation" parent="1" style="rounded=1;arcSize=14;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;EN_EVALUATION&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Clôture soumissions &amp; scoring IA&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="70" width="250" x="790" y="115" as="geometry" />
+                </mxCell>
+                <mxCell id="st_attribuee" parent="1" style="rounded=1;arcSize=14;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;ATTRIBUEE&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Soumission retenue &amp; projet acte&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="70" width="250" x="1130" y="115" as="geometry" />
+                </mxCell>
+                <mxCell id="st_ctrl_cf" parent="1" style="rounded=1;arcSize=14;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;CONTROLE_PREALABLE_CF&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Examen quitus &amp; rés. crédits CF&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="70" width="250" x="1470" y="115" as="geometry" />
+                </mxCell>
+                <mxCell id="st_vise_cf" parent="1" style="rounded=1;arcSize=14;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;VISE_CF&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Visa favorable CF accordé&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="70" width="240" x="1810" y="115" as="geometry" />
+                </mxCell>
+                <mxCell id="st_signe" parent="1" style="rounded=1;arcSize=14;whiteSpace=wrap;html=1;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;SIGNE_ENGAGE&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Signature ordonnateur, BCA officiel émis&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="75" width="260" x="1810" y="300" as="geometry" />
+                </mxCell>
+                <mxCell id="st_livraison" parent="1" style="rounded=1;arcSize=14;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;EN_COURS_LIVRAISON&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Notification prestataire &amp; exécution&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="75" width="250" x="1470" y="300" as="geometry" />
+                </mxCell>
+                <mxCell id="st_receptionne" parent="1" style="rounded=1;arcSize=14;whiteSpace=wrap;html=1;fontSize=11;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;RECEPTIONNE_MATIERE&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;PV réception comptable matière&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="75" width="250" x="1130" y="300" as="geometry" />
+                </mxCell>
+                <mxCell id="st_liquidee" parent="1" style="rounded=1;arcSize=14;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;FACTURE_LIQUIDEE&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Dépôt facture &amp; liquidation ordonnateur&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="75" width="260" x="1130" y="490" as="geometry" />
+                </mxCell>
+                <mxCell id="st_ordonnance" parent="1" style="rounded=1;arcSize=14;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;ORDONNANCE_TRANSMIS_TRESOR&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Mandatement &amp; visa ordonnancement&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="75" width="260" x="1470" y="490" as="geometry" />
+                </mxCell>
+                <mxCell id="st_solde" parent="1" style="rounded=1;arcSize=14;whiteSpace=wrap;html=1;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;PAYE_SOLDE&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Virement bancaire Trésor sur RIB&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="75" width="260" x="1810" y="490" as="geometry" />
+                </mxCell>
+                <mxCell id="st_final_succes" parent="1" style="ellipse;shape=endState;fillColor=#000000;strokeColor=#000000;strokeWidth=2;" value="" vertex="1">
+                    <mxGeometry height="30" width="30" x="2140" y="512" as="geometry" />
+                </mxCell>
+                <mxCell id="st_annule" parent="1" style="rounded=1;arcSize=14;whiteSpace=wrap;html=1;fontSize=11;fillColor=#f8cecc;strokeColor=#b85450;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;SANS_SUITE_ANNULE&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Clôture sans engagement financier&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="70" width="240" x="790" y="300" as="geometry" />
+                </mxCell>
+                <mxCell id="st_final_annule" parent="1" style="ellipse;shape=endState;fillColor=#000000;strokeColor=#000000;strokeWidth=2;" value="" vertex="1">
+                    <mxGeometry height="30" width="30" x="895" y="420" as="geometry" />
+                </mxCell>
+                <mxCell id="tr_init_br" edge="1" parent="1" source="st_init" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.4;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="st_brouillon" value="">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="tr_br_pub" edge="1" parent="1" source="st_brouillon" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.4;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="st_publiee" value="publier()&#10;[besoin validé]">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="tr_pub_eval" edge="1" parent="1" source="st_publiee" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.4;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="st_evaluation" value="cloturerSoumissions()&#10;[dateCloture]">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="tr_eval_attr" edge="1" parent="1" source="st_evaluation" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.4;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="st_attribuee" value="retenirSoumission(offre)&#10;[attributaire]">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="tr_eval_annul" edge="1" parent="1" source="st_evaluation" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#b85450;strokeWidth=1.4;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="st_annule" value="infructueux()&#10;[aucune offre]">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="tr_annul_fin" edge="1" parent="1" source="st_annule" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#b85450;strokeWidth=1.4;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="st_final_annule" value="">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="tr_attr_cf" edge="1" parent="1" source="st_attribuee" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.4;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="st_ctrl_cf" value="transmettreAuCF()">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="tr_cf_rejet" edge="1" parent="1" source="st_ctrl_cf" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#b85450;strokeWidth=1.4;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=1;" target="st_attribuee" value="rejeter(motif)&#10;[correction demandée]">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1595" y="230" />
+                            <mxPoint x="1255" y="230" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="tr_cf_vise" edge="1" parent="1" source="st_ctrl_cf" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.4;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="st_vise_cf" value="viser(ACCORDE)&#10;[quitus &amp; crédits OK]">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="tr_vise_signe" edge="1" parent="1" source="st_vise_cf" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.4;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="st_signe" value="ordonnateur.signer()&#10;[génération BCA officiel]">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="tr_signe_liv" edge="1" parent="1" source="st_signe" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.4;endArrow=block;endFill=1;exitX=0;exitY=0.5;entryX=1;entryY=0.5;" target="st_livraison" value="notifierFournisseur()&#10;[début exécution]">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="tr_liv_recep" edge="1" parent="1" source="st_livraison" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.4;endArrow=block;endFill=1;exitX=0;exitY=0.5;entryX=1;entryY=0.5;" target="st_receptionne" value="constaterLivraison(PV)&#10;[comptable matière]">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="tr_recep_liq" edge="1" parent="1" source="st_receptionne" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.4;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="st_liquidee" value="deposerFacture()&#10;[liquidation service fait]">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="tr_liq_ord" edge="1" parent="1" source="st_liquidee" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.4;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="st_ordonnance" value="signerOrdonnancement()&#10;[visa CF Trésor]">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="tr_ord_solde" edge="1" parent="1" source="st_ordonnance" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.4;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="st_solde" value="comptablePublic.payer()&#10;[virement bancaire]">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="tr_solde_fin" edge="1" parent="1" source="st_solde" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.4;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="st_final_succes" value="">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="page-3-activite" name="3. Diagramme d'Activité (UML)">
+        <mxGraphModel dx="1619" dy="725" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="2600" pageHeight="3190" math="0" shadow="0">
+            <root>
+                <mxCell id="0" />
+                <mxCell id="1" parent="0" />
+                <mxCell id="title_act" parent="1" style="text;html=1;align=center;verticalAlign=middle;rounded=1;fillColor=#F8FAFC;strokeColor=#94A3B8;strokeWidth=1.2;shadow=0;" value="&lt;b style='font-size:16px;color:#1E293B;'&gt;DIAGRAMME D'ACTIVITÉ UML - PROCESSUS DE TRAITEMENT D'UNE DÉPENSE PUBLIQUE (GBE+)&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:11px;color:#64748B;'&gt;Workflow Métier Inter-Acteurs : Ordonnateur • Fournisseur • Comptable Matière • Contrôleur Financier • Comptable Public&lt;/span&gt;" vertex="1">
+                    <mxGeometry height="46" width="2220" x="60" y="20" as="geometry" />
+                </mxCell>
+                <mxCell id="lane_ord" parent="1" style="shape=swimlane;startSize=40;collapsible=0;rounded=1;arcSize=4;fillColor=#F8FAFC;strokeColor=#94A3B8;strokeWidth=1.5;fontStyle=1;fontSize=12;fontColor=#1E293B;shadow=0;align=center;" value="Ordonnateur&#10;(Service Émetteur &amp; Prescription)" vertex="1">
+                    <mxGeometry height="2842" width="560" x="-40" y="85" as="geometry" />
+                </mxCell>
+                <mxCell id="act_sans_suite" parent="lane_ord" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#f8cecc;strokeColor=#b85450;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Déclarer sans suite&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Clôture sans engagement&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="50" width="150" x="60" y="566" as="geometry" />
+                </mxCell>
+                <mxCell id="lane_frs" parent="1" style="shape=swimlane;startSize=40;collapsible=0;rounded=1;arcSize=4;fillColor=#F8FAFC;strokeColor=#94A3B8;strokeWidth=1.5;fontStyle=1;fontSize=12;fontColor=#1E293B;shadow=0;align=center;" value="Fournisseur&#10;(Prestataire / Soumissionnaire)" vertex="1">
+                    <mxGeometry height="2842" width="460" x="520" y="85" as="geometry" />
+                </mxCell>
+                <mxCell id="lane_cm" parent="1" style="shape=swimlane;startSize=40;collapsible=0;rounded=1;arcSize=4;fillColor=#F8FAFC;strokeColor=#94A3B8;strokeWidth=1.5;fontStyle=1;fontSize=12;fontColor=#1E293B;shadow=0;align=center;" value="Comptable Matière&#10;(Gestion Patrimoine &amp; Réception)" vertex="1">
+                    <mxGeometry height="2842" width="480" x="980" y="85" as="geometry" />
+                </mxCell>
+                <mxCell id="act_cm_rejet" parent="lane_cm" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#f8cecc;strokeColor=#b85450;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Dresser PV de non-conformité&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Refus ou réserves notifiées au prestataire&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="50" width="150" x="10" y="1494" as="geometry" />
+                </mxCell>
+                <mxCell id="act_cm_constater" parent="lane_cm" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Constater les produits livrés&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Contrôle conformité matière, qualité, quantité&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="54" width="250" x="190" y="1348" as="geometry" />
+                </mxCell>
+                <mxCell id="lane_cf" parent="1" style="shape=swimlane;startSize=40;collapsible=0;rounded=1;arcSize=4;fillColor=#F8FAFC;strokeColor=#94A3B8;strokeWidth=1.5;fontStyle=1;fontSize=12;fontColor=#1E293B;shadow=0;align=center;" value="Contrôleur Financier&#10;(Visa Préalable &amp; Contrôle Budgétaire)" vertex="1">
+                    <mxGeometry height="2842" width="400" x="1460" y="85" as="geometry" />
+                </mxCell>
+                <mxCell id="lane_cp" parent="1" style="shape=swimlane;startSize=40;collapsible=0;rounded=1;arcSize=4;fillColor=#F8FAFC;strokeColor=#94A3B8;strokeWidth=1.5;fontStyle=1;fontSize=12;fontColor=#1E293B;shadow=0;align=center;" value="Comptable Public&#10;(Trésorier Payeur Général / Règlement)" vertex="1">
+                    <mxGeometry height="2842" width="420" x="1860" y="85" as="geometry" />
+                </mxCell>
+                <mxCell id="act_start" parent="1" style="ellipse;shape=startState;fillColor=#000000;strokeColor=#000000;strokeWidth=2;" value="" vertex="1">
+                    <mxGeometry height="30" width="30" x="275" y="145" as="geometry" />
+                </mxCell>
+                <mxCell id="act_eb_saisie" parent="1" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Exprimer le besoin d'achat&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Sélection Imputation, Matière &amp; Estimation&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="54" width="250" x="165" y="232" as="geometry" />
+                </mxCell>
+                <mxCell id="act_eb_publier" parent="1" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Publier l'expression de besoin&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Mise en concurrence / consultation ouverte&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="50" width="250" x="165" y="348" as="geometry" />
+                </mxCell>
+                <mxCell id="act_frs_consulter" parent="1" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Consulter les besoins ouverts&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Examen cahier des charges / spécifications&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="50" width="250" x="625" y="348" as="geometry" />
+                </mxCell>
+                <mxCell id="act_frs_soumettre" parent="1" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Déposer une soumission&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Offre financière, prix unitaire &amp; RIB&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="52" width="250" x="625" y="464" as="geometry" />
+                </mxCell>
+                <mxCell id="act_ord_evaluer" parent="1" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Évaluer les offres&lt;/b&gt;&lt;br&gt;&lt;i style=&quot;font-size:10px;&quot;&gt;Sélection de la soumission retenue&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="54" width="250" x="165" y="573" as="geometry" />
+                </mxCell>
+                <mxCell id="dec_attribution" parent="1" style="rhombus;whiteSpace=wrap;html=1;fontSize=10;fontColor=#000000;fillColor=#fff2cc;strokeColor=#d6b656;align=center;verticalAlign=middle;shadow=0;" value="Offre&#10;valide ?" vertex="1">
+                    <mxGeometry height="50" width="60" x="260" y="689" as="geometry" />
+                </mxCell>
+                <mxCell id="end_sans_suite" parent="1" style="ellipse;shape=endState;fillColor=#000000;strokeColor=#000000;strokeWidth=2;" value="" vertex="1">
+                    <mxGeometry height="30" width="30" x="81" y="805" as="geometry" />
+                </mxCell>
+                <mxCell id="act_prep_acte" parent="1" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Préparer le projet d'acte (BCA)&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Génération du projet d'engagement&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="52" width="250" x="165" y="805" as="geometry" />
+                </mxCell>
+                <mxCell id="act_trans_cf" parent="1" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Transmettre le dossier au CF&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Pour contrôle préalable et visa&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="50" width="250" x="165" y="921" as="geometry" />
+                </mxCell>
+                <mxCell id="act_cf_quitus" parent="1" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Vérifier conformité &amp; Quitus&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Contrôle classement Matière / Nature Éco&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="54" width="250" x="1515" y="918" as="geometry" />
+                </mxCell>
+                <mxCell id="act_cf_res_credit" parent="1" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Réserver les crédits budgétaires&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Blocage informatique des AE sur la ligne&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="52" width="250" x="1515" y="1037" as="geometry" />
+                </mxCell>
+                <mxCell id="dec_visa_cf" parent="1" style="rhombus;whiteSpace=wrap;html=1;fontSize=10;fontColor=#000000;fillColor=#fff2cc;strokeColor=#d6b656;align=center;verticalAlign=middle;shadow=0;" value="Visa&#10;accordé ?" vertex="1">
+                    <mxGeometry height="50" width="60" x="1610" y="1153" as="geometry" />
+                </mxCell>
+                <mxCell id="act_delivrer_visa" parent="1" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Délivrer le Visa favorable&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Mention officielle et attestation AE&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="50" width="250" x="1515" y="1263" as="geometry" />
+                </mxCell>
+                <mxCell id="act_signer_bca" parent="1" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Signer l'acte juridique (BCA)&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Apposition code-barres &amp; QR Code sécurisé&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="54" width="250" x="165" y="1262" as="geometry" />
+                </mxCell>
+                <mxCell id="act_notifier_frs" parent="1" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Notifier le BCA signé au Fournisseur&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Notification valant ordre de service&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="50" width="250" x="165" y="1378" as="geometry" />
+                </mxCell>
+                <mxCell id="act_frs_notif" parent="1" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Réceptionner la notification&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Lancement approvisionnement &amp; commande&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="50" width="250" x="625" y="1378" as="geometry" />
+                </mxCell>
+                <mxCell id="act_frs_livrer" parent="1" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Effectuer la livraison physique&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Livraison au magasin de la structure&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="50" width="250" x="625" y="1494" as="geometry" />
+                </mxCell>
+                <mxCell id="dec_cm_conforme" parent="1" style="rhombus;whiteSpace=wrap;html=1;fontSize=10;fontColor=#000000;fillColor=#fff2cc;strokeColor=#d6b656;align=center;verticalAlign=middle;shadow=0;" value="Livraison&#10;conforme ?" vertex="1">
+                    <mxGeometry height="50" width="60" x="1267" y="1610" as="geometry" />
+                </mxCell>
+                <mxCell id="act_cm_dresser_pv" parent="1" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Dresser le Procès-Verbal (PV)&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;PV de réception officielle sans réserve&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="52" width="250" x="1173" y="1784" as="geometry" />
+                </mxCell>
+                <mxCell id="act_cm_transmettre" parent="1" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Délivrer le PV au Fournisseur &amp;&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Informer l'Ordonnateur du service fait&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="52" width="250" x="1172" y="1959" as="geometry" />
+                </mxCell>
+                <mxCell id="act_frs_facturer" parent="1" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Introduire demande de paiement&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Dépôt Facture définitive, PV réception &amp; PJ&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="54" width="250" x="625" y="1959" as="geometry" />
+                </mxCell>
+                <mxCell id="act_ord_liquider" parent="1" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Liquider la dépense&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Vérification pièces &amp; service fait constaté&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="54" width="250" x="165" y="1965" as="geometry" />
+                </mxCell>
+                <mxCell id="act_ord_ordonnancer" parent="1" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Signer le projet d'ordonnancement&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Émission formelle du mandat de paiement&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="52" width="250" x="165" y="2088" as="geometry" />
+                </mxCell>
+                <mxCell id="act_ord_trans_ord" parent="1" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Transmettre le dossier au CF&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Pour visa d'ordonnancement&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="50" width="250" x="165" y="2204" as="geometry" />
+                </mxCell>
+                <mxCell id="act_cf_visa_ord" parent="1" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Viser le projet d'ordonnancement&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Contrôle liquidation et retenues fiscales (IR)&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="54" width="250" x="1515" y="2204" as="geometry" />
+                </mxCell>
+                <mxCell id="act_cf_trans_cp" parent="1" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Transmettre le dossier au Trésor&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Transmission au Comptable Public&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="50" width="250" x="1515" y="2320" as="geometry" />
+                </mxCell>
+                <mxCell id="act_cp_prise_en_charge" parent="1" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Prendre en charge le mandat&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Contrôle de régularité comptable&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="52" width="250" x="1945" y="2320" as="geometry" />
+                </mxCell>
+                <mxCell id="act_cp_payer" parent="1" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Exécuter le virement bancaire&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Paiement Trésor sur le compte RIB à 23 car.&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="54" width="250" x="1945" y="2443" as="geometry" />
+                </mxCell>
+                <mxCell id="act_frs_solde" parent="1" style="rounded=1;arcSize=24;whiteSpace=wrap;html=1;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;align=center;verticalAlign=middle;shadow=0;" value="&lt;b&gt;Constater le règlement reçu&lt;/b&gt;&lt;br&gt;&lt;i style='font-size:10px;'&gt;Solde effectif de la créance&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="50" width="250" x="625" y="2566" as="geometry" />
+                </mxCell>
+                <mxCell id="act_end_success" parent="1" style="ellipse;shape=endState;fillColor=#000000;strokeColor=#000000;strokeWidth=2;" value="" vertex="1">
+                    <mxGeometry height="30" width="30" x="735" y="2690" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_01" edge="1" parent="1" source="act_start" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="act_eb_saisie" value="">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_02" edge="1" parent="1" source="act_eb_saisie" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="act_eb_publier" value="">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_03" edge="1" parent="1" source="act_eb_publier" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="act_frs_consulter" value="[publication]">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_04" edge="1" parent="1" source="act_frs_consulter" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="act_frs_soumettre" value="">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_05" edge="1" parent="1" source="act_frs_soumettre" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=0;exitY=0.5;entryX=1;entryY=0.5;" target="act_ord_evaluer" value="[dépôt offre]">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="560" y="502" />
+                            <mxPoint x="560" y="612" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="fl_06" edge="1" parent="1" source="act_ord_evaluer" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="dec_attribution" value="">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_dec_non" edge="1" parent="1" source="dec_attribution" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=0;exitY=0.5;entryX=1;entryY=0.5;" target="act_sans_suite" value="[infructueux]">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_sans_suite_end" edge="1" parent="1" source="act_sans_suite" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="end_sans_suite" value="">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_dec_oui" edge="1" parent="1" source="dec_attribution" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="act_prep_acte" value="[retenu]">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_07" edge="1" parent="1" source="act_prep_acte" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="act_trans_cf" value="">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_08" edge="1" parent="1" source="act_trans_cf" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="act_cf_quitus" value="[dossier BCA]">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1460" y="957" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="fl_09" edge="1" parent="1" source="act_cf_quitus" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="act_cf_res_credit" value="">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_10" edge="1" parent="1" source="act_cf_res_credit" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="dec_visa_cf" value="">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_visa_rejet" edge="1" parent="1" source="dec_visa_cf" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#b85450;strokeWidth=1.3;endArrow=block;endFill=1;entryX=1;entryY=0.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="act_prep_acte" value="[refus / rejet]">
+                    <mxGeometry relative="1" x="0.1917" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1810" y="1189" />
+                            <mxPoint x="1810" y="842" />
+                        </Array>
+                        <mxPoint x="1680" y="1196" as="sourcePoint" />
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="fl_visa_accorde" edge="1" parent="1" source="dec_visa_cf" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="act_delivrer_visa" value="[accordé]">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_11" edge="1" parent="1" source="act_delivrer_visa" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=0;exitY=0.5;entryX=1;entryY=0.5;" target="act_signer_bca" value="[visa transmis]">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1460" y="1301" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="fl_12" edge="1" parent="1" source="act_signer_bca" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="act_notifier_frs" value="">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_13" edge="1" parent="1" source="act_notifier_frs" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="act_frs_notif" value="[notification]">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_14" edge="1" parent="1" source="act_frs_notif" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="act_frs_livrer" value="">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_15" edge="1" parent="1" source="act_frs_livrer" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;" target="act_cm_constater" value="[livraison]">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_16" edge="1" parent="1" style="rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="dec_cm_conforme" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1296" y="1550" as="sourcePoint" />
+                        <mxPoint x="1291" y="1610" as="targetPoint" />
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="fl_cm_non" edge="1" parent="1" source="dec_cm_conforme" style="rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" target="act_cm_rejet" value="[non conforme]">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_cm_rejet_frs" edge="1" parent="1" source="act_cm_rejet" style="rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#b85450;strokeWidth=1.3;endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;" target="act_frs_livrer" value="[reprise]">
+                    <mxGeometry relative="1" x="-0.3331" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_cm_oui" edge="1" parent="1" source="dec_cm_conforme" style="rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="act_cm_dresser_pv" value="[conforme]">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_17" edge="1" parent="1" source="act_cm_dresser_pv" style="rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="act_cm_transmettre" value="">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_18" edge="1" parent="1" source="act_cm_transmettre" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=0;exitY=0.5;entryX=1;entryY=0.5;" target="act_frs_facturer" value="[PV remis]">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_19" edge="1" parent="1" source="act_frs_facturer" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;" target="act_ord_liquider" value="[facture &amp; PJ]">
+                    <mxGeometry relative="1" x="0.2068" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="600" y="2004" />
+                            <mxPoint x="600" y="2004" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="fl_20" edge="1" parent="1" source="act_ord_liquider" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="act_ord_ordonnancer" value="">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_21" edge="1" parent="1" source="act_ord_ordonnancer" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="act_ord_trans_ord" value="">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_22" edge="1" parent="1" source="act_ord_trans_ord" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="act_cf_visa_ord" value="[dossier ordonnancé]">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1460" y="2240" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="fl_23" edge="1" parent="1" source="act_cf_visa_ord" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="act_cf_trans_cp" value="">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_24" edge="1" parent="1" source="act_cf_trans_cp" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="act_cp_prise_en_charge" value="[mandat visé]">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_25" edge="1" parent="1" source="act_cp_prise_en_charge" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="act_cp_payer" value="">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="fl_26" edge="1" parent="1" source="act_cp_payer" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=0;exitY=0.5;entryX=1;entryY=0.5;" target="act_frs_solde" value="[virement Trésor]">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1880" y="2482" />
+                            <mxPoint x="1880" y="2603" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="fl_27" edge="1" parent="1" source="act_frs_solde" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="act_end_success" value="">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="page-4-classes-cible-strategy" name="4. Modèle Cible (Pattern Strategy &amp; Visa)">
+        <mxGraphModel dx="3059" dy="2422" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="4200" pageHeight="2400" math="0" shadow="0">
+            <root>
+                <mxCell id="0" />
+                <mxCell id="1" parent="0" />
+                <mxCell id="p4_title" parent="1" style="text;html=1;align=center;verticalAlign=middle;rounded=1;fillColor=#F8FAFC;strokeColor=#94A3B8;strokeWidth=1.2;shadow=0;" value="&lt;b style='font-size:18px;color:#1E293B;'&gt;SYSTÈME DE GESTION DES DÉPENSES BUDGÉTAIRES (GBE+ MINFI) — MODÈLE DE DOMAINE MÉTIER (UML)&lt;/b&gt;&lt;br&gt;&lt;span style='font-size:12px;color:#64748B;'&gt;Architecture Sans Redondance : Couloirs Dédiés sans Chevauchement • Référentiels Dénormalisés Volontaires • Fabrique d'Actes &amp;amp; Pattern Strategy&lt;/span&gt;" vertex="1">
+                    <mxGeometry x="100" y="30" width="2900" height="54" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_Exercice" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;Exercice&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- annee : Integer&lt;br&gt;- code : Integer&lt;br&gt;- actif : Boolean&lt;br&gt;- dateDebut : Date&lt;br&gt;- dateFin : Date&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ getAnnee() : Integer&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="100" y="130" width="200" height="160" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_Section" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;Section&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- code : String&lt;br&gt;- sigle : String&lt;br&gt;- libelle : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ getCode() : String&lt;br&gt;+ getSigle() : String&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="420" y="130" width="200" height="140" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_Programme" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;Programme&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- code : String&lt;br&gt;- sigle : String&lt;br&gt;- libelle : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ getCode() : String&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="740" y="130" width="200" height="130" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_Action" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;Action&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- code : String&lt;br&gt;- sigle : String&lt;br&gt;- libelle : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ getCode() : String&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="1060" y="130" width="200" height="130" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_Activite" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;Activite&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- code : String&lt;br&gt;- sigle : String&lt;br&gt;- libelle : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ getCode() : String&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="1380" y="130" width="200" height="130" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_Tache" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;Tache&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- code : String&lt;br&gt;- sigle : String&lt;br&gt;- libelle : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ getCode() : String&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="1700" y="130" width="200" height="130" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_Chapitre" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;Chapitre&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- code : String&lt;br&gt;- sigle : String&lt;br&gt;- libelle : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ getCode() : String&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="2020" y="130" width="220" height="130" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_NatureEconomique" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;NatureEconomique&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- code : String&lt;br&gt;- sigle : String&lt;br&gt;- libelle : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ getCode() : String&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="2360" y="130" width="240" height="130" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_ex_sec" parent="1" style="rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;" value="" edge="1" source="p4_Exercice" target="p4_Section">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_ex_sec_src_lbl" connectable="0" parent="p4_rel_ex_sec" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_ex_sec_tgt_lbl" connectable="0" parent="p4_rel_ex_sec" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1..*" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_sec_prog" parent="1" style="rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;" value="" edge="1" source="p4_Section" target="p4_Programme">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_sec_prog_src_lbl" connectable="0" parent="p4_rel_sec_prog" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_sec_prog_tgt_lbl" connectable="0" parent="p4_rel_sec_prog" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1..*" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_prog_act" parent="1" style="rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;" value="" edge="1" source="p4_Programme" target="p4_Action">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_prog_act_src_lbl" connectable="0" parent="p4_rel_prog_act" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_prog_act_tgt_lbl" connectable="0" parent="p4_rel_prog_act" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1..*" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_act_actv" parent="1" style="rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;" value="" edge="1" source="p4_Action" target="p4_Activite">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_act_actv_src_lbl" connectable="0" parent="p4_rel_act_actv" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_act_actv_tgt_lbl" connectable="0" parent="p4_rel_act_actv" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1..*" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_actv_tch" parent="1" style="rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;" value="" edge="1" source="p4_Activite" target="p4_Tache">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_actv_tch_src_lbl" connectable="0" parent="p4_rel_actv_tch" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_actv_tch_tgt_lbl" connectable="0" parent="p4_rel_actv_tch" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1..*" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_sec_chap" parent="1" style="rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;" value="" edge="1" source="p4_Section" target="p4_Chapitre">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_sec_chap_src_lbl" connectable="0" parent="p4_rel_sec_chap" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_sec_chap_tgt_lbl" connectable="0" parent="p4_rel_sec_chap" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1..*" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_Utilisateur" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;i style='font-size:11px;color:#475569;'&gt;«abstract»&lt;/i&gt;&lt;br&gt;&lt;i&gt;&lt;b&gt;Utilisateur&lt;/b&gt;&lt;/i&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- matricule : String&lt;br&gt;- email : String&lt;br&gt;- telephone : String&lt;br&gt;- motDePasse : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ seConnecter() : Boolean&lt;br&gt;+ seDeconnecter() : void&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="1500" y="520" width="240" height="150" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_Fournisseur" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;Fournisseur&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- raisonSociale : String&lt;br&gt;- niu : String&lt;br&gt;- rccm : String&lt;br&gt;- adresse : String&lt;br&gt;- telephone : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ soumissionner(e : ExpressionBesoin)&lt;br&gt;+ enregistrerFacture(f : Facture)&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="100" y="730" width="260" height="170" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_ComptableMatiere" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;ComptableMatiere&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- codePoste : String&lt;br&gt;- structure : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ verifierBesoin(b : ExpressionBesoin)&lt;br&gt;+ classerMatieres()&lt;br&gt;+ dresserPVReception()&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="550" y="730" width="250" height="140" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_Ordonnateur" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;Ordonnateur&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- codeOrdonnateur : String&lt;br&gt;- structure : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ enregistrerExpressionBesoin()&lt;br&gt;+ preparerProjetActe()&lt;br&gt;+ signerActe(electronique : Boolean)&lt;br&gt;+ genererProjetOrdonnancement()&lt;br&gt;+ liquider(d : DemandePaiement)&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="1400" y="730" width="260" height="170" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_ControleurFinancier" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;ControleurFinancier&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- zoneCompetence : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ afficherFicheAccreditation()&lt;br&gt;+ reserverCredits(a : ActeJuridique)&lt;br&gt;+ donnerQuitusClassement()&lt;br&gt;+ viserActe(a : ActeJuridique) : Visa&lt;br&gt;+ viserOrdonnancement(o : Ordonnance) : Visa&lt;br&gt;+ transmettreAuComptable(o : Ordonnateur)&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="2700" y="730" width="260" height="170" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_inh_frs" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=0;endSize=14;exitX=0.5;exitY=0;entryX=0.25;entryY=1;" value="" edge="1" source="p4_Fournisseur" target="p4_Utilisateur">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="230" y="700" />
+                            <mxPoint x="1550" y="700" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="p4_inh_cm" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=0;endSize=14;exitX=0.5;exitY=0;entryX=0.4;entryY=1;" value="" edge="1" source="p4_ComptableMatiere" target="p4_Utilisateur">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="675" y="700" />
+                            <mxPoint x="1590" y="700" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="p4_inh_ord" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=0;endSize=14;exitX=0.5;exitY=0;entryX=0.5;entryY=1;" value="" edge="1" source="p4_Ordonnateur" target="p4_Utilisateur">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_CoordonneeBancaire" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style=&#x27;margin:0;margin-top:5px;text-align:center;&#x27;&gt;&lt;b&gt;CoordonneeBancaire&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;- rib : String&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="100" y="1060" width="260" height="60" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_comp_rib" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#4A5568;strokeWidth=1.3;startArrow=diamond;startFill=1;startSize=12;endArrow=open;endFill=0;endSize=8;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" value="" edge="1" source="p4_Fournisseur" target="p4_CoordonneeBancaire">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_Soumission" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style=&#x27;margin:0;margin-top:5px;text-align:center;&#x27;&gt;&lt;b&gt;Soumission&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;- numero : String&lt;br&gt;- dateSoumission : Date&lt;br&gt;- dateDerniereModification : Date&lt;br&gt;- montantProposeHT : Double&lt;br&gt;- tauxTva : Double&lt;br&gt;- montantTva : Double&lt;br&gt;- montantProposeTTC : Double&lt;br&gt;- tauxIr : Double&lt;br&gt;- montantIr : Double&lt;br&gt;- montantNetAPayer : Double&lt;br&gt;- delaiProposeJours : Integer&lt;br&gt;- statut : StatutSoumission&lt;br&gt;- empreinte : String&lt;br&gt;- dateDecision : Date&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;+ ajouterLigneOffre(l : LigneSoumission)&lt;br&gt;+ validerCompletude() : Boolean&lt;br&gt;+ estRetenue() : Boolean&lt;br&gt;+ retenirCommeAdjudicataire()&lt;br&gt;+ ecarter()&lt;br&gt;+ sceller()&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="100" y="1240" width="260" height="430" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_frs_soum" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=1;exitY=0.7;entryX=1;entryY=0.5;" value="dépose" edge="1" source="p4_Fournisseur" target="p4_Soumission">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="360" y="850" />
+                            <mxPoint x="390" y="850" />
+                            <mxPoint x="390" y="1340" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="p4_rel_frs_soum_src_lbl" connectable="0" parent="p4_rel_frs_soum" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_frs_soum_tgt_lbl" connectable="0" parent="p4_rel_frs_soum" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_LigneBesoin" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;LigneBesoin&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- numeroOrdre : Integer&lt;br&gt;- quantiteDemandee : Double&lt;br&gt;- specifications : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ getMatiere() : Matiere&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="550" y="1060" width="250" height="140" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_Matiere" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style=&#x27;margin:0;margin-top:5px;text-align:center;&#x27;&gt;&lt;b&gt;Matiere&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;- reference : String&lt;br&gt;- libelle : String&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="550" y="1270" width="250" height="79" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_ligne_mat" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" value="se rapporte à" edge="1" source="p4_LigneBesoin" target="p4_Matiere">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_mat_nat" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=0;exitY=0.5;entryX=0.6;entryY=1;" value="classé dans (quitus CF) — non relié pour l&#x27;instant (décision 2026-11-11)" edge="1" source="p4_Matiere" target="p4_NatureEconomique">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="480" y="1335" />
+                            <mxPoint x="480" y="340" />
+                            <mxPoint x="2520" y="340" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="p4_ExpressionBesoin" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style=&#x27;margin:0;margin-top:5px;text-align:center;&#x27;&gt;&lt;b&gt;ExpressionBesoin&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;- reference : String&lt;br&gt;- objet : String&lt;br&gt;- dateExpression : Date&lt;br&gt;- dateClotureSoumission : Date&lt;br&gt;- datePublication : Date&lt;br&gt;- dateClotureEffective : Date&lt;br&gt;- dateDecision : Date&lt;br&gt;- statut : StatutExpression&lt;br&gt;- motifAnnulation : String&lt;br&gt;- supprime : Boolean&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;+ ajouterLigne(l : LigneBesoin)&lt;br&gt;+ publier()&lt;br&gt;+ cloturerSoumissions()&lt;br&gt;+ retenirSoumission(s : Soumission)&lt;br&gt;+ declarerInfructueux()&lt;br&gt;+ annuler(motif : String)&lt;br&gt;+ supprimer()&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="950" y="1060" width="360" height="371" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_comp_eb_lignes" parent="1" style="rounded=0;html=1;fontSize=11;strokeColor=#4A5568;strokeWidth=1.3;startArrow=diamond;startFill=1;startSize=12;endArrow=open;endFill=0;endSize=8;exitX=0;exitY=0.25;entryX=1;entryY=0.25;" value="contient" edge="1" source="p4_ExpressionBesoin" target="p4_LigneBesoin">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_soum_eb" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=0.5;exitY=1;entryX=0.25;entryY=1;" value="répond à" edge="1" source="p4_Soumission" target="p4_ExpressionBesoin">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="230" y="1700" />
+                            <mxPoint x="1050" y="1561" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="p4_rel_ord_eb" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=0.1;exitY=1;entryX=0.7;entryY=0;" value="enregistre" edge="1" source="p4_Ordonnateur" target="p4_ExpressionBesoin">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1420" y="960" />
+                            <mxPoint x="1200" y="960" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="p4_rel_cm_eb" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=0.8;exitY=1;entryX=0.3;entryY=0;" value="vérifie" edge="1" source="p4_ComptableMatiere" target="p4_ExpressionBesoin">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="750" y="960" />
+                            <mxPoint x="1050" y="960" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="p4_rel_eb_chapitre" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=0.9;exitY=0;entryX=0.5;entryY=1;" value="émise par (structure émettrice)" edge="1" source="p4_ExpressionBesoin" target="p4_Chapitre">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1340" y="1060" />
+                            <mxPoint x="1340" y="380" />
+                            <mxPoint x="2130" y="380" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="p4_rel_eb_chap_src" connectable="0" parent="p4_rel_eb_chapitre" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+                    <mxGeometry relative="1" x="-0.88" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_eb_chap_tgt" connectable="0" parent="p4_rel_eb_chapitre" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_eb_exercice" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=0.05;exitY=0;entryX=0.5;entryY=1;" value="au titre de (exercice)" edge="1" source="p4_ExpressionBesoin" target="p4_Exercice">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="960" y="1060" />
+                            <mxPoint x="960" y="940" />
+                            <mxPoint x="870" y="940" />
+                            <mxPoint x="870" y="420" />
+                            <mxPoint x="200" y="420" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="p4_rel_eb_ex_src" connectable="0" parent="p4_rel_eb_exercice" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+                    <mxGeometry relative="1" x="-0.91" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_eb_ex_tgt" connectable="0" parent="p4_rel_eb_exercice" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_eb_tache" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=1;exitY=0.35;entryX=0.5;entryY=1;" value="s'inscrit dans (tâche/activité)" edge="1" source="p4_ExpressionBesoin" target="p4_Tache">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1310" y="1150" />
+                            <mxPoint x="1370" y="1150" />
+                            <mxPoint x="1370" y="460" />
+                            <mxPoint x="1800" y="460" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="p4_rel_eb_tch_src" connectable="0" parent="p4_rel_eb_tache" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_eb_tch_tgt" connectable="0" parent="p4_rel_eb_tache" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_eb_nature" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=1;exitY=0.6;entryX=0.25;entryY=1;" value="consomme (nature économique)" edge="1" source="p4_ExpressionBesoin" target="p4_NatureEconomique">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1310" y="1220" />
+                            <mxPoint x="1390" y="1220" />
+                            <mxPoint x="1390" y="500" />
+                            <mxPoint x="2420" y="500" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="p4_rel_eb_nat_src" connectable="0" parent="p4_rel_eb_nature" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_eb_nat_tgt" connectable="0" parent="p4_rel_eb_nature" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_ActeJuridiqueFactory" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;i style='font-size:11px;color:#475569;'&gt;«service / factory»&lt;/i&gt;&lt;br&gt;&lt;b&gt;ActeJuridiqueFactory&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ determinerForme(eb : ExpressionBesoin, m : Double) : FormeActeStrategie&lt;br&gt;+ creerActe(eb : ExpressionBesoin, s : Soumission) : ActeJuridique&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="1440" y="1060" width="340" height="150" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_dep_ord_factory" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;strokeColor=#4A5568;strokeWidth=1.2;dashed=1;endArrow=open;endFill=0;endSize=8;exitX=0.5;exitY=1;entryX=0.3;entryY=0;" value="invoque" edge="1" source="p4_Ordonnateur" target="p4_ActeJuridiqueFactory">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_dep_fact_eb" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;strokeColor=#B85450;strokeWidth=1.3;dashed=1;endArrow=open;endFill=0;endSize=8;exitX=0;exitY=0.4;entryX=1;entryY=0.2;" value="analyse besoin" edge="1" source="p4_ActeJuridiqueFactory" target="p4_ExpressionBesoin">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_dep_fact_acte" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;strokeColor=#82b366;strokeWidth=1.4;dashed=1;endArrow=open;endFill=0;endSize=8;exitX=1;exitY=0.4;entryX=0;entryY=0.2;" value="«creates» assemble" edge="1" source="p4_ActeJuridiqueFactory" target="p4_ActeJuridique">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_dep_fact_forme" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#1F3A5F;strokeColor=#9673a6;strokeWidth=1.3;dashed=1;endArrow=open;endFill=0;endSize=8;exitX=0.5;exitY=1;entryX=0;entryY=0.5;" value="instancie forme" edge="1" source="p4_ActeJuridiqueFactory" target="p4_FormeActeStrategie">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1610" y="1210" />
+                            <mxPoint x="1610" y="1550" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="p4_ActeJuridique" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style=&#x27;margin:0;margin-top:5px;text-align:center;&#x27;&gt;&lt;b&gt;ActeJuridique&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;- numero : String&lt;br&gt;- type : TypeActe&lt;br&gt;- objet : String&lt;br&gt;- dateEmission : Date&lt;br&gt;- montantTotalHT : Double&lt;br&gt;- tauxTva : Double&lt;br&gt;- montantTva : Double&lt;br&gt;- tauxIr : Double&lt;br&gt;- montantIr : Double&lt;br&gt;- montantTTC : Double&lt;br&gt;- montantNetAPayer : Double&lt;br&gt;- montantEnLettres : String&lt;br&gt;- dateSoumissionControle : Date&lt;br&gt;- dateSignature : Date&lt;br&gt;- signatureElectronique : Boolean&lt;br&gt;- statut : StatutActe&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;+ changerForme(f : FormeActeStrategie)&lt;br&gt;+ validerConformite() : Boolean&lt;br&gt;+ verifierSeuils() : Boolean&lt;br&gt;+ listerPiecesExigibles() : List&lt;br&gt;+ genererDocumentContractuel() : File&lt;br&gt;+ soumettreAuVisa()&lt;br&gt;+ viser()&lt;br&gt;+ renvoyerEnProjet()&lt;br&gt;+ signer(electronique : Boolean)&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="1900" y="1060" width="360" height="527" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_ord_acte" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=0.9;exitY=1;entryX=0.3;entryY=0;" value="prépare et signe" edge="1" source="p4_Ordonnateur" target="p4_ActeJuridique">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1640" y="900" />
+                            <mxPoint x="1640" y="960" />
+                            <mxPoint x="2000" y="960" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="p4_rel_ord_acte_src" connectable="0" parent="p4_rel_ord_acte" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_ord_acte_tgt" connectable="0" parent="p4_rel_ord_acte" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_FormeActeStrategie" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#000000;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;i style='font-size:11px;color:#475569;'&gt;«abstract»&lt;/i&gt;&lt;br&gt;&lt;i&gt;&lt;b&gt;FormeActeStrategie&lt;/b&gt;&lt;/i&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- codeForme : String&lt;br&gt;- designation : String&lt;br&gt;- seuilPlafond : Double&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ verifierEligibilite(b : ExpressionBesoin, m : Double)* : Boolean&lt;br&gt;+ validerPiecesDossier(a : ActeJuridique)* : Boolean&lt;br&gt;+ determinerCircuitVisa()* : CircuitControle&lt;br&gt;+ genererModele(a : ActeJuridique)* : File&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="1910" y="1687" width="340" height="175" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_StrategieBCA" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style=&#x27;margin:0;margin-top:5px;text-align:center;&#x27;&gt;&lt;b&gt;StrategieBonDeCommande&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;- delaiLivraisonMois : Integer&lt;br&gt;- referenceDevis : String&lt;br&gt;- codeBarresSecurite : String&lt;br&gt;- qrCodeSecurite : String&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;+ numeroter(eb : ExpressionBesoin, ordre : Integer) : String&lt;br&gt;+ appliquerDonnees(a : ActeJuridique)&lt;br&gt;+ imprimerBCA() : File&lt;br&gt;+ verifierEligibilite() : Boolean&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="1200" y="1967" width="270" height="218" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_StrategieLC" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;StrategieLettreCommande&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- numeroEnregistrement : String&lt;br&gt;- dureeExecutionMois : Integer&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ verifierCautionSimple() : Boolean&lt;br&gt;+ genererModele() : File&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="1540" y="1967" width="270" height="140" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_StrategieMarche" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;StrategieMarchePublic&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- numeroAppelOffres : String&lt;br&gt;- numeroLot : String&lt;br&gt;- tauxRetenueGarantie : Double&lt;br&gt;- penaliteJour : Double&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ verifierCautionBancaire() : Boolean&lt;br&gt;+ soumettreCommission() : void&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="1880" y="1967" width="290" height="150" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_StrategieBail" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;StrategieConventionBail&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- dateDebutBail : Date&lt;br&gt;- dateFinBail : Date&lt;br&gt;- loyerMensuel : Double&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ verifierAutorisationBail() : Boolean&lt;br&gt;+ genererModele() : File&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="2240" y="1967" width="270" height="140" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_inh_bca" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=0;endSize=14;exitX=0.5;exitY=0;entryX=0.2;entryY=1;" value="" edge="1" source="p4_StrategieBCA" target="p4_FormeActeStrategie">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1335" y="1917" />
+                            <mxPoint x="1980" y="1917" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="p4_inh_lc" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=0;endSize=14;exitX=0.5;exitY=0;entryX=0.4;entryY=1;" value="" edge="1" source="p4_StrategieLC" target="p4_FormeActeStrategie">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1675" y="1917" />
+                            <mxPoint x="2040" y="1917" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="p4_inh_marche" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=0;endSize=14;exitX=0.5;exitY=0;entryX=0.5;entryY=1;" value="" edge="1" source="p4_StrategieMarche" target="p4_FormeActeStrategie">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="2025" y="1917" />
+                            <mxPoint x="2080" y="1917" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="p4_inh_bail" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;strokeColor=#4A5568;strokeWidth=1.3;endArrow=block;endFill=0;endSize=14;exitX=0.5;exitY=0;entryX=0.8;entryY=1;" value="" edge="1" source="p4_StrategieBail" target="p4_FormeActeStrategie">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="2375" y="1917" />
+                            <mxPoint x="2180" y="1917" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="p4_comp_acte_forme" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;strokeColor=#4A5568;strokeWidth=1.5;startArrow=diamond;startFill=1;startSize=14;endArrow=open;endFill=0;endSize=8;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" value="applique forme contractuelle" edge="1" source="p4_ActeJuridique" target="p4_FormeActeStrategie">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_comp_acte_forme_src" connectable="0" parent="p4_comp_acte_forme" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.75" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_comp_acte_forme_tgt" connectable="0" parent="p4_comp_acte_forme" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="0.75" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_Visa" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;Visa&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- numero : String&lt;br&gt;- typeVisa : TypeVisa&lt;br&gt;- dateReception : Date&lt;br&gt;- dateVisa : Date&lt;br&gt;- decision : StatutVisa&lt;br&gt;- observations : String&lt;br&gt;- referenceQuitus : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ estFavorable() : Boolean&lt;br&gt;+ notifierDecision() : void&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="2700" y="1060" width="260" height="190" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_ReservationCredit" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style=&#x27;margin:0;margin-top:5px;text-align:center;&#x27;&gt;&lt;b&gt;ReservationCredit&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;- numero : String&lt;br&gt;- montant : Double&lt;br&gt;- dateReservation : Date&lt;br&gt;- statut : StatutReservation&lt;br&gt;- dateAnnulation : Date&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;+ bloquer()&lt;br&gt;+ annuler()&lt;/p&gt;" vertex="1">
+                    <mxGeometry x="2700" y="1340" width="250" height="176" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_cf_visa" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=0.3;exitY=1;entryX=0.3;entryY=0;" value="émet" edge="1" source="p4_ControleurFinancier" target="p4_Visa">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_cf_visa_src" connectable="0" parent="p4_rel_cf_visa" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_cf_visa_tgt" connectable="0" parent="p4_rel_cf_visa" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_cf_res" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=0.75;exitY=1;entryX=0.75;entryY=0;" value="réserve" edge="1" source="p4_ControleurFinancier" target="p4_ReservationCredit">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="2900" y="900" />
+                            <mxPoint x="2900" y="1340" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="p4_rel_acte_visa" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=1;exitY=0.3;entryX=0;entryY=0.3;" value="visé par" edge="1" source="p4_ActeJuridique" target="p4_Visa">
+                    <mxGeometry relative="1" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_acte_visa_src" connectable="0" parent="p4_rel_acte_visa" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_acte_visa_tgt" connectable="0" parent="p4_rel_acte_visa" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="0..*" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_acte_res" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=1;exitY=0.75;entryX=0;entryY=0.5;" value="bloque crédits" edge="1" source="p4_ActeJuridique" target="p4_ReservationCredit">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="2260" y="1300" />
+                            <mxPoint x="2480" y="1300" />
+                            <mxPoint x="2480" y="1420" />
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="p4_rel_acte_res_src" connectable="0" parent="p4_rel_acte_res" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#B85450;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1">
+                    <mxGeometry relative="1" x="-0.8" as="geometry" />
+                </mxCell>
+                <mxCell id="p4_rel_acte_res_tgt" connectable="0" parent="p4_rel_acte_res" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="0..1" vertex="1">
+                    <mxGeometry relative="1" x="0.8" as="geometry" />
+                </mxCell>
+            <mxCell id="p4_LigneSoumission" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style=&#x27;margin:0;margin-top:5px;text-align:center;&#x27;&gt;&lt;b&gt;LigneSoumission&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;- numeroOrdre : Integer&lt;br&gt;- prixUnitairePropose : Double&lt;br&gt;- montantTotalLigneHT : Double&lt;br&gt;- remarquesTechniques : String&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;+ calculerSousTotalHT() : Double&lt;br&gt;+ getLigneBesoin() : LigneBesoin&lt;/p&gt;" vertex="1"><mxGeometry x="100" y="1740" width="260" height="157" as="geometry" /></mxCell><mxCell id="p4_comp_soum_lignes" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;startArrow=diamond;startFill=1;startSize=12;endArrow=open;endFill=0;endSize=8;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" value="détaille (offre complète)" edge="1" source="p4_Soumission" target="p4_LigneSoumission"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="p4_comp_soum_lignes_src" connectable="0" parent="p4_comp_soum_lignes" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1"><mxGeometry relative="1" x="-0.8" as="geometry" /></mxCell><mxCell id="p4_comp_soum_lignes_tgt" connectable="0" parent="p4_comp_soum_lignes" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1..*" vertex="1"><mxGeometry relative="1" x="0.8" as="geometry" /></mxCell><mxCell id="p4_rel_lignesoum_lignebesoin" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" value="se réfère à" edge="1" source="p4_LigneSoumission" target="p4_LigneBesoin"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="450" y="1577" /><mxPoint x="450" y="1140" /></Array></mxGeometry></mxCell><mxCell id="p4_rel_lignesoum_lignebesoin_src" connectable="0" parent="p4_rel_lignesoum_lignebesoin" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1..*" vertex="1"><mxGeometry relative="1" x="-0.8" as="geometry" /></mxCell><mxCell id="p4_rel_lignesoum_lignebesoin_tgt" connectable="0" parent="p4_rel_lignesoum_lignebesoin" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;fontSize=10;fontColor=#1F3A5F;fontStyle=1;labelBackgroundColor=#ffffff;" value="1" vertex="1"><mxGeometry relative="1" x="0.8" as="geometry" /></mxCell><mxCell id="p4_panel_enums" parent="1" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#FAF5FF;strokeColor=#D8B4FE;strokeWidth=1.5;dashed=1;shadow=0;" value="" vertex="1"><mxGeometry x="3060" y="80" width="550" height="680" as="geometry" /></mxCell><mxCell id="p4_title_enums" parent="1" style="text;html=1;align=center;verticalAlign=middle;rounded=0;fontSize=13;fontStyle=1;fontColor=#6B21A8;" value="RÉFÉRENTIELS ET ÉNUMÉRATIONS DU DOMAINE (UML)" vertex="1"><mxGeometry x="3060" y="85" width="550" height="30" as="geometry" /></mxCell><mxCell id="p4_enum_StatutExpression" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#1E293B;shadow=0;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;i style='font-size:10px;color:#6b21a8;'&gt;«enumeration»&lt;/i&gt;&lt;br&gt;&lt;b&gt;StatutExpression&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;font-size:11px;'&gt;+ BROUILLON&lt;br&gt;+ PUBLIEE&lt;br&gt;+ EN_EVALUATION&lt;br&gt;+ ATTRIBUEE&lt;br&gt;+ ANNULEE&lt;br&gt;+ INFRUCTUEUSE&lt;/p&gt;" vertex="1"><mxGeometry x="3080" y="125" width="240" height="155" as="geometry" /></mxCell><mxCell id="p4_enum_StatutSoumission" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#1E293B;shadow=0;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;i style='font-size:10px;color:#6b21a8;'&gt;«enumeration»&lt;/i&gt;&lt;br&gt;&lt;b&gt;StatutSoumission&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;font-size:11px;'&gt;+ DEPOSEE&lt;br&gt;+ RECEVABLE&lt;br&gt;+ EN_EXAMEN&lt;br&gt;+ RETENUE&lt;br&gt;+ NON_RETENUE&lt;br&gt;+ REJETEE&lt;/p&gt;" vertex="1"><mxGeometry x="3080" y="295" width="240" height="155" as="geometry" /></mxCell><mxCell id="p4_enum_TypeActe" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#1E293B;shadow=0;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;i style='font-size:10px;color:#6b21a8;'&gt;«enumeration»&lt;/i&gt;&lt;br&gt;&lt;b&gt;TypeActe&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;font-size:11px;'&gt;+ BON_DE_COMMANDE (BCA)&lt;br&gt;+ LETTRE_COMMANDE (LC)&lt;br&gt;+ MARCHE_PUBLIC&lt;br&gt;+ CONVENTION_BAIL&lt;/p&gt;" vertex="1"><mxGeometry x="3080" y="465" width="240" height="145" as="geometry" /></mxCell><mxCell id="p4_enum_StatutActe" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#1E293B;shadow=0;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;i style='font-size:10px;color:#6b21a8;'&gt;«enumeration»&lt;/i&gt;&lt;br&gt;&lt;b&gt;StatutActe&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;font-size:11px;'&gt;+ PROJET&lt;br&gt;+ SOUMIS_CONTROLE&lt;br&gt;+ VISE_CF&lt;br&gt;+ SIGNE_ORDONNATEUR&lt;br&gt;+ NOTIFIE_PRESTATAIRE&lt;br&gt;+ REJETE&lt;br&gt;+ ANNULE&lt;/p&gt;" vertex="1"><mxGeometry x="3350" y="125" width="240" height="170" as="geometry" /></mxCell><mxCell id="p4_enum_StatutVisa" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#1E293B;shadow=0;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;i style='font-size:10px;color:#6b21a8;'&gt;«enumeration»&lt;/i&gt;&lt;br&gt;&lt;b&gt;StatutVisa&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;font-size:11px;'&gt;+ FAVORABLE&lt;br&gt;+ DEFAVORABLE_REJET&lt;br&gt;+ SUSPENDU_RESERVES&lt;/p&gt;" vertex="1"><mxGeometry x="3350" y="310" width="240" height="135" as="geometry" /></mxCell><mxCell id="p4_enum_TypeVisa" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#1E293B;shadow=0;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;i style='font-size:10px;color:#6b21a8;'&gt;«enumeration»&lt;/i&gt;&lt;br&gt;&lt;b&gt;TypeVisa&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;font-size:11px;'&gt;+ ENGAGEMENT_JURIDIQUE&lt;br&gt;+ ORDONNANCEMENT_PAIEMENT&lt;/p&gt;" vertex="1"><mxGeometry x="3350" y="465" width="240" height="135" as="geometry" /></mxCell><mxCell id="p4_Beneficiaire" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="&lt;p style='margin:0;margin-top:5px;text-align:center;'&gt;&lt;b&gt;Beneficiaire&lt;/b&gt;&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;- code : String&lt;br&gt;- libelle : String&lt;/p&gt;&lt;hr size='1'&gt;&lt;p style='margin:0;margin-left:8px;line-height:1.45;'&gt;+ getCode() : String&lt;/p&gt;" vertex="1"><mxGeometry x="2020" y="530" width="220" height="110" as="geometry" /></mxCell><mxCell id="p4_rel_eb_beneficiaire" edge="1" parent="1" source="p4_ExpressionBesoin" target="p4_Beneficiaire" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=0.85;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" value="au profit de (bénéficiaire)"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="1256" y="1000" /><mxPoint x="2130" y="1000" /></Array></mxGeometry></mxCell><mxCell id="p4_CreditBudgetaire" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" value="&lt;p style=&#x27;margin:0;margin-top:5px;text-align:center;&#x27;&gt;&lt;b&gt;CreditBudgetaire&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;- codeImputation : String&lt;br&gt;- montantAE : Double&lt;br&gt;- montantAEConsomme : Double&lt;br&gt;- montantAEDisponible : Double&lt;br&gt;- montantCP : Double&lt;br&gt;- montantCPConsomme : Double&lt;br&gt;- montantCPDisponible : Double&lt;br&gt;- statut : StatutCredit&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;+ consommerAE(m : Double)&lt;br&gt;+ libererAE(m : Double)&lt;br&gt;+ consommerCP(m : Double)&lt;br&gt;+ libererCP(m : Double)&lt;/p&gt;" vertex="1"><mxGeometry x="3070.0" y="1340.0" width="260" height="274" as="geometry" /></mxCell><mxCell id="p4_rel_reservation_credit" edge="1" parent="1" source="p4_ReservationCredit" target="p4_CreditBudgetaire" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" value="sur la ligne de crédit"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell><mxCell id="p4_rel_soumission_rib" edge="1" parent="1" source="p4_Soumission" target="p4_CoordonneeBancaire" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;exitX=0.75;exitY=0;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;" value="payée sur (RIB choisi)"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell><mxCell id="p4_Taxe" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="&lt;p style=&#x27;margin:0;margin-top:5px;text-align:center;&#x27;&gt;&lt;b&gt;Taxe&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;- code : CodeTaxe&lt;br&gt;- libelle : String&lt;br&gt;- taux : Double&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;&#x27;&gt;+ appliquer(baseHT : Double) : Double&lt;/p&gt;" vertex="1"><mxGeometry x="470" y="1380" width="230" height="118" as="geometry" /></mxCell><mxCell id="p4_rel_soumission_taxe" edge="1" parent="1" source="p4_Soumission" target="p4_Taxe" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=11;fontColor=#1F3A5F;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=8;strokeColor=#4A5568;strokeWidth=1.3;endArrow=open;endFill=0;endSize=8;dashed=1;exitX=1;exitY=0.35;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" value="taxes appliquées (TVA, IR)"><mxGeometry relative="1" as="geometry"></mxGeometry></mxCell><mxCell id="p4_enum_StatutReservation" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#1E293B;shadow=0;" value="&lt;p style=&#x27;margin:0;margin-top:5px;text-align:center;&#x27;&gt;&lt;i style=&#x27;font-size:10px;color:#6b21a8;&#x27;&gt;«enumeration»&lt;/i&gt;&lt;br&gt;&lt;b&gt;StatutReservation&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;font-size:11px;&#x27;&gt;+ ACTIVE&lt;br&gt;+ ANNULEE&lt;/p&gt;" vertex="1"><mxGeometry x="3080" y="630" width="240" height="100" as="geometry" /></mxCell><mxCell id="p4_enum_CodeTaxe" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=0;fontSize=12;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#1E293B;shadow=0;" value="&lt;p style=&#x27;margin:0;margin-top:5px;text-align:center;&#x27;&gt;&lt;i style=&#x27;font-size:10px;color:#6b21a8;&#x27;&gt;«enumeration»&lt;/i&gt;&lt;br&gt;&lt;b&gt;CodeTaxe&lt;/b&gt;&lt;/p&gt;&lt;hr size=&#x27;1&#x27;&gt;&lt;p style=&#x27;margin:0;margin-left:8px;line-height:1.45;font-size:11px;&#x27;&gt;+ TVA&lt;br&gt;+ IR&lt;/p&gt;" vertex="1"><mxGeometry x="3350" y="630" width="240" height="100" as="geometry" /></mxCell></root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

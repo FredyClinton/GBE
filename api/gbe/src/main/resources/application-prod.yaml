@@ -1,0 +1,8 @@
+# Profil de production : tout vient de l'environnement, aucune valeur par défaut sensible.
+app:
+  security:
+    jwt:
+      private-key: file:${JWT_PRIVATE_KEY_PATH}
+      public-key: file:${JWT_PUBLIC_KEY_PATH}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS}

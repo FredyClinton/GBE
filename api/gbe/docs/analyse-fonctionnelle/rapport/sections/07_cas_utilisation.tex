@@ -1,0 +1,89 @@
+\section{Présentation des principaux cas d'utilisation}
+
+\subsection{Organisation par domaines fonctionnels}
+
+Afin d'offrir une lecture claire et modulaire du système sans surcharger la représentation graphique, les cas d'utilisation ont été regroupés en quatre grands domaines fonctionnels correspondant aux phases majeures du cycle de vie de la dépense :
+
+\begin{enumerate}
+  \item \textbf{Domaine 1 — Expression du besoin et mise en concurrence} ;
+  \item \textbf{Domaine 2 — Engagement juridique et contrôle budgétaire préalable} ;
+  \item \textbf{Domaine 3 — Exécution des livraisons et réception matière} ;
+  \item \textbf{Domaine 4 — Facturation, liquidation et ordonnancement}.
+\end{enumerate}
+
+Chaque cas d'utilisation traduit un service fonctionnel complet rendu par le système à un ou plusieurs acteurs, à l'exclusion de toute fonction purement technique (telle que l'authentification ou le paramétrage).
+
+\subsection{Catalogue des cas d'utilisation par domaine}
+
+\begin{table}[H]
+\centering
+\small
+\caption{Catalogue structuré des cas d'utilisation du système}
+\label{tab:catalogue_uc}
+\begin{tabularx}{\linewidth}{L{1.2cm} L{5.0cm} L{3.6cm} Y}
+\toprule
+\textbf{\sffamily Code} & \textbf{\sffamily Intitulé du cas d'utilisation} & \textbf{\sffamily Acteur(s) participant(s)} & \textbf{\sffamily Description fonctionnelle synthétique} \\
+\midrule
+\multicolumn{4}{l}{\cellcolor{GrisClair}\textbf{\sffamily\textcolor{BleuInstitutionnel}{Domaine 1 — Expression du besoin et mise en concurrence}}} \\
+\midrule
+UC01 & Exprimer un besoin & Ordonnateur & Enregistrer et publier dans le système une expression de besoin. \\
+UC02 & Consulter les expressions de besoin ouvertes & Fournisseur & Parcourir et consulter le détail des expressions de besoin ouvertes à la soumission. \\
+UC03 & Soumissionner à une expression de besoin & Fournisseur & Déposer une offre en réponse à une expression de besoin ouverte. \\
+\midrule
+\multicolumn{4}{l}{\cellcolor{GrisClair}\textbf{\sffamily\textcolor{BleuInstitutionnel}{Domaine 2 — Engagement juridique et contrôle budgétaire préalable}}} \\
+\midrule
+UC04 & Préparer et soumettre le projet d'acte juridique & Ordonnateur & Élaborer le projet d'acte juridique et le transmettre pour contrôle au contrôleur financier. \\
+UC05 & Signer l'acte juridique & Ordonnateur & Apposer la signature de l'ordonnateur sur l'acte juridique après obtention des contrôles et visas requis. \\
+UC06 & Examiner et viser le projet d'acte juridique & Contrôleur financier & Instruire le projet d'acte juridique soumis par l'ordonnateur et accorder le visa du contrôle financier. \\
+UC07 & Réserver les crédits & Contrôleur financier & Procéder au blocage préventif des crédits budgétaires associés au projet d'acte juridique. \\
+UC08 & Donner le quitus sur le classement en nature économique & Contrôleur financier & Valider le classement des matières dans les natures économiques proposées. \\
+\midrule
+\multicolumn{4}{l}{\cellcolor{GrisClair}\textbf{\sffamily\textcolor{BleuInstitutionnel}{Domaine 3 — Exécution des livraisons et réception matière}}} \\
+\midrule
+UC09 & Prendre en charge et constater les produits livrés & Comptable matière, Fournisseur & Enregistrer la prise en charge d'une livraison effectuée par le fournisseur et constater les produits effectivement livrés. \\
+UC10 & Établir et délivrer le procès-verbal de réception & Comptable matière, Fournisseur & Générer, valider et mettre à disposition du fournisseur le procès-verbal attestant la réception. \\
+UC11 & Informer l'ordonnateur des livraisons & Comptable matière, Ordonnateur & Notifier et mettre à disposition de l'ordonnateur les informations relatives aux livraisons constatées. \\
+\midrule
+\multicolumn{4}{l}{\cellcolor{GrisClair}\textbf{\sffamily\textcolor{BleuInstitutionnel}{Domaine 4 — Facturation, liquidation et ordonnancement}}} \\
+\midrule
+UC12 & Introduire une demande de paiement & Fournisseur & Initier une demande de règlement au titre d'une livraison effectuée. \\
+UC13 & Soumettre les factures et pièces justificatives & Fournisseur & Déposer dans le système les factures et l'ensemble des pièces justificatives associées à la demande de paiement. \\
+UC14 & Suivre l'évolution de ses demandes & Fournisseur & Consulter l'état d'avancement des demandes introduites dans le système. \\
+UC15 & Enregistrer et valider les factures & Ordonnateur & Prendre en compte et valider les factures déposées par le fournisseur au regard des livraisons reçues. \\
+UC16 & Procéder à la liquidation & Ordonnateur & Arrêter le montant exact de la dépense après vérification des titres et de la réalité des livraisons. \\
+UC17 & Générer, signer et transmettre le projet d'ordonnancement & Ordonnateur, Contrôleur financier & Établir le projet d'ordonnancement de paiement, le signer et le transmettre au contrôleur financier. \\
+UC18 & Signer et transmettre le dossier d'ordonnancement & Contrôleur financier, Comptable public & Signer le dossier d'ordonnancement contrôlé et le transmettre au comptable public qui le reçoit. \\
+UC19 & Contrôler le projet d'ordonnancement & Contrôleur financier & Effectuer les vérifications réglementaires sur le projet d'ordonnancement reçu de l'ordonnateur. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Justification des relations entre cas d'utilisation (\texttt{include} et \texttt{extend})}
+
+Conformément aux bonnes pratiques de modélisation UML, les relations de dépendance entre cas d'utilisation ont été strictement limitées aux situations où elles traduisent une règle structurelle explicite issue des notes de réunion :
+
+\begin{enumerate}
+  \item \textbf{Relation \texttt{« extend »} entre \emph{Soumissionner à une expression de besoin} (UC03) et \emph{Consulter les expressions de besoin ouvertes} (UC02) :}
+  \begin{itemize}
+    \item \emph{Sens de la flèche :} de UC03 (cas d'extension) vers UC02 (cas de base).
+    \item \emph{Justification métier :} la consultation des expressions de besoin ouvertes se suffit à elle-même. Toutefois, à l'occasion de cette consultation, le fournisseur peut choisir, de manière optionnelle et conditionnelle, de déposer une soumission.
+  \end{itemize}
+
+  \item \textbf{Relations \texttt{« include »} issues de \emph{Examiner et viser le projet d'acte juridique} (UC06) vers \emph{Réserver les crédits} (UC07) et \emph{Donner le quitus sur le classement en nature économique} (UC08) :}
+  \begin{itemize}
+    \item \emph{Sens des flèches :} de UC06 (cas de base) vers UC07 et UC08 (cas inclus).
+    \item \emph{Justification métier :} l'octroi du visa du contrôleur financier sur un projet d'acte juridique repose sur la vérification et la réservation des crédits ainsi que sur l'octroi du quitus relatif au classement des matières dans les natures économiques. Ces deux opérations constituent des sous-ensemble fonctionnels obligatoires du contrôle préalable de l'engagement.
+  \end{itemize}
+
+  \item \textbf{Relation \texttt{« include »} entre \emph{Introduire une demande de paiement} (UC12) et \emph{Soumettre les factures et pièces justificatives} (UC13) :}
+  \begin{itemize}
+    \item \emph{Sens de la flèche :} de UC12 (cas de base) vers UC13 (cas inclus).
+    \item \emph{Justification métier :} une demande de paiement introduite par le fournisseur comporte obligatoirement la remise des factures et des pièces justificatives correspondantes.
+  \end{itemize}
+
+  \item \textbf{Relation \texttt{« include »} entre \emph{Signer et transmettre le dossier d'ordonnancement} (UC18) et \emph{Contrôler le projet d'ordonnancement} (UC19) :}
+  \begin{itemize}
+    \item \emph{Sens de la flèche :} de UC18 (cas de base) vers UC19 (cas inclus).
+    \item \emph{Justification métier :} les notes précisent que le contrôleur financier reçoit les projets d'ordonnancement, effectue les contrôles nécessaires, puis signe et transmet les dossiers au comptable public. La signature et la transmission du dossier incluent donc systématiquement la réalisation préalable de ces contrôles.
+  \end{itemize}
+\end{enumerate}

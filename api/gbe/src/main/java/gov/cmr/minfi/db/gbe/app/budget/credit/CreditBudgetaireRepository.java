@@ -1,0 +1,96 @@
+package gov.cmr.minfi.db.gbe.app.budget.credit;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface CreditBudgetaireRepository extends JpaRepository<CreditBudgetaire, String> {
+
+
+    Optional<CreditBudgetaire> findByCodeImputation(String codeImputation);
+
+    boolean existsByCodeImputation(String codeImputation);
+
+    List<CreditBudgetaire> findByExerciceId(String exerciceId);
+
+    List<CreditBudgetaire> findByExerciceIdAndStatut(String exerciceId, StatutCredit statut);
+
+
+    List<CreditBudgetaire> findBySectionId(String sectionId);
+
+    List<CreditBudgetaire> findBySectionIdAndExerciceId(String sectionId, String exerciceId);
+
+
+    List<CreditBudgetaire> findByProgrammeId(String programmeId);
+
+    List<CreditBudgetaire> findByProgrammeIdAndStatut(String programmeId, StatutCredit statut);
+
+
+    List<CreditBudgetaire> findByActionId(String actionId);
+
+
+    List<CreditBudgetaire> findByChapitreId(String chapitreId);
+
+
+    List<CreditBudgetaire> findByStatut(StatutCredit statut);
+
+
+    /** Ligne de crédit d'une imputation complète (unique, uk_credit_imputation) : déduite du besoin (Q22). */
+    Optional<CreditBudgetaire> findByExerciceIdAndSectionIdAndProgrammeIdAndActionIdAndChapitreIdAndNatureEconomiqueId(
+            String exerciceId, String sectionId, String programmeId, String actionId, String chapitreId,
+            String natureEconomiqueId);
+
+    // Vérification d'unicité de l'imputation  avant création
+    boolean existsByExerciceIdAndSectionIdAndProgrammeIdAndActionIdAndChapitreIdAndNatureEconomiqueId(
+            String exerciceId,
+            String sectionId,
+            String programmeId,
+            String actionId,
+            String chapitreId,
+            String natureEconomiqueId
+    );
+
+
+    // Recherche combinée exercice + section + statut
+    @Query("""
+            SELECT c FROM CreditBudgetaire c
+            WHERE c.exercice.id = :exerciceId
+            AND c.section.id = :sectionId
+            AND c.statut = :statut
+            """)
+    List<CreditBudgetaire> findByExerciceIdAndSectionIdAndStatut(
+            @Param("exerciceId") String exerciceId,
+            @Param("sectionId") String sectionId,
+            @Param("statut") StatutCredit statut
+    );
+
+
+    // Tous les crédits actifs (non annulés) d'un exercice
+    @Query("""
+            SELECT c FROM CreditBudgetaire c
+            WHERE c.exercice.id = :exerciceId
+            AND c.statut <> gov.cmr.minfi.db.gbe.app.budget.credit.StatutCredit.ANNULE
+            """)
+    List<CreditBudgetaire> findActifsByExerciceId(@Param("exerciceId") String exerciceId);
+
+    // Tous les credits enfants d'un credit parent
+    List<CreditBudgetaire> findByCreditParentId(String creditParentId);
+
+    // Tout le chaine d'un credit pluriannuel
+    @Query(value = """
+            WITH RECURSIVE chaine_ae AS (
+                SELECT id, credit_parent_id
+                FROM credit_budgetaire
+                WHERE id = :creditId
+                UNION ALL
+                SELECT c.id, c.credit_parent_id
+                FROM credit_budgetaire c
+                INNER JOIN chaine_ae ca ON c.id = ca.credit_parent_id
+            )
+            SELECT id FROM chaine_ae
+            """, nativeQuery = true)
+    List<String> findAllAncestorCreditIds(@Param("creditId") String creditId);
+}

@@ -1,0 +1,80 @@
+\section{Points à clarifier avec le responsable métier}
+
+Afin de consolider cette première analyse et de préparer les étapes ultérieures de conception (identification des objets métier, définition des cycles de vie et des règles de gestion), plusieurs questions ont été soumises à l'arbitrage du responsable du projet.
+
+\subsection*{Arbitrages métier déjà actés}
+
+À l'issue des premiers échanges de cadrage, les règles de gestion structurantes suivantes sont formellement intégrées à la modélisation :
+\begin{itemize}
+  \item \textbf{Valorisation de l'expression de besoin :} l'ordonnateur formalise son besoin sous un angle strictement physique et technique (matière, quantités demandées et spécifications techniques). L'attribut de prix unitaire estimé au niveau des lignes de besoin a été supprimé du modèle afin d'éviter toute ambiguïté ou contrainte indue sur l'ordonnateur, la valorisation unitaire relevant exclusivement des offres des soumissionnaires. Aucun plafond strict fondé sur la mercuriale n'est appliqué à ce stade.
+  \item \textbf{Soumissions obligatoirement totales :} chaque fournisseur soumissionnaire doit impérativement renseigner un prix unitaire proposé pour chacune des lignes de l'expression de besoin. Les offres partielles ne sont pas admises.
+  \item \textbf{Attribution globale :} l'attribution est prononcée au profit d'un prestataire unique pour la totalité de l'expression de besoin.
+  \item \textbf{Détermination de la forme de l'acte juridique :} le montant total retenu fixe le seuil légal minimal (interdiction de sous-évaluer ou de recourir à un acte allégé en dépassement de plafond), mais la décision finale intègre la nature économique de la dépense, la durée de la prestation et la décision propre de l'ordonnateur de recourir à un acte plus formalisé pour sécuriser la commande.
+\end{itemize}
+
+Les questions subsidiaires ci-après demeurent ouvertes pour les phases d'affinement détaillées.
+
+\subsection{Conditions de publication des expressions de besoin}
+
+\begin{enumerate}
+  \item Toutes les expressions de besoin saisies par l'ordonnateur ont-elles vocation à être publiées auprès des fournisseurs, ou certaines dépenses font-elles l'objet d'une procédure restreinte ou directe ?
+  \item Une validation interne préalable (hiérarchique ou budgétaire indicative) est-elle requise avant qu'une expression de besoin ne devienne visible comme « ouverte à la soumission » ?
+  \item Quelles informations minimales composent une expression de besoin (objet, quantités, spécifications, date limite de soumission, pièces attendues) et selon quelles règles sa clôture intervient-elle ?
+\end{enumerate}
+
+\subsection{Processus de sélection des fournisseurs}
+
+\begin{enumerate}
+  \item Comment s'opère la transition entre le dépôt des soumissions par les fournisseurs et la préparation du projet d'acte juridique par l'ordonnateur ?
+  \item La phase d'examen des offres, de comparaison des soumissions et de sélection du fournisseur retenu doit-elle être gérée et tracée dans l'application, ou relève-t-elle d'une commission externe dont seul le résultat est enregistré ?
+  \item Les fournisseurs non retenus doivent-ils être informés via l'application dans le cadre du suivi de leurs demandes ?
+\end{enumerate}
+
+\subsection{Modalités de visa et de signature des actes juridiques}
+
+\begin{enumerate}
+  \item Dans quel ordre exact interviennent les trois opérations du contrôleur financier lors de l'engagement : la réservation des crédits, le quitus sur le classement des matières dans les natures économiques et le visa du projet d'acte juridique constituent-ils une validation unique ou trois étapes successives distinctes ?
+  \item Qui propose initialement le classement des matières dans les natures économiques (l'ordonnateur lors de la préparation du projet d'acte juridique, ou un autre intervenant) avant que le contrôleur financier ne donne son quitus ?
+  \item Quelle est la nature exacte de la signature des actes juridiques et des projets d'ordonnancement dans le système (validation électronique interne, signature électronique certifiée ou téléversement d'un document signé manuscritement) ?
+  \item Une fois l'acte juridique signé par l'ordonnateur, comment est-il transmis ou notifié au fournisseur retenu pour déclencher les livraisons ?
+\end{enumerate}
+
+\subsection{Modalités de réception des livraisons}
+
+\begin{enumerate}
+  \item Le fournisseur doit-il déclarer ou annoncer sa livraison dans l'application avant sa prise en charge par le comptable matière, ou l'enregistrement dans le système est-il initié exclusivement par le comptable matière lors de la remise physique des biens ?
+  \item De quelle manière le procès-verbal de réception est-il délivré au fournisseur (mise à disposition dans son espace applicatif, notification électronique, remise d'un document signé) ?
+  \item L'information de l'ordonnateur par le comptable matière est-elle déclenchée automatiquement dès l'établissement du procès-verbal de réception, ou fait-elle l'objet d'une transmission distincte ?
+\end{enumerate}
+
+\subsection{Gestion des livraisons partielles ou non conformes}
+
+\begin{enumerate}
+  \item Un même acte juridique peut-il donner lieu à plusieurs livraisons échelonnées (livraisons partielles) donnant chacune lieu à un procès-verbal de réception distinct ?
+  \item En cas de livraison partielle, le fournisseur est-il autorisé à introduire une demande de paiement partielle, ou la facturation n'est-elle possible qu'après livraison complète ?
+  \item Quelle est la procédure attendue lorsque le comptable matière constate une non-conformité quantitative ou qualitative (procès-verbal de refus ou de réserve, notification au fournisseur et à l'ordonnateur, remplacement des produits) ?
+\end{enumerate}
+
+\subsection{Pièces justificatives exigées pour les demandes de paiement}
+
+\begin{enumerate}
+  \item Quelle est la liste réglementaire des pièces justificatives que le fournisseur doit soumettre à l'appui de sa demande de paiement et de sa facture ?
+  \item Le fournisseur doit-il téléverser à nouveau le procès-verbal de réception et l'acte juridique signé, ou le système les associe-t-il automatiquement au dossier dès lors qu'ils ont été produits dans l'application ?
+  \item L'application doit-elle bloquer l'envoi d'une demande de paiement tant que certaines pièces justificatives obligatoires ne sont pas jointes ou tant qu'aucun procès-verbal de réception n'a été enregistré ?
+\end{enumerate}
+
+\subsection{Modalités de rejet et de reprise des dossiers}
+
+\begin{enumerate}
+  \item Quels sont les différents motifs et niveaux de décision possibles pour le contrôleur financier (tant sur le projet d'acte juridique que sur le projet d'ordonnancement) : visa favorable, rejet définitif ou demande de modification avec renvoi à l'ordonnateur ?
+  \item En cas de rejet d'un projet d'acte juridique ou d'un projet d'ordonnancement après réservation des crédits, quel est l'impact sur les crédits réservés (maintien du blocage pendant la correction ou libération automatique des crédits) ?
+  \item Lorsque l'ordonnateur invalide une facture soumise par le fournisseur, le dossier retourne-t-il au fournisseur pour régularisation ou donne-t-il lieu à l'introduction d'une nouvelle demande ?
+\end{enumerate}
+
+\subsection{Rôle exact du comptable public dans le périmètre de l'application}
+
+\begin{enumerate}
+  \item La responsabilité du comptable public dans l'application se limite-t-elle strictement à la réception et à la consultation du dossier d'ordonnancement transmis par le contrôleur financier ?
+  \item Le comptable public doit-il pouvoir accuser réception du dossier, enregistrer sa prise en charge comptable, rejeter un dossier incomplet ou renseigner le statut de paiement effectif dans le système ?
+  \item Jusqu'à quel jalon exact s'étend la fonctionnalité de suivi des demandes offerte au fournisseur (s'arrête-t-elle à la transmission au comptable public ou inclut-elle l'information du paiement effectif) ?
+\end{enumerate}
