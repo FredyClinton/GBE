@@ -15,6 +15,7 @@ import gov.cmr.minfi.db.gbe.app.identite.iam.permission.Permission;
 import gov.cmr.minfi.db.gbe.app.identite.mandat.MandatScopeValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +39,7 @@ public class ControleCfServiceImpl implements ControleCfService {
     private final MandatScopeValidator mandatScopeValidator;
     private final ReferenceGenerator referenceGenerator;
     private final VisaMapper visaMapper;
+    private final ApplicationEventPublisher evenements;
     private final Clock clock;
 
     @Override
@@ -85,6 +87,9 @@ public class ControleCfServiceImpl implements ControleCfService {
             case SUSPENDU_RESERVES -> { /* l'acte reste SOUMIS_CONTROLE, en attente de compléments (Q18) */ }
         }
         visaRepository.save(visa);
+        // notifierDecision() (onglet 4) : l'ordonnateur auteur du projet d'acte est prévenu
+        evenements.publishEvent(new DecisionCfEvent(acte.getId(), acte.getNumero(), visa.getDecision(),
+                visa.getObservations(), acte.getCreatedBy()));
         log.info("Visa {} ({}) sur l'acte {}", visa.getNumero(), visa.getDecision(), acte.getNumero());
         return visaMapper.toResponse(visa);
     }

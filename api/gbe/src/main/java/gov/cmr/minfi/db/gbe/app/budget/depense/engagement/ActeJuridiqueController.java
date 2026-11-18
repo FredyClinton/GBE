@@ -3,6 +3,7 @@ package gov.cmr.minfi.db.gbe.app.budget.depense.engagement;
 import gov.cmr.minfi.db.gbe.app.common.config.OpenApiTags;
 import gov.cmr.minfi.db.gbe.app.common.pagination.PageResponse;
 import gov.cmr.minfi.db.gbe.app.budget.depense.engagement.dto.ActeJuridiqueResponse;
+import gov.cmr.minfi.db.gbe.app.budget.depense.engagement.dto.AnnulationActeRequest;
 import gov.cmr.minfi.db.gbe.app.budget.depense.engagement.dto.CreationActeRequest;
 import gov.cmr.minfi.db.gbe.app.budget.depense.engagement.dto.ModificationActeRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,7 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-/** Actes juridiques (UC04) : préparation du projet par l'ordonnateur et envoi au CF. */
+/** Actes juridiques (UC04, UC05) : préparation du projet, envoi au CF, signature, notification et annulation. */
 @RestController
 @RequestMapping("/api/v1/actes")
 @RequiredArgsConstructor
@@ -122,5 +123,46 @@ public class ActeJuridiqueController {
     public ResponseEntity<ActeJuridiqueResponse> soumettreAuControle(
             @Parameter(description = "Identifiant de l'acte juridique", required = true) @PathVariable String acteId) {
         return ResponseEntity.ok(acteService.soumettreAuControle(acteId));
+    }
+
+    @Operation(
+        summary = "Signer l'acte visé et le notifier au fournisseur",
+        description = "L'ordonnateur signe l'acte visé par le CF (VISE_CF → SIGNE_ORDONNATEUR) : la signature est une " +
+            "validation tracée (signataire et date). " +
+            "Dans la même opération, l'acte est notifié au fournisseur (→ NOTIFIE_PRESTATAIRE) : il apparaît dans son " +
+            "espace et une notification lui est déposée. L'exécution des livraisons peut commencer."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Acte signé et notifié"),
+        @ApiResponse(responseCode = "400", description = "L'acte n'est pas visé par le CF (TRANSITION_STATUT_INVALIDE)"),
+        @ApiResponse(responseCode = "403", description = "Permission SIGNER_ACTE manquante ou hors du périmètre des mandats de l'utilisateur"),
+        @ApiResponse(responseCode = "404", description = "Acte introuvable")
+    })
+    @PatchMapping("/{acteId}/signer")
+    @PreAuthorize("hasAuthority('SIGNER_ACTE')")
+    public ResponseEntity<ActeJuridiqueResponse> signer(
+            @Parameter(description = "Identifiant de l'acte juridique", required = true) @PathVariable String acteId) {
+        return ResponseEntity.ok(acteService.signer(acteId));
+    }
+
+    @Operation(
+        summary = "Annuler un acte visé, signé ou notifié",
+        description = "Fait passer l'acte à ANNULE avec un motif obligatoire. " +
+            "La réservation des crédits est annulée et les AE reviennent sur la ligne de crédit. " +
+            "Si l'acte avait été notifié, le fournisseur le voit annulé dans son espace et reçoit une notification. " +
+            "Un projet ou un acte soumis au CF ne s'annule pas par cette route."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Acte annulé, AE libérées"),
+        @ApiResponse(responseCode = "400", description = "Motif manquant ou statut ne permettant pas l'annulation (TRANSITION_STATUT_INVALIDE)"),
+        @ApiResponse(responseCode = "403", description = "Permission ENGAGE_DEPENSE manquante ou hors du périmètre des mandats de l'utilisateur"),
+        @ApiResponse(responseCode = "404", description = "Acte introuvable")
+    })
+    @PatchMapping("/{acteId}/annuler")
+    @PreAuthorize("hasAuthority('ENGAGE_DEPENSE')")
+    public ResponseEntity<ActeJuridiqueResponse> annuler(
+            @Parameter(description = "Identifiant de l'acte juridique", required = true) @PathVariable String acteId,
+            @Valid @RequestBody AnnulationActeRequest request) {
+        return ResponseEntity.ok(acteService.annuler(acteId, request.motif()));
     }
 }

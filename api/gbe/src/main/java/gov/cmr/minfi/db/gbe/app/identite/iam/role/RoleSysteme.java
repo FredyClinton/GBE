@@ -28,7 +28,8 @@ public enum RoleSysteme {
                     Permission.REVISER_CP,
                     Permission.EXPRIMER_BESOIN,
                     Permission.LIQUIDER_DEPENSE,
-                    Permission.ORDONNANCER
+                    Permission.ORDONNANCER,
+                    Permission.SIGNER_ACTE
             );
         }
     },
@@ -46,7 +47,8 @@ public enum RoleSysteme {
                     Permission.MANAGE_AFFECTATIONS,
                     Permission.EXPRIMER_BESOIN,
                     Permission.LIQUIDER_DEPENSE,
-                    Permission.ORDONNANCER
+                    Permission.ORDONNANCER,
+                    Permission.SIGNER_ACTE
             );
         }
     },

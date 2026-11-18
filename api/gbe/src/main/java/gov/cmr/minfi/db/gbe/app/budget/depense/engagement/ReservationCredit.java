@@ -2,6 +2,8 @@ package gov.cmr.minfi.db.gbe.app.budget.depense.engagement;
 
 import gov.cmr.minfi.db.gbe.app.budget.credit.CreditBudgetaire;
 import gov.cmr.minfi.db.gbe.app.common.audit.BaseEntity;
+import gov.cmr.minfi.db.gbe.app.common.exception.BusinessException;
+import gov.cmr.minfi.db.gbe.app.common.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -47,6 +49,21 @@ public class ReservationCredit extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "credit_budgetaire_id", nullable = false, foreignKey = @ForeignKey(name = "fk_reservation_credit"))
     private CreditBudgetaire creditBudgetaire;
+
+    /**
+     * annuler() de l'onglet 4 : acte visé ou signé annulé (Q2), les AE reviennent sur la ligne
+     * ({@link CreditBudgetaire#libererAE}, permis même sur une ligne bloquée).
+     */
+    public void annuler(LocalDateTime maintenant) {
+        if (statut != StatutReservation.ACTIVE) {
+            throw new BusinessException(
+                    ErrorCode.TRANSITION_STATUT_INVALIDE,
+                    statut, StatutReservation.ANNULEE, "Seule une réservation active peut être annulée");
+        }
+        creditBudgetaire.libererAE(montant);
+        this.statut = StatutReservation.ANNULEE;
+        this.dateAnnulation = maintenant;
+    }
 
     /** bloquer() de l'onglet 4 : consomme les AE sur la ligne (refusé si la ligne est bloquée ou insuffisante). */
     public static ReservationCredit bloquer(String numero, ActeJuridique acte, CreditBudgetaire credit,

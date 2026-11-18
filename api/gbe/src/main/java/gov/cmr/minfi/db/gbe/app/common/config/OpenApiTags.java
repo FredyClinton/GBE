@@ -33,6 +33,8 @@ public final class OpenApiTags {
 
     public static final String ESPACE_FOURNISSEUR = "Espace fournisseur";
 
+    public static final String NOTIFICATIONS = "Notifications";
+
     private OpenApiTags() {
     }
 }

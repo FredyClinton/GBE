@@ -20,6 +20,13 @@ public record ActeJuridiqueResponse(
         Integer delaiLivraisonMois,
         String referenceDevis,
         LocalDateTime dateSoumissionControle,
+        // Signature, notification et annulation (2d)
+        String signataireId,
+        String signataireNom,
+        LocalDateTime dateSignature,
+        LocalDateTime dateNotification,
+        String motifAnnulation,
+        LocalDateTime dateAnnulation,
         // Montants
         BigDecimal montantTotalHT,
         BigDecimal tauxTva,
@@ -54,6 +61,7 @@ public record ActeJuridiqueResponse(
         String creditBudgetaireId,
         String reservationNumero,
         BigDecimal montantReserve,
+        String reservationStatut,
         // Fournisseur
         String fournisseurId,
         String fournisseurNiu,

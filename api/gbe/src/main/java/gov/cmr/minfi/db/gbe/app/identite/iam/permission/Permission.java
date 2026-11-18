@@ -9,6 +9,7 @@ public enum Permission {
     REJETER_DEPENSE("Rejeter une dépense"),
     EXPRIMER_BESOIN("Exprimer un besoin"),
     ORDONNANCER("Ordonnancer une dépense"),
+    SIGNER_ACTE("Signer un acte juridique visé et le notifier au fournisseur"),
 
     // ── Contrôleur financier ──────────────────────────
     VISA_CFI("Viser une dépense"),

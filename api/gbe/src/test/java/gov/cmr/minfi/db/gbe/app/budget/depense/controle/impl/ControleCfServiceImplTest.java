@@ -42,8 +42,10 @@ class ControleCfServiceImplTest {
     private final ReservationCreditRepository reservationRepository = mock(ReservationCreditRepository.class);
     private final MandatScopeValidator scope = mock(MandatScopeValidator.class);
     private final ReferenceGenerator references = mock(ReferenceGenerator.class);
+    private final org.springframework.context.ApplicationEventPublisher evenements =
+            mock(org.springframework.context.ApplicationEventPublisher.class);
     private final ControleCfServiceImpl service = new ControleCfServiceImpl(acteRepository, visaRepository,
-            reservationRepository, scope, references, mock(VisaMapper.class), HORLOGE);
+            reservationRepository, scope, references, mock(VisaMapper.class), evenements, HORLOGE);
 
     private CreditBudgetaire credit;
     private ActeJuridique acte;

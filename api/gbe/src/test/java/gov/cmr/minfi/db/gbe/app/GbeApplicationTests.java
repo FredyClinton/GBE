@@ -191,6 +191,13 @@ class GbeApplicationTests {
         for (gov.cmr.minfi.db.gbe.app.referentiel.taxe.CodeTaxe c : gov.cmr.minfi.db.gbe.app.referentiel.taxe.CodeTaxe.values()) {
             assertThat(taxes).contains("'" + c.name() + "'");
         }
+        final String typesNotification = jdbcTemplate.queryForObject(
+                "SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname = 'notifications_type_check'",
+                String.class);
+        for (gov.cmr.minfi.db.gbe.app.notification.TypeNotification n
+                : gov.cmr.minfi.db.gbe.app.notification.TypeNotification.values()) {
+            assertThat(typesNotification).contains("'" + n.name() + "'");
+        }
     }
 
     @Test
@@ -748,6 +755,106 @@ class GbeApplicationTests {
                         .content("{\"decision\":\"FAVORABLE\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("TRANSITION_STATUT_INVALIDE"));
+
+        // Lot 2d — l'ordonnateur a reçu les trois décisions du CF dans sa boîte de notifications
+        mockMvc.perform(get("/api/v1/notifications/non-lues/nombre").header("Authorization", ordo))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nonLues").value(3));
+        mockMvc.perform(get("/api/v1/notifications").header("Authorization", ordo))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[*].type").value(org.hamcrest.Matchers.everyItem(
+                        org.hamcrest.Matchers.is("DECISION_CF"))))
+                .andExpect(jsonPath("$.content[*].objetId").value(org.hamcrest.Matchers.everyItem(
+                        org.hamcrest.Matchers.is(acteId))));
+        mockMvc.perform(patch("/api/v1/notifications/lues").header("Authorization", ordo))
+                .andExpect(status().isNoContent());
+        mockMvc.perform(get("/api/v1/notifications").param("nonLues", "true").header("Authorization", ordo))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(0));
+
+        // Avant la signature, le fournisseur ne voit pas l'acte dans son espace
+        mockMvc.perform(get("/api/v1/fournisseurs/moi/actes").header("Authorization", autre[0]))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(0));
+        mockMvc.perform(get("/api/v1/fournisseurs/moi/actes/{id}", acteId).header("Authorization", autre[0]))
+                .andExpect(status().isNotFound());
+
+        // Signature (UC05, SIGNER_ACTE) : le CF ne signe pas ; l'ordonnateur signe et l'acte est notifié dans la même opération
+        mockMvc.perform(patch("/api/v1/actes/{id}/signer", acteId).header("Authorization", cf))
+                .andExpect(status().isForbidden());
+        // Sans SIGNER_ACTE, l'ordonnateur (ENGAGE_DEPENSE seul) ne signe pas ; la permission accordée, il signe
+        mockMvc.perform(patch("/api/v1/actes/{id}/signer", acteId).header("Authorization", ordo))
+                .andExpect(status().isForbidden());
+        jdbcTemplate.update("""
+                INSERT INTO mandat_permissions (mandat_id, permission)
+                SELECT m.id, 'SIGNER_ACTE' FROM mandat m JOIN users u ON u.id = m.user_id WHERE u.email = ?
+                """, "ordo.soumission@minfi.cm");
+        mockMvc.perform(patch("/api/v1/actes/{id}/signer", acteId).header("Authorization", ordo))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.statut").value("NOTIFIE_PRESTATAIRE"))
+                .andExpect(jsonPath("$.dateSignature").isNotEmpty())
+                .andExpect(jsonPath("$.dateNotification").isNotEmpty())
+                .andExpect(jsonPath("$.signataireId").isNotEmpty());
+        mockMvc.perform(patch("/api/v1/actes/{id}/signer", acteId).header("Authorization", ordo))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("TRANSITION_STATUT_INVALIDE"));
+
+        // Espace fournisseur : l'acte notifié, sans la ligne de crédit ni la réservation ; invisible de l'autre fournisseur
+        mockMvc.perform(get("/api/v1/fournisseurs/moi/actes").header("Authorization", autre[0]))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.content[0].id").value(acteId));
+        mockMvc.perform(get("/api/v1/fournisseurs/moi/actes/{id}", acteId).header("Authorization", autre[0]))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.statut").value("NOTIFIE_PRESTATAIRE"))
+                .andExpect(jsonPath("$.lignes.length()").value(2))
+                .andExpect(jsonPath("$.creditBudgetaireId").doesNotExist())
+                .andExpect(jsonPath("$.reservationNumero").doesNotExist());
+        mockMvc.perform(get("/api/v1/fournisseurs/moi/actes/{id}", acteId).header("Authorization", frs[0]))
+                .andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/v1/fournisseurs/moi/actes").header("Authorization", ordo))
+                .andExpect(status().isForbidden());
+        final String notificationTitulaire = champ(mockMvc.perform(get("/api/v1/notifications").header("Authorization", autre[0]))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.content[0].type").value("ACTE_NOTIFIE"))
+                .andExpect(jsonPath("$.content[0].lue").value(false))
+                .andReturn(), "$.content[0].id");
+        // La notification d'un autre utilisateur est introuvable ; le destinataire la marque lue
+        mockMvc.perform(patch("/api/v1/notifications/{id}/lue", notificationTitulaire).header("Authorization", frs[0]))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("NOTIFICATION_NOT_FOUND"));
+        mockMvc.perform(patch("/api/v1/notifications/{id}/lue", notificationTitulaire).header("Authorization", autre[0]))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.lue").value(true));
+
+        // Annulation (Q2) : motif obligatoire, réservation annulée et AE libérées, fournisseur prévenu
+        mockMvc.perform(patch("/api/v1/actes/{id}/annuler", acteId).header("Authorization", ordo)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"motif\":\" \"}"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(patch("/api/v1/actes/{id}/annuler", acteId).header("Authorization", ordo)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"motif\":\"Besoin couvert autrement\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.statut").value("ANNULE"))
+                .andExpect(jsonPath("$.motifAnnulation").value("Besoin couvert autrement"))
+                .andExpect(jsonPath("$.reservationStatut").value("ANNULEE"));
+        final Map<String, Object> aeApres = jdbcTemplate.queryForMap(
+                "SELECT montant_ae_consomme AS consomme, montant_ae_disponible AS disponible FROM credit_budgetaire WHERE id = ?",
+                creditId);
+        assertThat((java.math.BigDecimal) aeApres.get("consomme")).isEqualByComparingTo("0");
+        assertThat((java.math.BigDecimal) aeApres.get("disponible")).isEqualByComparingTo("1000000");
+        mockMvc.perform(patch("/api/v1/actes/{id}/annuler", acteId).header("Authorization", ordo)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"motif\":\"Deux fois\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("TRANSITION_STATUT_INVALIDE"));
+        mockMvc.perform(get("/api/v1/fournisseurs/moi/actes/{id}", acteId).header("Authorization", autre[0]))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.statut").value("ANNULE"));
+        mockMvc.perform(get("/api/v1/notifications/non-lues/nombre").header("Authorization", autre[0]))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nonLues").value(1));
+        mockMvc.perform(get("/api/v1/notifications").param("nonLues", "true").header("Authorization", autre[0]))
+                .andExpect(jsonPath("$.content[0].type").value("ACTE_ANNULE"));
     }
 
     @Test

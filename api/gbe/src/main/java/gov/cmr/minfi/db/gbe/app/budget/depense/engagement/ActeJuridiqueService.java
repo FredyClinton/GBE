@@ -16,7 +16,18 @@ public interface ActeJuridiqueService {
     /** UC04 : PROJET → SOUMIS_CONTROLE, ligne de crédit déduite du besoin (Q22). */
     ActeJuridiqueResponse soumettreAuControle(String acteId);
 
+    /** UC05 : VISE_CF → SIGNE_ORDONNATEUR → NOTIFIE_PRESTATAIRE dans la même opération (Q6, Q20). */
+    ActeJuridiqueResponse signer(String acteId);
+
+    /** Acte visé, signé ou notifié → ANNULE ; réservation annulée et AE libérées (Q2). */
+    ActeJuridiqueResponse annuler(String acteId, String motif);
+
     ActeJuridiqueResponse getActe(String acteId);
+
+    /** Espace fournisseur : actes notifiés au fournisseur connecté. */
+    PageResponse<ActeJuridiqueResponse> mesActesFournisseur(Pageable pageable);
+
+    ActeJuridiqueResponse getActeFournisseur(String acteId);
 
     PageResponse<ActeJuridiqueResponse> rechercher(String exerciceId, StatutActe statut, Pageable pageable);
 }

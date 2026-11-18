@@ -17,14 +17,19 @@ import gov.cmr.minfi.db.gbe.app.budget.depense.engagement.forme.DonneesForme;
 import gov.cmr.minfi.db.gbe.app.budget.depense.soumission.Soumission;
 import gov.cmr.minfi.db.gbe.app.budget.depense.soumission.SoumissionRepository;
 import gov.cmr.minfi.db.gbe.app.budget.depense.soumission.StatutSoumission;
+import gov.cmr.minfi.db.gbe.app.identite.fournisseur.Fournisseur;
+import gov.cmr.minfi.db.gbe.app.identite.fournisseur.FournisseurConnecte;
 import gov.cmr.minfi.db.gbe.app.identite.iam.permission.Permission;
+import gov.cmr.minfi.db.gbe.app.identite.user.User;
 import gov.cmr.minfi.db.gbe.app.identite.mandat.MandatScopeValidator;
 import gov.cmr.minfi.db.gbe.app.identite.mandat.MandatScopeValidator.Perimetre;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +45,7 @@ import java.util.Set;
 public class ActeJuridiqueServiceImpl implements ActeJuridiqueService {
 
     static final Set<String> TRIS_AUTORISES = Set.of("numero", "dateEmission", "montantTTC", "statut");
+    static final Set<String> TRIS_FOURNISSEUR = Set.of("numero", "dateNotification", "montantTTC", "statut");
     private static final String AUCUN_ID = "-";
 
     private final ActeJuridiqueRepository acteRepository;
@@ -49,6 +55,8 @@ public class ActeJuridiqueServiceImpl implements ActeJuridiqueService {
     private final ActeJuridiqueFactory acteFactory;
     private final MandatScopeValidator mandatScopeValidator;
     private final ActeJuridiqueMapper acteMapper;
+    private final FournisseurConnecte fournisseurConnecte;
+    private final ApplicationEventPublisher evenements;
     private final Clock clock;
 
     @Override
@@ -101,6 +109,57 @@ public class ActeJuridiqueServiceImpl implements ActeJuridiqueService {
     }
 
     @Override
+    @Transactional
+    public ActeJuridiqueResponse signer(String acteId) {
+        final ActeJuridique acte = findActeAvecDroit(acteId, Permission.SIGNER_ACTE);
+        final LocalDateTime maintenant = LocalDateTime.now(clock);
+        acte.signer(ordonnateurConnecte(), maintenant);
+        // UC05, étape 3 : « le système notifie immédiatement l'acte officiel au fournisseur » (Q20)
+        acte.notifierFournisseur(maintenant);
+        evenements.publishEvent(new ActeNotifieEvent(acte.getId(), acte.getNumero(), acte.getObjet(),
+                acte.getSoumission().getFournisseur().getUser().getId()));
+        log.info("Acte {} signé et notifié au fournisseur {}", acte.getNumero(),
+                acte.getSoumission().getFournisseur().getNiu());
+        return acteMapper.toResponse(acte);
+    }
+
+    @Override
+    @Transactional
+    public ActeJuridiqueResponse annuler(String acteId, String motif) {
+        final ActeJuridique acte = findActeAvecDroit(acteId, Permission.ENGAGE_DEPENSE);
+        if (motif == null || motif.isBlank()) {
+            throw new BusinessException(ErrorCode.ACTE_MOTIF_ANNULATION_OBLIGATOIRE, acte.getNumero());
+        }
+        final LocalDateTime maintenant = LocalDateTime.now(clock);
+        acte.annuler(motif.trim(), maintenant);
+        // Un acte visé a toujours une réservation active (2c) : ses AE reviennent sur la ligne
+        if (acte.getReservation() != null) {
+            acte.getReservation().annuler(maintenant);
+        }
+        evenements.publishEvent(new ActeAnnuleEvent(acte.getId(), acte.getNumero(), acte.getMotifAnnulation(),
+                acte.isNotifie() ? acte.getSoumission().getFournisseur().getUser().getId() : null));
+        log.info("Acte {} annulé ({} libérés sur les AE)", acte.getNumero(),
+                acte.getReservation() == null ? 0 : acte.getReservation().getMontant());
+        return acteMapper.toResponse(acte);
+    }
+
+    @Override
+    public PageResponse<ActeJuridiqueResponse> mesActesFournisseur(Pageable pageable) {
+        final Fournisseur fournisseur = fournisseurConnecte.exiger();
+        final Pageable page = Tris.verifier(pageable, TRIS_FOURNISSEUR, Sort.by(Sort.Direction.DESC, "dateNotification"));
+        return PageResponse.of(acteRepository.findNotifiesAuFournisseur(fournisseur.getId(), page),
+                acteMapper::toActeFournisseurResume);
+    }
+
+    @Override
+    public ActeJuridiqueResponse getActeFournisseur(String acteId) {
+        final Fournisseur fournisseur = fournisseurConnecte.exiger();
+        // L'acte d'un autre fournisseur, ou pas encore notifié, est introuvable
+        return acteMapper.toActeFournisseur(acteRepository.findNotifieAuFournisseur(acteId, fournisseur.getId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.ACTE_NOT_FOUND, acteId)));
+    }
+
+    @Override
     public ActeJuridiqueResponse getActe(String acteId) {
         return acteMapper.toResponse(findActeAvecDroit(acteId, null));
     }
@@ -127,6 +186,11 @@ public class ActeJuridiqueServiceImpl implements ActeJuridiqueService {
 
     private void verifierDroit(ExpressionBesoin besoin, Permission permission) {
         mandatScopeValidator.checkAccessPerimetre(besoin.getSection().getId(), besoin.getProgramme().getId(), permission);
+    }
+
+    private static User ordonnateurConnecte() {
+        return (User) java.util.Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication())
+                .getPrincipal();
     }
 
     /** JPQL n'accepte pas « IN () » : une valeur qui ne correspond à aucun id remplace l'ensemble vide. */

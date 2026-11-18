@@ -34,6 +34,9 @@ public interface ActeJuridiqueMapper {
     @Mapping(target = "creditBudgetaireId", source = "creditBudgetaire.id")
     @Mapping(target = "reservationNumero", source = "reservation.numero")
     @Mapping(target = "montantReserve", source = "reservation.montant")
+    @Mapping(target = "reservationStatut", source = "reservation.statut")
+    @Mapping(target = "signataireId", source = "signataire.id")
+    @Mapping(target = "signataireNom", expression = "java(nomSignataire(acte))")
     @Mapping(target = "fournisseurId", source = "soumission.fournisseur.id")
     @Mapping(target = "fournisseurNiu", source = "soumission.fournisseur.niu")
     @Mapping(target = "fournisseurRaisonSociale", source = "soumission.fournisseur.raisonSociale")
@@ -47,4 +50,23 @@ public interface ActeJuridiqueMapper {
     @InheritConfiguration(name = "toResponse")
     @Mapping(target = "lignes", ignore = true)
     ActeJuridiqueResponse toResume(ActeJuridique acte);
+
+    /** Espace fournisseur : sans la ligne de crédit ni la réservation (données internes à l'administration). */
+    @InheritConfiguration(name = "toResponse")
+    @Mapping(target = "creditBudgetaireId", ignore = true)
+    @Mapping(target = "reservationNumero", ignore = true)
+    @Mapping(target = "montantReserve", ignore = true)
+    @Mapping(target = "reservationStatut", ignore = true)
+    @Mapping(target = "signataireId", ignore = true)
+    ActeJuridiqueResponse toActeFournisseur(ActeJuridique acte);
+
+    /** Pour les listes de l'espace fournisseur : sans les lignes. */
+    @InheritConfiguration(name = "toActeFournisseur")
+    @Mapping(target = "lignes", ignore = true)
+    ActeJuridiqueResponse toActeFournisseurResume(ActeJuridique acte);
+
+    default String nomSignataire(ActeJuridique acte) {
+        return acte.getSignataire() == null ? null
+                : acte.getSignataire().getFirstName() + " " + acte.getSignataire().getLastName();
+    }
 }

@@ -7,6 +7,7 @@ import gov.cmr.minfi.db.gbe.app.common.exception.ErrorCode;
 import gov.cmr.minfi.db.gbe.app.budget.depense.besoin.ExpressionBesoin;
 import gov.cmr.minfi.db.gbe.app.budget.depense.engagement.forme.BonDeCommande;
 import gov.cmr.minfi.db.gbe.app.budget.depense.soumission.Soumission;
+import gov.cmr.minfi.db.gbe.app.identite.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -77,6 +78,24 @@ public class ActeJuridique extends BaseEntity {
 
     @Column(name = "date_soumission_controle")
     private LocalDateTime dateSoumissionControle;
+
+    /** Ordonnateur signataire (validation tracée, Q6). */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "signataire_id", foreignKey = @ForeignKey(name = "fk_acte_signataire"))
+    private User signataire;
+
+    @Column(name = "date_signature")
+    private LocalDateTime dateSignature;
+
+    /** Mise à disposition du fournisseur dans son espace (Q20) ; reste renseignée si l'acte est annulé ensuite. */
+    @Column(name = "date_notification")
+    private LocalDateTime dateNotification;
+
+    @Column(name = "motif_annulation", columnDefinition = "TEXT")
+    private String motifAnnulation;
+
+    @Column(name = "date_annulation")
+    private LocalDateTime dateAnnulation;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "expression_besoin_id", nullable = false, unique = true,
@@ -156,6 +175,43 @@ public class ActeJuridique extends BaseEntity {
     public void verifierSoumisAuControle() {
         validerTransition(Set.of(StatutActe.SOUMIS_CONTROLE), StatutActe.SOUMIS_CONTROLE,
                 "Seul un acte soumis au contrôle peut recevoir une décision du CF");
+    }
+
+    /**
+     * VISE_CF → SIGNE_ORDONNATEUR (ordonnateur.signer() de l'onglet 2, UC05) : validation tracée, signataire et date
+     * (Q6). Le service enchaîne aussitôt {@link #notifierFournisseur} (Q20).
+     */
+    public void signer(User ordonnateur, LocalDateTime maintenant) {
+        validerTransition(Set.of(StatutActe.VISE_CF), StatutActe.SIGNE_ORDONNATEUR,
+                "Seul un acte visé par le CF peut être signé");
+        this.signataire = ordonnateur;
+        this.dateSignature = maintenant;
+        this.statut = StatutActe.SIGNE_ORDONNATEUR;
+    }
+
+    /** SIGNE_ORDONNATEUR → NOTIFIE_PRESTATAIRE (notifierFournisseur() de l'onglet 2) : l'exécution peut commencer. */
+    public void notifierFournisseur(LocalDateTime maintenant) {
+        validerTransition(Set.of(StatutActe.SIGNE_ORDONNATEUR), StatutActe.NOTIFIE_PRESTATAIRE,
+                "Seul un acte signé peut être notifié au fournisseur");
+        this.dateNotification = maintenant;
+        this.statut = StatutActe.NOTIFIE_PRESTATAIRE;
+    }
+
+    /**
+     * VISE_CF | SIGNE_ORDONNATEUR | NOTIFIE_PRESTATAIRE → ANNULE (Q2) : le service annule la réservation et libère
+     * les AE. Un projet ou un acte soumis au CF ne s'annule pas (rien n'est réservé, décision à prendre).
+     */
+    public void annuler(String motif, LocalDateTime maintenant) {
+        validerTransition(Set.of(StatutActe.VISE_CF, StatutActe.SIGNE_ORDONNATEUR, StatutActe.NOTIFIE_PRESTATAIRE),
+                StatutActe.ANNULE, "Seul un acte visé, signé ou notifié peut être annulé");
+        this.motifAnnulation = motif;
+        this.dateAnnulation = maintenant;
+        this.statut = StatutActe.ANNULE;
+    }
+
+    /** L'acte a été mis à disposition du fournisseur (il le voit dans son espace, même annulé ensuite). */
+    public boolean isNotifie() {
+        return dateNotification != null;
     }
 
     private void validerTransition(Set<StatutActe> autorises, StatutActe cible, String message) {

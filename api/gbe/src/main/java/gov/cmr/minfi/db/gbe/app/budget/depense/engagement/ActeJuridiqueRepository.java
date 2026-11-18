@@ -12,6 +12,20 @@ public interface ActeJuridiqueRepository extends JpaRepository<ActeJuridique, St
 
     boolean existsByExpressionBesoinId(String expressionBesoinId);
 
+    /** Espace fournisseur : ses actes qui lui ont été notifiés (y compris annulés ensuite). */
+    @Query("""
+            SELECT a FROM ActeJuridique a JOIN a.soumission s
+            WHERE s.fournisseur.id = :fournisseurId AND a.dateNotification IS NOT NULL
+            """)
+    Page<ActeJuridique> findNotifiesAuFournisseur(@Param("fournisseurId") String fournisseurId, Pageable pageable);
+
+    @Query("""
+            SELECT a FROM ActeJuridique a JOIN a.soumission s
+            WHERE a.id = :acteId AND s.fournisseur.id = :fournisseurId AND a.dateNotification IS NOT NULL
+            """)
+    java.util.Optional<ActeJuridique> findNotifieAuFournisseur(@Param("acteId") String acteId,
+                                                               @Param("fournisseurId") String fournisseurId);
+
     /** Actes du périmètre (sections entières ou programmes), filtrés en base. */
     @Query("""
             SELECT a FROM ActeJuridique a JOIN a.expressionBesoin b
