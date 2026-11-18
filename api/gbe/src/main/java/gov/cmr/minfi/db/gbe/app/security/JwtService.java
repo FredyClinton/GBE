@@ -29,22 +29,23 @@ public class JwtService {
     private final PrivateKey privateKey;
     private final PublicKey publicKey;
 
-    @Value("${app.security.jwt.access-token-expiration}")
     private long accesTokenExpiration;
 
-    @Value("${app.security.jwt.refresh-token-expiration}")
     private long refreshTokenExpiration;
 
-
-    @Value("${app.security.jwt.mfa-token-expiration}")
     private long mfaTokenExpiration;
-
 
     public JwtService(
             @Value("${app.security.jwt.private-key}") final Resource privateKey,
-            @Value("${app.security.jwt.public-key}") final Resource publicKey) throws Exception {
+            @Value("${app.security.jwt.public-key}") final Resource publicKey,
+            @Value("${app.security.jwt.access-token-expiration}") final long accesTokenExpiration,
+            @Value("${app.security.jwt.refresh-token-expiration}") final long refreshTokenExpiration,
+            @Value("${app.security.jwt.mfa-token-expiration}") final long mfaTokenExpiration) throws Exception {
         this.privateKey = KeyUtils.loadPrivateKey(privateKey);
         this.publicKey = KeyUtils.loadPublicKey(publicKey);
+        this.accesTokenExpiration = accesTokenExpiration;
+        this.refreshTokenExpiration = refreshTokenExpiration;
+        this.mfaTokenExpiration = mfaTokenExpiration;
     }
 
     public String generateAccessToken(final String username) {
