@@ -92,6 +92,15 @@ class GbeApplicationTests {
                 assertThat(tags.get(0)).as("groupe de %s", route).startsWith("Référentiel · ");
             }
         }));
+
+        // Schémas triés par domaine (ordre des tags), puis par ordre alphabétique
+        final List<String> schemas = new java.util.ArrayList<>(
+                JsonPath.<Map<String, Object>>read(json, "$.components.schemas").keySet());
+        assertThat(schemas.indexOf("AuthenticationRequest")).isLessThan(schemas.indexOf("ChapitreResponse"));
+        assertThat(schemas.indexOf("ChapitreResponse")).isLessThan(schemas.indexOf("ExpressionBesoinRequest"));
+        assertThat(schemas.indexOf("ExpressionBesoinRequest")).isLessThan(schemas.indexOf("ExpressionBesoinResponse"));
+        assertThat(schemas.indexOf("ExpressionBesoinResponse")).isLessThan(schemas.indexOf("ActeJuridiqueResponse"));
+        assertThat(schemas.indexOf("ActeJuridiqueResponse")).isLessThan(schemas.indexOf("NotificationResponse"));
     }
 
     /** Renouvellement : seul un jeton de rafraîchissement valide d'un compte actif donne un nouveau jeton d'accès. */
