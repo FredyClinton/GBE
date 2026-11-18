@@ -216,6 +216,8 @@ public class ExpressionBesoinServiceImpl implements ExpressionBesoinService {
             throw new BusinessException(ErrorCode.BESOIN_CHAPITRE_HORS_SECTION, chapitre.getCodeComplet());
         }
 
+        final Chapitre beneficiaire = beneficiaire(request, chapitre, tache);
+
         final NatureEconomique nature = natureEconomiqueRepository.findById(request.natureEconomiqueId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, request.natureEconomiqueId()));
         if (nature.getExercice() != null && !nature.getExercice().getId().equals(tache.getExercice().getId())) {
@@ -226,6 +228,7 @@ public class ExpressionBesoinServiceImpl implements ExpressionBesoinService {
         besoin.setDateClotureSoumission(request.dateClotureSoumission());
         besoin.rattacherA(tache);
         besoin.setChapitre(chapitre);
+        besoin.setBeneficiaire(beneficiaire);
         besoin.setNatureEconomique(nature);
 
         if (request.lignes() != null) {
@@ -235,6 +238,24 @@ public class ExpressionBesoinServiceImpl implements ExpressionBesoinService {
                 besoin.ajouterLigne(matiere, ligne.quantiteDemandee(), ligne.specifications());
             }
         }
+    }
+
+    /**
+     * Chapitre bénéficiaire (Q27) : la structure émettrice si aucun n'est indiqué ; sinon un chapitre de l'exercice de
+     * la tâche (sans contrainte de section, à confirmer).
+     */
+    private Chapitre beneficiaire(ExpressionBesoinRequest request, Chapitre emetteur, Tache tache) {
+        if (request.beneficiaireId() == null || request.beneficiaireId().isBlank()
+                || request.beneficiaireId().equals(emetteur.getId())) {
+            return emetteur;
+        }
+        final Chapitre beneficiaire = chapitreRepository.findById(request.beneficiaireId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, request.beneficiaireId()));
+        if (beneficiaire.getExercice() != null
+                && !beneficiaire.getExercice().getId().equals(tache.getExercice().getId())) {
+            throw new BusinessException(ErrorCode.BESOIN_BENEFICIAIRE_HORS_EXERCICE, beneficiaire.getCodeComplet());
+        }
+        return beneficiaire;
     }
 
     /** Charge le besoin et vérifie que l'utilisateur peut agir dessus (périmètre + EXPRIMER_BESOIN). */

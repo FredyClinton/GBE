@@ -110,6 +110,8 @@ public enum ErrorCode {
             "Les soumissions ne peuvent être clôturées qu'après la date limite (%s)", BAD_REQUEST),
     BESOIN_CHAPITRE_HORS_SECTION("BESOIN_CHAPITRE_HORS_SECTION",
             "Le chapitre %s n'appartient pas à la section de la tâche", BAD_REQUEST),
+    BESOIN_BENEFICIAIRE_HORS_EXERCICE("BESOIN_BENEFICIAIRE_HORS_EXERCICE",
+            "Le chapitre bénéficiaire %s n'appartient pas à l'exercice de la tâche", BAD_REQUEST),
     TRI_INVALIDE("TRI_INVALIDE", "Tri impossible sur « %s » ; propriétés autorisées : %s", BAD_REQUEST),
     BESOIN_NON_OUVERT("BESOIN_NON_OUVERT",
             "L'expression de besoin %s n'est pas ouverte aux soumissions (non publiée ou date limite passée)", BAD_REQUEST),

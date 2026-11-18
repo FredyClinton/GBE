@@ -17,6 +17,9 @@ public interface ExpressionBesoinMapper {
     @Mapping(target = "exerciceId", source = "exercice.id")
     @Mapping(target = "chapitreId", source = "chapitre.id")
     @Mapping(target = "chapitreCode", source = "chapitre.codeComplet")
+    @Mapping(target = "beneficiaireId", source = "beneficiaire.id")
+    @Mapping(target = "beneficiaireCode", source = "beneficiaire.codeComplet")
+    @Mapping(target = "beneficiaireLibelle", source = "beneficiaire.libelleFr")
     @Mapping(target = "natureEconomiqueId", source = "natureEconomique.id")
     @Mapping(target = "natureEconomiqueCode", source = "natureEconomique.code")
     @Mapping(target = "natureEconomiqueLibelle", source = "natureEconomique.libelleFr")
@@ -31,6 +34,9 @@ public interface ExpressionBesoinMapper {
     @Mapping(target = "exerciceId", source = "exercice.id")
     @Mapping(target = "chapitreId", source = "chapitre.id")
     @Mapping(target = "chapitreCode", ignore = true)
+    @Mapping(target = "beneficiaireId", source = "beneficiaire.id")
+    @Mapping(target = "beneficiaireCode", ignore = true)
+    @Mapping(target = "beneficiaireLibelle", ignore = true)
     @Mapping(target = "natureEconomiqueId", source = "natureEconomique.id")
     @Mapping(target = "natureEconomiqueCode", ignore = true)
     @Mapping(target = "natureEconomiqueLibelle", ignore = true)
@@ -39,6 +45,7 @@ public interface ExpressionBesoinMapper {
 
     @Mapping(target = "sectionLibelle", source = "section.libelleFr")
     @Mapping(target = "structureEmettrice", source = "chapitre.libelleFr")
+    @Mapping(target = "beneficiaire", source = "beneficiaire.libelleFr")
     @Mapping(target = "natureEconomiqueCode", source = "natureEconomique.code")
     @Mapping(target = "natureEconomiqueLibelle", source = "natureEconomique.libelleFr")
     BesoinOuvertResponse toBesoinOuvert(ExpressionBesoin besoin);
@@ -46,6 +53,7 @@ public interface ExpressionBesoinMapper {
     /** Pour les listes publiques : sans les lignes. */
     @Mapping(target = "sectionLibelle", source = "section.libelleFr")
     @Mapping(target = "structureEmettrice", source = "chapitre.libelleFr")
+    @Mapping(target = "beneficiaire", source = "beneficiaire.libelleFr")
     @Mapping(target = "natureEconomiqueCode", source = "natureEconomique.code")
     @Mapping(target = "natureEconomiqueLibelle", source = "natureEconomique.libelleFr")
     @Mapping(target = "lignes", ignore = true)

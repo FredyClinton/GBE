@@ -84,7 +84,7 @@ class ExpressionBesoinServiceImplTest {
     private final Matiere papier = Matiere.builder().id("M").reference("PAP-A4").libelle("Papier").build();
 
     private static ExpressionBesoinRequest requete(String chapitreId, String natureId) {
-        return new ExpressionBesoinRequest("Fournitures de bureau", DATE_LIMITE, "T", chapitreId, natureId,
+        return new ExpressionBesoinRequest("Fournitures de bureau", DATE_LIMITE, "T", chapitreId, null, natureId,
                 List.of(new LigneBesoinRequest("M", new BigDecimal("10"), "rames")));
     }
 
@@ -143,6 +143,38 @@ class ExpressionBesoinServiceImplTest {
     }
 
     @Test
+    void creation_sansBeneficiaire_laStructureEmettriceEstBeneficiaire() {
+        service.creer(requete("C", "N"));
+
+        final ArgumentCaptor<ExpressionBesoin> captor = ArgumentCaptor.forClass(ExpressionBesoin.class);
+        verify(besoinRepository).save(captor.capture());
+        assertThat(captor.getValue().getBeneficiaire()).isSameAs(chapitre);
+    }
+
+    @Test
+    void creation_beneficiaireDistinct_dUneAutreSection_accepte() {
+        final Chapitre minfi = Chapitre.builder().id("B1").codeComplet("2011000020").section(autreSection)
+                .exercice(exercice).build();
+        when(chapitreRepository.findById("B1")).thenReturn(Optional.of(minfi));
+
+        service.creer(new ExpressionBesoinRequest("Fournitures", DATE_LIMITE, "T", "C", "B1", "N", List.of()));
+
+        final ArgumentCaptor<ExpressionBesoin> captor = ArgumentCaptor.forClass(ExpressionBesoin.class);
+        verify(besoinRepository).save(captor.capture());
+        assertThat(captor.getValue().getBeneficiaire()).isSameAs(minfi);
+        assertThat(captor.getValue().getChapitre()).isSameAs(chapitre);
+    }
+
+    @Test
+    void creation_beneficiaireDUnAutreExercice_refuse() {
+        when(chapitreRepository.findById("B2")).thenReturn(Optional.of(
+                Chapitre.builder().id("B2").codeComplet("2011000020").exercice(autreExercice).build()));
+        assertThat(code(() -> service.creer(
+                new ExpressionBesoinRequest("Fournitures", DATE_LIMITE, "T", "C", "B2", "N", List.of()))))
+                .isEqualTo(ErrorCode.BESOIN_BENEFICIAIRE_HORS_EXERCICE);
+    }
+
+    @Test
     void creation_natureDUnAutreExercice_refusee() {
         when(natureEconomiqueRepository.findById("N2")).thenReturn(Optional.of(
                 NatureEconomique.builder().id("N2").code("612100").exercice(autreExercice).build()));
@@ -158,7 +190,7 @@ class ExpressionBesoinServiceImplTest {
         when(besoinRepository.findById("B")).thenReturn(Optional.of(publie));
 
         final ExpressionBesoinRequest sansLigne =
-                new ExpressionBesoinRequest("Fournitures", DATE_LIMITE, "T", "C", "N", List.of());
+                new ExpressionBesoinRequest("Fournitures", DATE_LIMITE, "T", "C", null, "N", List.of());
         assertThat(code(() -> service.modifier("B", sansLigne))).isEqualTo(ErrorCode.BESOIN_SANS_LIGNE);
     }
 

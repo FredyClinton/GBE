@@ -37,6 +37,8 @@ public record ActeJuridiqueResponse(
         // Structure émettrice et imputation
         String structureEmettriceCode,
         String structureEmettriceLibelle,
+        String beneficiaireCode,
+        String beneficiaireLibelle,
         String exerciceCode,
         String sectionCode,
         String programmeNumero,

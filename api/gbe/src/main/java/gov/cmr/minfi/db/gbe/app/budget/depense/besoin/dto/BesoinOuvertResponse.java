@@ -18,6 +18,7 @@ public record BesoinOuvertResponse(
         LocalDateTime dateClotureSoumission,
         String sectionLibelle,
         String structureEmettrice,
+        String beneficiaire,
         String natureEconomiqueCode,
         String natureEconomiqueLibelle,
         List<LigneBesoinResponse> lignes

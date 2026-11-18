@@ -17,6 +17,8 @@ public interface ActeJuridiqueMapper {
     @Mapping(target = "soumissionNumero", source = "soumission.numero")
     @Mapping(target = "structureEmettriceCode", source = "expressionBesoin.chapitre.codeComplet")
     @Mapping(target = "structureEmettriceLibelle", source = "expressionBesoin.chapitre.libelleFr")
+    @Mapping(target = "beneficiaireCode", source = "expressionBesoin.beneficiaire.codeComplet")
+    @Mapping(target = "beneficiaireLibelle", source = "expressionBesoin.beneficiaire.libelleFr")
     @Mapping(target = "exerciceCode", source = "expressionBesoin.exercice.codeExercice")
     @Mapping(target = "sectionCode", source = "expressionBesoin.section.codeSection")
     @Mapping(target = "programmeNumero", source = "expressionBesoin.programme.numero")

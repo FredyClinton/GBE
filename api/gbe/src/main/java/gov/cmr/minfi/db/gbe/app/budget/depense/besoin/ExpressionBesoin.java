@@ -99,6 +99,12 @@ public class ExpressionBesoin extends BaseEntity {
     @JoinColumn(name = "chapitre_id", nullable = false, foreignKey = @ForeignKey(name = "fk_expression_besoin_chapitre"))
     private Chapitre chapitre;
 
+    /** Bénéficiaire (« au profit de ») : un chapitre, par défaut la structure émettrice (Q27). */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "beneficiaire_id", nullable = false,
+            foreignKey = @ForeignKey(name = "fk_expression_besoin_beneficiaire"))
+    private Chapitre beneficiaire;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "nature_economique_id", nullable = false,
             foreignKey = @ForeignKey(name = "fk_expression_besoin_nature"))

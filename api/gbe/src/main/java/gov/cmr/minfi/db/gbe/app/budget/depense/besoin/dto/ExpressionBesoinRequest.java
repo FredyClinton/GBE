@@ -18,6 +18,8 @@ public record ExpressionBesoinRequest(
         LocalDateTime dateClotureSoumission,
         @NotBlank String tacheId,
         @NotBlank @Schema(description = "Structure émettrice, dans la section de la tâche") String chapitreId,
+        @Schema(description = "Chapitre bénéficiaire (« au profit de ») ; par défaut la structure émettrice")
+        String beneficiaireId,
         @NotBlank String natureEconomiqueId,
         @Valid List<LigneBesoinRequest> lignes
 ) {}
