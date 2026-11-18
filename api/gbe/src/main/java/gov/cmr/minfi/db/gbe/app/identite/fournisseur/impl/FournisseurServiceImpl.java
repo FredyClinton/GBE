@@ -3,7 +3,7 @@ package gov.cmr.minfi.db.gbe.app.identite.fournisseur.impl;
 import gov.cmr.minfi.db.gbe.app.common.exception.BusinessException;
 import gov.cmr.minfi.db.gbe.app.common.exception.ErrorCode;
 import gov.cmr.minfi.db.gbe.app.identite.auth.tfa.TwoFactorAuthenticationService;
-import gov.cmr.minfi.db.gbe.app.depense.soumission.SoumissionRepository;
+import gov.cmr.minfi.db.gbe.app.budget.depense.soumission.SoumissionRepository;
 import gov.cmr.minfi.db.gbe.app.identite.fournisseur.CoordonneeBancaire;
 import gov.cmr.minfi.db.gbe.app.identite.fournisseur.FournisseurConnecte;
 import gov.cmr.minfi.db.gbe.app.identite.fournisseur.Fournisseur;
