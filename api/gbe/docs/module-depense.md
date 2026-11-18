@@ -59,14 +59,16 @@ Les conventions du projet s'appliquent (voir `CLAUDE.md`) : `Entity`, `Repositor
 app/
 ├── referentiel/matiere/            Matiere (catalogue : référence, libellé)
 ├── identite/fournisseur/           Fournisseur, CoordonneeBancaire (compte User externe)
-└── depense/
-    ├── besoin/                     ExpressionBesoin, LigneBesoin
-    ├── soumission/                 Soumission, LigneSoumission
-    ├── engagement/                 ActeJuridique, FormeActe (stratégies), ReservationCredit
-    ├── controle/                   Visa (type ENGAGEMENT | ORDONNANCEMENT)
-    ├── reception/                  Livraison, ProcesVerbalReception
-    ├── liquidation/                DemandePaiement, Facture, PieceJustificative
-    └── ordonnancement/             Ordonnancement
+└── budget/
+    ├── credit/                     CreditBudgetaire (crédits AE/CP)
+    └── depense/
+        ├── besoin/                 ExpressionBesoin, LigneBesoin
+        ├── soumission/             Soumission, LigneSoumission
+        ├── engagement/             ActeJuridique, FormeActe (stratégies), ReservationCredit
+        ├── controle/               Visa (type ENGAGEMENT | ORDONNANCEMENT)
+        ├── reception/              Livraison, ProcesVerbalReception
+        ├── liquidation/            DemandePaiement, Facture, PieceJustificative
+        └── ordonnancement/         Ordonnancement
 common/fichier/                     stockage des pièces (disque local en dev)
 ```
 
@@ -86,7 +88,7 @@ Chaque lot comprend sa migration, ses tests et ses routes, et peut être livré 
 |---|---|---|---|
 | **0** | Rôles `FOURNISSEUR` et `COMPTABLE_MATIERE`, nouvelles permissions, référentiel `Matiere`, refonte du statut des crédits (§2.1), rattachement des natures à l'exercice, permissions par défaut du mandat MINISTRE | — | **livré** (2026-11-11, voir §4.1) |
 | **1** | (découpage en §4.2) Référentiels `Activite` et `Tache` (CRUD admin + consultation, migration V11), fournisseurs (création, RIB), expression de besoin rattachée à une tâche, un chapitre, un exercice et une nature économique (brouillon → publiée → clôturée), consultation des besoins ouverts, soumissions | UC01–UC03 | **livré** (2026-11-11) |
-| **2** | Évaluation et attribution, projet d'acte et formes, contrôle CF (réservation des AE, quitus, visa ou rejet), signature | UC04–UC08 | à faire |
+| **2** | Évaluation et attribution, projet d'acte et formes, contrôle CF (réservation des AE, quitus, visa ou rejet), signature | UC04–UC08 | **livré** (2026-11-18, découpage en §4.5) |
 | **3** | Stockage de fichiers, livraisons, PV conforme ou non conforme, information de l'ordonnateur | UC09–UC11 | à faire |
 | **4** | Demande de paiement, factures et pièces, validation, liquidation, ordonnancement, visa CF, transmission au Trésor, suivi fournisseur | UC12–UC19 | à faire |
 
@@ -246,7 +248,7 @@ rapport, section 9 ; drawio, onglets 1, 2, 3 et 4 (deux copies).
 | **2a** (**livré**) | **Attribution** : saisie du résultat de la commission (Q4), `EN_EVALUATION → ATTRIBUEE` (`retenirSoumission`) ou `→ INFRUCTUEUSE` (`infructueux()`, « déclarer sans suite ») ; offre retenue `RETENUE`, les autres `NON_RETENUE` ; consultation des offres par l'ordonnateur | onglet 2, onglet 3 (« Évaluer les offres », « Offre valide ? »), Q4 | 1e |
 | **2b** (**livré**) | **Projet d'acte** (UC04) : `ActeJuridique` créé par `ActeJuridiqueFactory` à partir du besoin et de l'offre retenue ; `TypeActe` et une `FormeActeStrategie` par type (BCA, LC, marché, bail) ; forme minimale proposée, forme inférieure refusée (Q3) ; table des seuils (vide → choix libre) ; `PROJET` modifiable → `SOUMIS_CONTROLE` (plus modifiable) | UC04, onglet 4 (factory, stratégies), onglet 1 (`type : TypeActe`), §9 « forme de l'acte » | 2a |
 | **2c** (**livré**) | **Contrôle CF** (UC06 « include » UC07, UC08) : une seule décision transactionnelle (Q1) ; `Visa` (`ENGAGEMENT_JURIDIQUE`) ; si favorable : quitus + `ReservationCredit` + `consommerAE` sur la ligne + acte `VISE_CF` ; sinon rien n'est réservé (Q2) et le dossier revient à l'ordonnateur | UC06–UC08, onglet 2 (`viser`, `rejeter(motif)`), onglet 3 (« refus / rejet » → préparer le projet d'acte), onglet 4 (`Visa`, `ReservationCredit`) | 2b |
-| **2d** | **Signature et notification** (UC05) : `VISE_CF → SIGNE_ORDONNATEUR` (validation tracée : signataire, date, Q6) puis `NOTIFIE_PRESTATAIRE` ; le fournisseur voit l'acte dans son espace ; annulation d'un acte visé ou signé avec `libererAE` (Q2) | UC05, onglet 2 (`signer`, `notifierFournisseur`), onglet 3 (« Notifier le BCA signé ») | 2c |
+| **2d** (**livré**) | **Signature et notification** (UC05) : `VISE_CF → SIGNE_ORDONNATEUR` (validation tracée : signataire, date, Q6) puis `NOTIFIE_PRESTATAIRE` ; le fournisseur voit l'acte dans son espace ; annulation d'un acte visé ou signé avec `libererAE` (Q2) | UC05, onglet 2 (`signer`, `notifierFournisseur`), onglet 3 (« Notifier le BCA signé ») | 2c |
 
 **2a livré (V17) :**
 - **Besoin :** `attribuer` (`EN_EVALUATION → ATTRIBUEE`) et `declarerInfructueux` (`EN_EVALUATION → INFRUCTUEUSE`), avec `dateDecision`.
@@ -260,7 +262,7 @@ rapport, section 9 ; drawio, onglets 1, 2, 3 et 4 (deux copies).
 
 **2b livré (V18, V19) :**
 - **Taxes (V18, Q23) :** la table `taxes` contient TVA 19,25 % et IR 5,5 %, modifiables par l'admin. `CalculTaxe` → `TvaEtIrParametres` calcule TVA, IR, TTC et NAP de l'offre, et le fournisseur ne saisit plus le TTC.
-- **Acte (V19), package `depense/engagement` :**
+- **Acte (V19), package `budget/depense/engagement` :**
   - `ActeJuridique` : numéro, type, objet, date d'émission, délai en mois, HT, TVA, IR, TTC, NAP, montant en lettres, statut, besoin, offre retenue, ligne de crédit ;
   - `ActeJuridiqueFactory` (`determinerForme`, `creerActe`) ;
   - `FormeActeStrategie` avec une seule stratégie, `StrategieBonDeCommande` (numérotation Q24, éligibilité toujours vraie tant que la table des seuils est vide) ;
@@ -277,7 +279,7 @@ rapport, section 9 ; drawio, onglets 1, 2, 3 et 4 (deux copies).
   - `GET /{id}` : contenu complet du BCA (structure émettrice, imputation, fournisseur, RIB, lignes, montants) ;
   - `PUT /{id}` : modification de l'objet et du délai ;
   - `PATCH /{id}/soumettre` : envoi au CF.
-- **Bénéficiaire (Q27) :** pas encore ajouté, en attente de vérification.
+- **Bénéficiaire (Q27, V22, 2026-11-18) :** les bénéficiaires sont des chapitres. `ExpressionBesoin.beneficiaire` (chapitre, obligatoire en base) est distinct de la structure émettrice ; `beneficiaireId` est facultatif dans la requête (par défaut la structure émettrice) et doit appartenir à l'exercice de la tâche (400 `BESOIN_BENEFICIAIRE_HORS_EXERCICE`), sans contrainte de section. Exposé dans le besoin (`beneficiaireId/Code/Libelle`), la consultation publique (`beneficiaire`) et l'acte (`beneficiaireCode/Libelle`). Ajout de champs seulement : pas de rupture pour le frontend.
 - **Refonte (V21, demandée le 2026-11-11) : données de la forme séparées de l'acte, par composition.**
   - L'onglet 4 relie l'acte à une `FormeActeStrategie` qui porte ses propres attributs (« applique forme contractuelle », 1 ↔ 1).
   - **Données :** l'entité `BonDeCommande` (table `bons_de_commande`, liée 1-1 à l'acte) contient `delaiLivraisonMois` (retiré de l'acte), `referenceDevis` (facultative), `codeBarresSecurite` et `qrCodeSecurite` (remplis avec l'impression, lot 3).
@@ -288,8 +290,8 @@ rapport, section 9 ; drawio, onglets 1, 2, 3 et 4 (deux copies).
   - **API :** inchangée, plus `referenceDevis` en entrée et en sortie.
 
 **2c livré (V20) :**
-- **`Visa`** (package `depense/controle`, onglet 4) : numéro, `typeVisa = ENGAGEMENT_JURIDIQUE`, date de réception (envoi au CF), date du visa, décision (`StatutVisa`), observations, référence du quitus et acte. Le CF auteur est tracé par `createdBy`.
-- **`ReservationCredit`** (`depense/engagement`) : numéro, montant, date, statut (`ACTIVE` / `ANNULEE`), acte (un seul) et **ligne de crédit** (lien ajouté, absent des diagrammes).
+- **`Visa`** (package `budget/depense/controle`, onglet 4) : numéro, `typeVisa = ENGAGEMENT_JURIDIQUE`, date de réception (envoi au CF), date du visa, décision (`StatutVisa`), observations, référence du quitus et acte. Le CF auteur est tracé par `createdBy`.
+- **`ReservationCredit`** (`budget/depense/engagement`) : numéro, montant, date, statut (`ACTIVE` / `ANNULEE`), acte (un seul) et **ligne de crédit** (lien ajouté, absent des diagrammes).
 - **Une seule décision transactionnelle** (Q1), `POST /api/v1/actes/{id}/visas` :
   - `FAVORABLE` :
     - permissions `VISA_CFI`, `RESERVER_CREDIT` et `QUITUS_NATURE` sur le périmètre du besoin ;
@@ -302,10 +304,16 @@ rapport, section 9 ; drawio, onglets 1, 2, 3 et 4 (deux copies).
 - **Historique :** `GET /api/v1/actes/{id}/visas`. L'acte affiche le numéro et le montant de sa réservation.
 - **Numérotation provisoire** (à confirmer, §7) : `VISA-<année>-00001`, `RES-<année>-00001`. Référence du quitus générée : `QUI-<année>-00001`.
 
-**Mise en œuvre prévue de la notification (Q20, étape 2d) :**
-- **Signature :** `signer` fait passer l'acte à `SIGNE_ORDONNATEUR` (signataire, `dateSignature`), puis à `NOTIFIE_PRESTATAIRE` (`dateNotification`) dans la même transaction.
-- **Côté fournisseur :** il consulte ses actes notifiés dans son espace (`GET /api/v1/fournisseurs/moi/actes` et le détail). Seuls les actes notifiés y figurent.
-- **Pas d'e-mail ni de SMS pour l'instant :** le projet n'a aucun service d'envoi. Une table de notifications (boîte de réception dans l'application) pourra servir plus tard au PV, au paiement, etc.
+**2d livré (V23, V24, 2026-11-18) :**
+- **Signature (UC05, Q6, Q20) :** `PATCH /api/v1/actes/{id}/signer`, permission dédiée **`SIGNER_ACTE`** sur le périmètre du besoin (V25, décision 2026-11-18 ; permission par défaut d'ORDONNATEUR et MINISTRE, mandats existants et super-admin alignés). `signer` passe l'acte de `VISE_CF` à `SIGNE_ORDONNATEUR` (signataire, `dateSignature`), puis `notifierFournisseur` le passe à `NOTIFIE_PRESTATAIRE` (`dateNotification`), dans la même transaction. Onglet 2 : `ordonnateur.signer()` puis `notifierFournisseur()`.
+- **Espace fournisseur :** `GET /api/v1/fournisseurs/moi/actes` (paginé, tri par défaut `dateNotification` décroissant) et `/{id}`. Seuls les actes notifiés y figurent, y compris ceux annulés ensuite. La ligne de crédit et la réservation sont masquées. L'acte d'un autre fournisseur, ou pas encore notifié, répond 404.
+- **Annulation (Q2) :** `PATCH /api/v1/actes/{id}/annuler` avec un motif obligatoire (`ENGAGE_DEPENSE`), depuis `VISE_CF`, `SIGNE_ORDONNATEUR` ou `NOTIFIE_PRESTATAIRE`. La réservation passe `ANNULEE` et `libererAE` rend le TTC à la ligne (`ReservationCredit.annuler`, onglet 4). `NOTIFIE_PRESTATAIRE` est inclus parce que la signature enchaîne la notification : sans lui, un acte signé ne pourrait jamais être annulé.
+- **Boîte de notifications (module `notification/`, écart volontaire : classe absente des diagrammes) :**
+  - table `notifications` (destinataire, type, titre, message, objet concerné, dates de création et de lecture) ;
+  - les services publient des événements métier (`ActeNotifieEvent`, `ActeAnnuleEvent`, `DecisionCfEvent`). `NotificationListener` les écoute de façon synchrone et écrit la notification dans la même transaction : si l'opération échoue, la notification disparaît avec elle ;
+  - destinataires : le fournisseur titulaire (acte notifié, acte annulé s'il l'avait reçu) et l'ordonnateur auteur du projet (`createdBy`) pour chaque décision du CF (`notifierDecision()`, onglet 4) ;
+  - API `/api/v1/notifications` (tout utilisateur connecté, seulement les siennes) : liste paginée (filtre `nonLues`), `GET /non-lues/nombre`, `PATCH /{id}/lue`, `PATCH /lues` ;
+  - pas de temps réel : le frontend interroge le compteur à intervalles réguliers. SSE viendra se brancher sur les mêmes événements (§7).
 
 **Lecture d'un BCA réel** (fourni le 2026-11-11, n° BCA-A602010097) :
 
@@ -320,7 +328,7 @@ rapport, section 9 ; drawio, onglets 1, 2, 3 et 4 (deux copies).
 | N° RIB | 10025… | RIB choisi dans l'offre (1e) | ✓ |
 | Programme, action, activité, tâche | 233, 7, 202337G011… | tâche du besoin → activité → action → programme | ✓ |
 | Imputation budgétaire | 60 20 233 7 33000035 0112 360140 | 60 = exercice (`code_exercice`), 20 = section, 233 = programme, 7 = action, 33000035 = chapitre, 360140 = nature (vérifié en base) ; 0112 = classification fonctionnelle (Q28) | origine de la fonction à définir |
-| Bénéficiaire | 11000020 - MINFI | absent du modèle et du référentiel | Q27 |
+| Bénéficiaire | 11000020 - MINFI | chapitre bénéficiaire du besoin (V22) ; le code `11000020` n'est pas dans le référentiel actuel | Q27 ✓ |
 | Lignes : n°, référence, désignation, qté, P.U., P.T. HT | 34-004-220017… | matière, quantité (besoin) et prix (offre retenue) | ✓ |
 | Total HT, TVA (19,25 %), IR (5,5 %), NAP, total TTC | 4 120 000 ; 793 100 ; 226 600 ; 3 893 400 ; 4 913 100 | TVA et IR absents du modèle de l'acte | Q23 |
 | Arrêté à la somme de | quatre millions neuf cent treize mille cent | `montantEnLettres` = TTC en lettres | ✓ |
@@ -375,10 +383,10 @@ Elles bloquent les lots 1 et 2. Les hypothèses s'appliquent tant qu'il n'y a pa
 | Q24 | Format du numéro (BCA-A602010097) | provisoire : `BCA-<année>-00001` | **Décidé (2026-11-11)** : `BCA-A` + code de l'exercice (`exercice.code_exercice`, 60 pour 2026) + code de la section (20 pour le MINFI) + numéro d'ordre **sur 5 chiffres**, qui repart à chaque **exercice** sans tenir compte de la section. Exemple : `BCA-A602010097` = A, 60, 20, 10097. **À vérifier** : la portée par exercice seul, et le premier numéro (00001 supposé, « repart à 0 »). Livré en 2b. |
 | Q25 | Délai de livraison en mois : saisi par l'ordonnateur au projet, ou déduit du délai de l'offre (jours) ? | saisi au projet, proposé à partir de l'offre (jours ÷ 30, arrondi au supérieur) | **Décidé (2026-11-11)** : comme l'hypothèse. |
 | Q26 | Date d'émission : création du projet, envoi au CF ou signature ? | date de création du projet | **Décidé (2026-11-11)** : date de création du projet. |
-| Q27 | Bénéficiaire (11000020 - MINFI) : de quoi s'agit-il, d'où vient-il ? | — | **Conception mise à jour (2026-11-11)** : classe `Beneficiaire` (`code`, `libelle`) ajoutée aux onglets 1 et 4 des deux drawio, avec l'association `ExpressionBesoin` → `Beneficiaire` « au profit de (bénéficiaire) ». Absente du rapport et du référentiel (code `11000020` introuvable parmi les chapitres). **Reste à définir avant de coder** : nature du code (chapitre ou autre nomenclature), source des données, multiplicité, valeur par défaut. |
+| Q27 | Bénéficiaire (11000020 - MINFI) : de quoi s'agit-il, d'où vient-il ? | — | **Décidé (2026-11-18)** : les bénéficiaires sont des **chapitres**. La classe `Beneficiaire` est retirée des drawio : l'association « au profit de (bénéficiaire) » pointe sur `Chapitre` (onglets 1 et 4, deux copies). Livré en V22 : bénéficiaire facultatif à la saisie (par défaut la structure émettrice), même exercice que la tâche, sans contrainte de section. **À vérifier** : contrainte de section, et le code `11000020` absent du référentiel (aucun chapitre MINFI en `2011…`). |
 | Q28 | Imputation : sens de « 60 » et origine de « 0112 » (classe fonctionnelle, table vide) | sert seulement à l'impression, peut attendre | **Décidé (2026-11-11)** : `60` = code de l'exercice (2026), `0112` = classification fonctionnelle. Reste : d'où vient la classification fonctionnelle (table `classe_fonctionnelle` vide). Reporté avec l'impression (§7). |
 | Q29 | « Fait à » : lieu saisi sur l'acte ou fixé par structure ? | sert à l'impression, peut attendre | Reporté avec l'impression (§7). |
-| Q30 | Périmètre du CF : aujourd'hui, seul un mandat MINISTRE sans programme couvre toute la section ; un CF ne voit et ne vise que les actes de son programme. Le CF doit-il couvrir toute une section (ou une « zone de compétence », attribut `zoneCompetence` de la classe `ControleurFinancier`) ? | — | — |
+| Q30 | Périmètre du CF : aujourd'hui, seul un mandat MINISTRE sans programme couvre toute la section ; un CF ne voit et ne vise que les actes de son programme. Le CF doit-il couvrir toute une section (ou une « zone de compétence », attribut `zoneCompetence` de la classe `ControleurFinancier`) ? | — | **Décidé (2026-11-18)** : le CF ne vise les actes juridiques que **selon ses habilitations**, c'est-à-dire ses mandats (section, programme) et leurs permissions (`VISA_CFI`, `RESERVER_CREDIT`, `QUITUS_NATURE`). C'est le comportement livré en 2c : pas de `zoneCompetence`, pas d'extension à la section. Un CF qui contrôle plusieurs programmes reçoit un mandat par programme. |
 
 Autres questions du rapport (section 9), pour les lots 3 et 4 : livraisons partielles et paiements partiels, procédure en cas de non-conformité, liste des pièces justificatives obligatoires, rôle exact du comptable public (prise en charge, rejet, statut de paiement), limite du suivi fournisseur.
 
@@ -419,7 +427,7 @@ Ce qui a été volontairement laissé de côté, avec sa source et le moment pr�
 ### Numérotation et référentiel
 - Numéros du visa (`VISA-<année>-00001`), de la réservation (`RES-…`) et du quitus (`QUI-…`) : provisoires, à aligner sur les formats réels.
 - Numéro du BCA (Q24) : à vérifier que le numéro d'ordre repart bien par exercice seul (toutes sections confondues, compteur `BCA-A<code exercice>`), et que le premier numéro est 00001.
-- Bénéficiaire (Q27) : classe `Beneficiaire` ajoutée au drawio (onglets 1 et 4). Pas encore codée : il faut savoir si le code est un chapitre (`<CODE CHAPITRE>-<SIGLE SECTION>` ?) ou une autre nomenclature, et d'où viennent les données.
+- Bénéficiaire (Q27) : chapitre, livré en V22. Reste à vérifier : contrainte de section éventuelle, et l'absence du code `11000020` dans le référentiel des chapitres (source des données à confirmer).
 
 ### Soumissions et fournisseurs
 - `StatutSoumission` : `RECEVABLE`, `EN_EXAMEN` et `REJETEE` ne sont pas utilisés (Q13, commission externe).
@@ -427,7 +435,14 @@ Ce qui a été volontairement laissé de côté, avec sa source et le moment pr�
 - Les offres sont visibles de l'ordonnateur avant la clôture (Q14) : point de confidentialité à garder en tête.
 
 ### Notifications
-- Pas d'e-mail ni de SMS : les décisions sont visibles dans l'application (statut des offres, actes notifiés dans l'espace fournisseur, Q20). Une boîte de notifications pourra être ajoutée plus tard (PV, paiement…).
+- **Temps réel** (décision 2026-11-18) : SSE (`SseEmitter`) branché sur les événements après validation de la transaction, de préférence à un WebSocket (diffusion serveur → navigateur seulement). À prévoir : jeton JWT hors en-tête (`EventSource`), broker si plusieurs instances.
+- **E-mail et SMS :** aucun service d'envoi ; à brancher sur les mêmes événements, après validation de la transaction.
+- **Autres événements à notifier :** offres retenues et non retenues (Q16, aujourd'hui visibles par le statut seul), envoi au CF (pour le CF), PV de réception (UC11), paiement.
+- **Annulation d'un acte annoncée au CF :** seul le fournisseur est prévenu aujourd'hui.
+
+### Engagement (2d)
+- Annulation d'un projet ou d'un acte soumis au CF : non prévue (rien n'est réservé), à décider.
+- Après l'annulation d'un acte, le besoin reste `ATTRIBUEE` et ne peut plus recevoir d'autre acte (un seul acte par besoin) : relance ou nouvelle attribution à décider.
 
 ### Sécurité et API
 - **401 ou 403 :** une requête sans jeton ou avec un jeton invalide reçoit 403. Un `AuthenticationEntryPoint` renverrait 401, à coordonner avec le frontend.
@@ -444,6 +459,7 @@ Ce qui a été volontairement laissé de côté, avec sa source et le moment pr�
 - Jeton de rafraîchissement invalide : 401 `REFRESH_TOKEN_INVALIDE` au lieu de 500.
 - Nouveaux champs (ajouts) dans `SoumissionResponse` et `ExpressionBesoinResponse`.
 - Nouvelles routes `/api/v1/actes` (projet d'acte BCA) et `/api/v1/actes/{id}/visas` (décision du CF).
+- Lot 2d : routes `PATCH /api/v1/actes/{id}/signer` (permission `SIGNER_ACTE`) et `/annuler` (`ENGAGE_DEPENSE`), `GET /api/v1/fournisseurs/moi/actes`, et la boîte `/api/v1/notifications` (badge : interroger `/non-lues/nombre`). Nouveaux champs dans `ActeJuridiqueResponse` (signature, notification, annulation, `reservationStatut`, bénéficiaire). Bénéficiaire du besoin : `beneficiaireId` facultatif en entrée, `beneficiaireId/Code/Libelle` en sortie, `beneficiaire` dans la consultation publique.
 - Offre : le fournisseur ne saisit plus `montantProposeTTC` (ignoré s'il est envoyé). La réponse donne `tauxTva`, `montantTva`, `tauxIr`, `montantIr` et `montantNetAPayer`. Le code d'erreur `MONTANT_TTC_INVALIDE` disparaît.
 
 ---
@@ -483,3 +499,7 @@ Ce qui a été volontairement laissé de côté, avec sa source et le moment pr�
 | 2026-11-11 | Refonte de 2b (V21) : données propres au BCA dans `bons_de_commande` (délai en mois, référence du devis, code-barres et QR code à venir), rattachées à l'acte par composition ; `StrategieBonDeCommande` porte le comportement. |
 | 2026-11-11 | Drawio : classe `Beneficiaire` (code, libellé) et association « au profit de (bénéficiaire) » depuis `ExpressionBesoin`, onglets 1 et 4 des deux copies. Pas encore de code (Q27). |
 | 2026-11-11 | **Drawio aligné sur le code livré** (onglets 1 et 4, deux copies). Classes mises à jour : `ExpressionBesoin` (sans `montantEstime` ni `valider()` ; dates de publication, de clôture effective et de décision, motif, suppression logique, `publier`, `declarerInfructueux`, `annuler`, `supprimer`), `Soumission` (numéro, TVA, IR, TTC, NAP, empreinte, date de décision, `ecarter`, `sceller`), `LigneSoumission` (sans délai par ligne), `CoordonneeBancaire` (RIB seul), `Matiere` (référence et libellé), `ActeJuridique` (type, date d'émission, TVA, IR, date d'envoi au CF, `viser`, `renvoyerEnProjet` ; délai déplacé dans la forme), BCA (délai en mois, référence du devis, code-barres et QR code), `Visa` de l'onglet 1 aligné sur l'onglet 4, `ReservationCredit` (`StatutReservation`, date d'annulation). Ajouts : classes `CreditBudgetaire` et `Taxe`, liens `Soumission → CoordonneeBancaire` (« payée sur (RIB choisi) »), `ReservationCredit → CreditBudgetaire` (« sur la ligne de crédit »), dépendance `Soumission ⇢ Taxe`, énumérations `StatutReservation` et `CodeTaxe` (copie de `analyse-fonctionnelle/`). Lien `Matiere → NatureEconomique` conservé mais annoté « non relié pour l'instant ». |
+| 2026-11-18 | Q30 décidée : le CF vise selon ses habilitations (mandats et permissions), comportement de 2c inchangé. Q27 décidée : les bénéficiaires sont des chapitres ; classe `Beneficiaire` retirée des drawio (association vers `Chapitre`), **V22** : `expressions_besoin.beneficiaire_id` (par défaut la structure émettrice), exposé dans le besoin, la consultation publique et l'acte. |
+| 2026-11-18 | **2d livré, lot 2 terminé** (V23, V24) : signature tracée et notification dans la même opération (`PATCH /actes/{id}/signer`), espace fournisseur (`/fournisseurs/moi/actes`), annulation d'un acte visé, signé ou notifié avec libération des AE (`PATCH /actes/{id}/annuler`), boîte de notifications alimentée par événements (acte notifié, acte annulé, décision du CF). Temps réel (SSE) reporté. |
+| 2026-11-18 | Permission **`SIGNER_ACTE`** (V25) pour la signature de l'acte, à la place d'`ENGAGE_DEPENSE` : défaut d'ORDONNATEUR et MINISTRE, contrainte CHECK reconstruite, mandats existants et super-admin alignés. L'annulation reste sous `ENGAGE_DEPENSE`. |
+| 2026-11-18 | Drawio aligné sur le lot 2d (deux copies) : `ActeJuridique` (dates de notification et d'annulation, motif ; `signer(o)`, `notifierFournisseur()`, `annuler(motif)` ; `signatureElectronique` retiré, Q6), onglet 2 (`signer()` sous `SIGNER_ACTE`, transitions d'annulation vers `SANS_SUITE_ANNULE`), onglet 5 (`SIGNER_ACTE` dans `Permission` et la matrice, classes `Notification` et `TypeNotification` reliées à `User`). |
