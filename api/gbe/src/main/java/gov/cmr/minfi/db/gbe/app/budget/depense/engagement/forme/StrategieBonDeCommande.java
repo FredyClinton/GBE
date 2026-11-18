@@ -26,7 +26,7 @@ public class StrategieBonDeCommande implements FormeActeStrategie {
 
     @Override
     public boolean verifierEligibilite(ExpressionBesoin besoin, BigDecimal montantTTC) {
-        return true; // table des seuils (Q3) pas encore renseignée
+        return true; // les seuils de l'échelle (Q3) sont appliqués par EchelleFormesActe ; pas de règle propre au BCA
     }
 
     @Override

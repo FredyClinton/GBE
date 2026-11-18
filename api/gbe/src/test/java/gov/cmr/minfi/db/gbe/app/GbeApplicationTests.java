@@ -207,6 +207,16 @@ class GbeApplicationTests {
                 : gov.cmr.minfi.db.gbe.app.notification.TypeNotification.values()) {
             assertThat(typesNotification).contains("'" + n.name() + "'");
         }
+        final String typesActe = jdbcTemplate.queryForObject(
+                "SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname = 'seuils_forme_acte_type_check'",
+                String.class);
+        for (gov.cmr.minfi.db.gbe.app.budget.depense.engagement.TypeActe ta
+                : gov.cmr.minfi.db.gbe.app.budget.depense.engagement.TypeActe.values()) {
+            assertThat(typesActe).contains("'" + ta.name() + "'");
+        }
+        assertThat(jdbcTemplate.queryForList(
+                "SELECT type_acte FROM seuils_forme_acte ORDER BY rang", String.class))
+                .containsExactly("BON_DE_COMMANDE", "LETTRE_COMMANDE", "MARCHE_PUBLIC");
     }
 
     @Test

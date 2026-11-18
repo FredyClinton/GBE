@@ -265,7 +265,7 @@ rapport, section 9 ; drawio, onglets 1, 2, 3 et 4 (deux copies).
 - **Acte (V19), package `budget/depense/engagement` :**
   - `ActeJuridique` : numéro, type, objet, date d'émission, délai en mois, HT, TVA, IR, TTC, NAP, montant en lettres, statut, besoin, offre retenue, ligne de crédit ;
   - `ActeJuridiqueFactory` (`determinerForme`, `creerActe`) ;
-  - `FormeActeStrategie` avec une seule stratégie, `StrategieBonDeCommande` (numérotation Q24, éligibilité toujours vraie tant que la table des seuils est vide) ;
+  - `FormeActeStrategie` avec une seule stratégie, `StrategieBonDeCommande` (numérotation Q24) ; seuils appliqués depuis V26 par `EchelleFormesActe` (voir Q3) ;
   - `common/texte/MontantEnLettres` (orthographe traditionnelle, vérifiée sur les montants du BCA).
 - **Règles :**
   - création à partir d'un besoin `ATTRIBUEE` et de son offre `RETENUE`, un acte par besoin (409 `ACTE_DEJA_CREE`) ;
@@ -360,7 +360,7 @@ Elles bloquent les lots 1 et 2. Les hypothèses s'appliquent tant qu'il n'y a pa
 |---|---|---|---|
 | Q1 | Contrôle CF : réservation, quitus et visa forment-ils **une seule validation** ou **trois étapes** ? | une seule validation | **Décidé (2026-11-11)** : une seule validation, transactionnelle (réservation + quitus + visa ensemble). À isoler dans le service pour pouvoir passer à trois étapes plus tard. |
 | Q2 | Rejet d'un acte par le CF : AE réservées **libérées** ou **maintenues** ? | libérées | **Décidé (2026-11-11)** : libérées. Conséquence de Q1 : rien n'est réservé avant le visa favorable, donc un rejet (`DEFAVORABLE_REJET`) ou une suspension (`SUSPENDU_RESERVES`) ne bloque aucune AE. `libererAE` sert à l'annulation d'un acte déjà visé (`VISE_CF` / `SIGNE_ORDONNATEUR` → `ANNULE`). |
-| Q3 | Seuils des formes d'acte (BCA / LC / Marché / Bail) ? | table de paramétrage, sans valeurs inventées | **Décidé (2026-11-11)** : l'ordonnateur choisit la forme ; le système propose la forme minimale et refuse une forme inférieure (échelle BCA < LC < Marché ; Bail hors échelle, imposé par la nature). Tant que la table des seuils est vide, le choix est libre. |
+| Q3 | Seuils des formes d'acte (BCA / LC / Marché / Bail) ? | table de paramétrage, sans valeurs inventées | **Décidé (2026-11-11)** : l'ordonnateur choisit la forme ; le système propose la forme minimale et refuse une forme inférieure (échelle BCA < LC < Marché ; Bail hors échelle, imposé par la nature). Tant que la table des seuils est vide, le choix est libre. **Seuils fixés (2026-11-18, V26)** sur le **TTC** de l'acte, plafonds exclusifs : BCA < 5 000 000 FCFA, lettre-commande < 50 000 000 FCFA, marché public au-delà ; bail hors échelle. Table `seuils_forme_acte`, appliquée par `EchelleFormesActe` dans `ActeJuridiqueFactory` : sans type demandé, forme minimale ; forme inférieure refusée (`FORME_ACTE_INELIGIBLE`). Seul le BCA existant, un TTC ≥ 5 000 000 est refusé (`FORME_ACTE_REQUISE_NON_DISPONIBLE`). |
 | Q4 | Évaluation des offres **dans l'application**, ou seul le résultat d'une commission externe est saisi ? | seul le résultat est saisi | **Décidé (2026-11-11)** : commission externe, seul le résultat (offre retenue, PV de commission) est saisi. |
 | Q5 | Fournisseurs : **auto-inscription** ou création par l'admin ? | création par l'admin | **Décidé (2026-11-11)** : création par l'admin. |
 | Q6 | Signature : validation tracée (qui, quand) ou téléversement d'un document signé ? | validation tracée | **Décidé (2026-11-11)** : validation tracée (utilisateur, date). |
@@ -411,7 +411,7 @@ Ce qui a été volontairement laissé de côté, avec sa source et le moment pr�
 ### Formes d'acte autres que le BCA (Q21)
 - Lettre-commande, marché public, convention de bail et leurs champs propres (onglet 4 : référence du devis, n° d'appel d'offres, lot, cautions, retenue de garantie, pénalités, dates et loyer du bail).
 - Ces formes viendront quand les informations seront disponibles. Jusque-là, seule la forme BCA est traitée, mais l'architecture garde la `FormeActeStrategie` (une stratégie par forme).
-- La table des seuils (Q3) reste vide, et le choix de la forme est libre.
+- Seuils (Q3, V26) : BCA < 5 M, LC < 50 M, marché au-delà, sur le TTC. Tant que seul le BCA existe, un acte de 5 000 000 FCFA TTC ou plus est refusé. À confirmer : bornes exactes (5 000 000 pile → LC, 50 000 000 pile → marché, plafonds exclusifs). Pas de route d'administration des seuils pour l'instant (modification par migration).
 
 ### Taxes et montants
 - **Taxes selon le type d'acte** (à faire quand les règles de la LC, du marché et du bail seront connues) :
@@ -503,3 +503,4 @@ Ce qui a été volontairement laissé de côté, avec sa source et le moment pr�
 | 2026-11-18 | **2d livré, lot 2 terminé** (V23, V24) : signature tracée et notification dans la même opération (`PATCH /actes/{id}/signer`), espace fournisseur (`/fournisseurs/moi/actes`), annulation d'un acte visé, signé ou notifié avec libération des AE (`PATCH /actes/{id}/annuler`), boîte de notifications alimentée par événements (acte notifié, acte annulé, décision du CF). Temps réel (SSE) reporté. |
 | 2026-11-18 | Permission **`SIGNER_ACTE`** (V25) pour la signature de l'acte, à la place d'`ENGAGE_DEPENSE` : défaut d'ORDONNATEUR et MINISTRE, contrainte CHECK reconstruite, mandats existants et super-admin alignés. L'annulation reste sous `ENGAGE_DEPENSE`. |
 | 2026-11-18 | Drawio aligné sur le lot 2d (deux copies) : `ActeJuridique` (dates de notification et d'annulation, motif ; `signer(o)`, `notifierFournisseur()`, `annuler(motif)` ; `signatureElectronique` retiré, Q6), onglet 2 (`signer()` sous `SIGNER_ACTE`, transitions d'annulation vers `SANS_SUITE_ANNULE`), onglet 5 (`SIGNER_ACTE` dans `Permission` et la matrice, classes `Notification` et `TypeNotification` reliées à `User`). |
+| 2026-11-18 | Q3 : seuils des formes d'acte fixés (**V26**, table `seuils_forme_acte`) sur le TTC : BCA < 5 M, LC < 50 M, marché au-delà. `EchelleFormesActe` : forme minimale par défaut, forme inférieure refusée, forme exigée mais non disponible refusée (`FORME_ACTE_REQUISE_NON_DISPONIBLE`). |

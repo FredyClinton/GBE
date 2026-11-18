@@ -32,7 +32,9 @@ public class ActeJuridiqueController {
     @Operation(
         summary = "Préparer le projet d'acte d'un besoin attribué",
         description = "Crée le projet d'acte (statut PROJET) à partir d'un besoin ATTRIBUEE et de son offre retenue. " +
-            "Seule la forme bon de commande administratif (BCA) est disponible. " +
+            "La forme suit les seuils sur le montant TTC : bon de commande administratif (BCA) en dessous de 5 000 000 FCFA, " +
+            "lettre-commande en dessous de 50 000 000 FCFA, marché public au-delà. Sans type demandé, la forme minimale est retenue ; " +
+            "une forme inférieure est refusée. Seul le BCA est disponible pour l'instant : un montant de 5 000 000 FCFA ou plus est refusé. " +
             "Le numéro suit le format BCA-A<code exercice><code section><numéro d'ordre sur 5 chiffres>. " +
             "L'acte reprend l'objet du besoin, le fournisseur, le RIB, les lignes et les montants de l'offre retenue " +
             "(HT, TVA, IR, TTC, net à payer), avec le TTC en lettres. " +
@@ -41,7 +43,7 @@ public class ActeJuridiqueController {
     )
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Projet d'acte créé"),
-        @ApiResponse(responseCode = "400", description = "Besoin non attribué (BESOIN_NON_ATTRIBUE), forme non disponible (FORME_ACTE_NON_DISPONIBLE) ou délai invalide"),
+        @ApiResponse(responseCode = "400", description = "Besoin non attribué (BESOIN_NON_ATTRIBUE), forme inférieure au seuil (FORME_ACTE_INELIGIBLE), forme exigée par le montant non disponible (FORME_ACTE_REQUISE_NON_DISPONIBLE), forme non disponible (FORME_ACTE_NON_DISPONIBLE) ou délai invalide"),
         @ApiResponse(responseCode = "403", description = "Permission ENGAGE_DEPENSE manquante ou hors du périmètre des mandats de l'utilisateur"),
         @ApiResponse(responseCode = "404", description = "Besoin ou offre retenue introuvable"),
         @ApiResponse(responseCode = "409", description = "Un acte existe déjà pour ce besoin (ACTE_DEJA_CREE)")
