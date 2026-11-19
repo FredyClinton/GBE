@@ -59,12 +59,14 @@ public class OpenApiSchemasConfig {
             if (openApi.getComponents() == null || openApi.getComponents().getSchemas() == null) {
                 return;
             }
+            final var schemas = openApi.getComponents().getSchemas();
+            // swagger-models expose Map<String, Schema> avec Schema en type brut : impossible de le paramétrer ici
+            @SuppressWarnings("rawtypes")
             final Map<String, Schema> tries = new LinkedHashMap<>();
-            openApi.getComponents().getSchemas().entrySet().stream()
-                    .sorted(Comparator
-                            .comparingInt((Map.Entry<String, Schema> e) -> rang(e.getKey(), rangParClasse))
-                            .thenComparing(Map.Entry::getKey, String.CASE_INSENSITIVE_ORDER))
-                    .forEach(e -> tries.put(e.getKey(), e.getValue()));
+            schemas.keySet().stream()
+                    .sorted(Comparator.comparingInt((String nom) -> rang(nom, rangParClasse))
+                            .thenComparing(String.CASE_INSENSITIVE_ORDER))
+                    .forEach(nom -> tries.put(nom, schemas.get(nom)));
             openApi.getComponents().setSchemas(tries);
         };
     }
