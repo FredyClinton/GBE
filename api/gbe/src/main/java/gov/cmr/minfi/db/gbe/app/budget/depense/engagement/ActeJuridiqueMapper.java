@@ -1,12 +1,18 @@
 package gov.cmr.minfi.db.gbe.app.budget.depense.engagement;
 
 import gov.cmr.minfi.db.gbe.app.budget.depense.engagement.dto.ActeJuridiqueResponse;
-import gov.cmr.minfi.db.gbe.app.budget.depense.soumission.SoumissionMapper;
+import gov.cmr.minfi.db.gbe.app.budget.depense.soumission.LigneSoumission;
+import gov.cmr.minfi.db.gbe.app.budget.depense.soumission.dto.LigneSoumissionResponse;
 import org.mapstruct.InheritConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = SoumissionMapper.class)
+/**
+ * Sans {@code uses} : un mapper qui en utilise un autre est généré avec un constructeur {@code @Autowired}.
+ * La conversion des lignes d'offre est donc déclarée ici ({@link #toLigne}), avec les mêmes règles que
+ * {@code SoumissionMapper.toResponse(LigneSoumission)}.
+ */
+@Mapper(componentModel = "spring")
 public interface ActeJuridiqueMapper {
 
     @Mapping(target = "delaiLivraisonMois", source = "bonDeCommande.delaiLivraisonMois")
@@ -64,6 +70,13 @@ public interface ActeJuridiqueMapper {
     @InheritConfiguration(name = "toActeFournisseur")
     @Mapping(target = "lignes", ignore = true)
     ActeJuridiqueResponse toActeFournisseurResume(ActeJuridique acte);
+
+    /** Ligne de l'offre retenue, recopiée dans l'acte (mêmes règles que SoumissionMapper). */
+    @Mapping(target = "ligneBesoinId", source = "ligneBesoin.id")
+    @Mapping(target = "matiereReference", source = "ligneBesoin.matiere.reference")
+    @Mapping(target = "matiereLibelle", source = "ligneBesoin.matiere.libelle")
+    @Mapping(target = "quantiteDemandee", source = "ligneBesoin.quantiteDemandee")
+    LigneSoumissionResponse toLigne(LigneSoumission ligne);
 
     default String nomSignataire(ActeJuridique acte) {
         return acte.getSignataire() == null ? null

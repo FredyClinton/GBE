@@ -161,6 +161,10 @@
                             <version>${mapstruct.version}</version>
                         </path>
                     </annotationProcessorPaths>
+                    <compilerArgs>
+                        <!-- Mappers générés : dépendances (uses = ...) injectées par constructeur, jamais @Autowired -->
+                        <arg>-Amapstruct.defaultInjectionStrategy=constructor</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>

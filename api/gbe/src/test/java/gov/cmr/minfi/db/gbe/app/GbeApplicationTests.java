@@ -57,7 +57,7 @@ class GbeApplicationTests {
     private final JdbcTemplate jdbcTemplate;
     private final JwtService jwtService;
 
-    /** Injection par constructeur ({@link TestConstructor} en mode ALL), sans {@code @Autowired}. */
+    /** Injection par constructeur ({@link TestConstructor} en mode ALL : aucune annotation d'injection). */
     GbeApplicationTests(final MockMvc mockMvc, final SectionRepository sectionRepository,
                         final RoleRepository roleRepository, final JdbcTemplate jdbcTemplate,
                         final JwtService jwtService) {
