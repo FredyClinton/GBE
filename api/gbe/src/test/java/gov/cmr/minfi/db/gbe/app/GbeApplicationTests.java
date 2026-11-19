@@ -7,12 +7,12 @@ import gov.cmr.minfi.db.gbe.app.identite.iam.role.RoleSysteme;
 import gov.cmr.minfi.db.gbe.app.referentiel.administratif.SectionRepository;
 import gov.cmr.minfi.db.gbe.app.security.JwtService;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.TestConstructor;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -44,26 +44,29 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Testcontainers
+@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class GbeApplicationTests {
 
     @Container
     @ServiceConnection
     static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer("postgres:17.9");
 
-    @Autowired
-    private MockMvc mockMvc;
+    private final MockMvc mockMvc;
+    private final SectionRepository sectionRepository;
+    private final RoleRepository roleRepository;
+    private final JdbcTemplate jdbcTemplate;
+    private final JwtService jwtService;
 
-    @Autowired
-    private SectionRepository sectionRepository;
-
-    @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private JwtService jwtService;
+    /** Injection par constructeur ({@link TestConstructor} en mode ALL), sans {@code @Autowired}. */
+    GbeApplicationTests(final MockMvc mockMvc, final SectionRepository sectionRepository,
+                        final RoleRepository roleRepository, final JdbcTemplate jdbcTemplate,
+                        final JwtService jwtService) {
+        this.mockMvc = mockMvc;
+        this.sectionRepository = sectionRepository;
+        this.roleRepository = roleRepository;
+        this.jdbcTemplate = jdbcTemplate;
+        this.jwtService = jwtService;
+    }
 
     /**
      * Documentation Swagger : chaque route a un résumé et un tag déclaré dans OpenApiConfig (ordre d'affichage),
