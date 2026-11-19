@@ -119,7 +119,9 @@ Covered by `CreditBudgetaireTest`. Keep it in sync when adding transitions.
 - Password login always returns a short-lived MFA token (never access tokens); MFA is mandatory. `firstLogin = true`:
   the response also carries the QR code (secret generated at login if missing) and `/setup-mfa` enables MFA, sets
   `firstLogin = false` and returns the tokens; afterwards `/verify` exchanges MFA token + TOTP code for access + refresh
-  tokens. `firstLogin` is about MFA setup only: there is no password-change route. TOTP parameters (SHA1, 6 digits,
+  tokens. `firstLogin` is about MFA setup only and does not force a password change (the user changes it, when he wants, with
+  `POST /api/v1/users/me/password`). `GET /api/v1/users/me` returns the same `UserContext` as the login, re-read from
+  the database (`UserService.getProfil`, also used by the login so both stay identical). TOTP parameters (SHA1, 6 digits,
   30 s) live in one place in `TwoFactorAuthenticationService`, shared by the QR code and the verifier. Locked account /
   expired password at login give 401 `ERR_USER_LOCKED` / `ERR_CREDENTIALS_EXPIRED`.
 - `POST /auth/refresh` (`JwtService.extraireSujetRefreshToken`): returns a new access token and the same refresh token.

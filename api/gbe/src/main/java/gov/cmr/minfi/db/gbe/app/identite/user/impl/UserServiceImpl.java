@@ -2,8 +2,12 @@ package gov.cmr.minfi.db.gbe.app.identite.user.impl;
 
 import gov.cmr.minfi.db.gbe.app.common.exception.BusinessException;
 import gov.cmr.minfi.db.gbe.app.common.exception.ErrorCode;
+import gov.cmr.minfi.db.gbe.app.identite.auth.AuthMapper;
+import gov.cmr.minfi.db.gbe.app.identite.auth.dto.MandatContext;
+import gov.cmr.minfi.db.gbe.app.identite.auth.dto.UserContext;
 import gov.cmr.minfi.db.gbe.app.identite.iam.permission.Permission;
 import gov.cmr.minfi.db.gbe.app.identite.iam.role.RoleSysteme;
+import gov.cmr.minfi.db.gbe.app.identite.mandat.MandatMapper;
 import gov.cmr.minfi.db.gbe.app.identite.mandat.MandatRepository;
 import gov.cmr.minfi.db.gbe.app.identite.user.User;
 import gov.cmr.minfi.db.gbe.app.identite.user.UserMapper;
@@ -18,8 +22,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,6 +39,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final MandatRepository affectationRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final MandatMapper mandatMapper;
+    private final AuthMapper authMapper;
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserContext getProfil(String userId) {
+        final User user = this.userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, userId));
+        final List<MandatContext> mandats =
+                mandatMapper.toContextList(affectationRepository.findMandatsValidesParUser(userId));
+        return authMapper.toUserContext(user, mandats);
+    }
 
     @Override
     public UserDetails loadUserByUsername(final String userEmail) throws UsernameNotFoundException {

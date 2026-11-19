@@ -1,20 +1,14 @@
 package gov.cmr.minfi.db.gbe.app.identite.auth.impl;
 
-import gov.cmr.minfi.db.gbe.app.identite.auth.AuthMapper;
 import gov.cmr.minfi.db.gbe.app.identite.auth.AuthenticationService;
 import gov.cmr.minfi.db.gbe.app.identite.auth.dto.*;
-import gov.cmr.minfi.db.gbe.app.identite.auth.dto.AuthenticationResponse;
-import gov.cmr.minfi.db.gbe.app.identite.auth.dto.MandatContext;
-import gov.cmr.minfi.db.gbe.app.identite.auth.dto.UserContext;
 import gov.cmr.minfi.db.gbe.app.identite.auth.tfa.TwoFactorAuthenticationService;
 import gov.cmr.minfi.db.gbe.app.common.exception.BusinessException;
 import gov.cmr.minfi.db.gbe.app.common.exception.ErrorCode;
-import gov.cmr.minfi.db.gbe.app.identite.mandat.Mandat;
-import gov.cmr.minfi.db.gbe.app.identite.mandat.MandatMapper;
-import gov.cmr.minfi.db.gbe.app.identite.mandat.MandatRepository;
 import gov.cmr.minfi.db.gbe.app.security.JwtService;
 import gov.cmr.minfi.db.gbe.app.identite.user.User;
 import gov.cmr.minfi.db.gbe.app.identite.user.UserRepository;
+import gov.cmr.minfi.db.gbe.app.identite.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,8 +16,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -34,9 +26,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	private final TwoFactorAuthenticationService tfaService;
 	private final UserRepository userRepository;
 	private final JwtService jwtService;
-	private final MandatRepository mandatRepository;
-	private final MandatMapper mandatMapper;
-	private final AuthMapper authMapper;
+	private final UserService userService;
 
 	@Override
 	public AuthenticationResponse login(AuthenticationRequest request) {
@@ -149,8 +139,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	// ── Helpers privés ────────────────────────────────
 
 	private AuthenticationResponse buildResponse(User user) {
-		final List<Mandat> mandats = mandatRepository.findMandatsValidesParUser(user.getId());
-
 		return AuthenticationResponse
 			.builder()
 			.accessToken(jwtService.generateAccessToken(user.getUsername()))
@@ -158,12 +146,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			.tokenType("Bearer")
 			.firstLogin(false)
 			.mfaEnabled(true)
-			.userContext(buildUserContext(user, mandats))
+			// même contenu que GET /api/v1/users/me
+			.userContext(userService.getProfil(user.getId()))
 			.build();
-	}
-
-	private UserContext buildUserContext(User user, List<Mandat> mandats) {
-		final List<MandatContext> mandatContexts = mandatMapper.toContextList(mandats);
-		return authMapper.toUserContext(user, mandatContexts);
 	}
 }

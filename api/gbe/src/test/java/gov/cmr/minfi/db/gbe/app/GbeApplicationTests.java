@@ -902,6 +902,28 @@ class GbeApplicationTests {
                 .andExpect(jsonPath("$.firstLogin").value(true));
     }
 
+    /** GET /users/me : profil et mandats valides relus en base ; refusé sans jeton. */
+    @Test
+    void profil_me() throws Exception {
+        final Map<String, Object> programme = jdbcTemplate.queryForMap(
+                "SELECT id AS programme_id, section_id FROM programmes ORDER BY id LIMIT 1");
+        final String jeton = ordonnateur("ordo.profil@minfi.cm", "+237670000099",
+                (String) programme.get("section_id"), (String) programme.get("programme_id"));
+
+        mockMvc.perform(get("/api/v1/users/me").header("Authorization", jeton))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value("ordo.profil@minfi.cm"))
+                .andExpect(jsonPath("$.role").value("ORDONNATEUR"))
+                .andExpect(jsonPath("$.mandats.length()").value(1))
+                .andExpect(jsonPath("$.mandats[0].programmeId").value(programme.get("programme_id")))
+                .andExpect(jsonPath("$.mandats[0].sectionId").value(programme.get("section_id")))
+                .andExpect(jsonPath("$.mandats[0].permissions").value(
+                        org.hamcrest.Matchers.containsInAnyOrder("EXPRIMER_BESOIN", "ENGAGE_DEPENSE")));
+
+        mockMvc.perform(get("/api/v1/users/me"))
+                .andExpect(status().isForbidden());
+    }
+
     /** Compte verrouillé ou mot de passe expiré : 401 typé au login (avant : 500 du gestionnaire générique). */
     @Test
     void connexion_compteVerrouilleOuMotDePasseExpire_401() throws Exception {

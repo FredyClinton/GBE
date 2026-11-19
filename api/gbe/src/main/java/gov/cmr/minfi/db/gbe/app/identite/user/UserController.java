@@ -1,5 +1,6 @@
 package gov.cmr.minfi.db.gbe.app.identite.user;
 
+import gov.cmr.minfi.db.gbe.app.identite.auth.dto.UserContext;
 import gov.cmr.minfi.db.gbe.app.identite.user.dto.ChangePasswordRequest;
 import gov.cmr.minfi.db.gbe.app.identite.user.dto.ProfileUpdateRequest;
 import gov.cmr.minfi.db.gbe.app.common.config.OpenApiTags;
@@ -22,6 +23,21 @@ import java.util.Objects;
 @Tag(name = OpenApiTags.MON_COMPTE)
 public class UserController {
     private  final UserService userServices;
+
+    @Operation(
+        summary = "Consulter son profil",
+        description = "Retourne le profil de l'utilisateur connecté et ses mandats valides, relus en base : " +
+            "même contenu que userContext à la connexion, à jour après une modification du profil ou des mandats. " +
+            "Un fournisseur n'a pas de mandat (liste vide)."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Profil retourné"),
+        @ApiResponse(responseCode = "403", description = "Non authentifié (jeton absent, invalide ou expiré)")
+    })
+    @GetMapping("/me")
+    public ResponseEntity<UserContext> getProfil(final Authentication principal) {
+        return ResponseEntity.ok(this.userServices.getProfil(getUserId(principal)));
+    }
 
     @Operation(
         summary = "Modifier son profil",
