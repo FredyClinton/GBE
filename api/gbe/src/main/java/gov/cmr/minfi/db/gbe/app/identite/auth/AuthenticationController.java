@@ -25,15 +25,15 @@ public class AuthenticationController {
 
     @Operation(
         summary = "Se connecter",
-        description = "Route publique : vérifie l'e-mail et le mot de passe. " +
-            "Si la double authentification est active, retourne un jeton MFA de courte durée à confirmer par /verify, ou par /setup-mfa lors de sa première configuration ; sinon retourne les jetons d'accès et de rafraîchissement. " +
-            "Le champ firstLogin impose un changement de mot de passe."
+        description = "Route publique : vérifie l'e-mail et le mot de passe, puis retourne toujours un jeton MFA de courte durée (aucun jeton d'accès à cette étape). " +
+            "Première connexion (firstLogin = true) : la réponse contient aussi le QR code (secretImageUri) à scanner, et la double authentification se configure par /setup-mfa. " +
+            "Connexions suivantes (firstLogin = false) : le code TOTP se confirme par /verify. " +
+            "firstLogin ne concerne que la configuration de la double authentification, pas le mot de passe."
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Authentification réussie ou jeton MFA retourné"),
+        @ApiResponse(responseCode = "200", description = "Identifiants valides : jeton MFA retourné (avec le QR code à la première connexion)"),
         @ApiResponse(responseCode = "400", description = "Données invalides"),
-        @ApiResponse(responseCode = "401", description = "Mot de passe incorrect ou compte désactivé"),
-        @ApiResponse(responseCode = "404", description = "Utilisateur introuvable")
+        @ApiResponse(responseCode = "401", description = "E-mail inconnu ou mot de passe incorrect (BAD_CREDENTIALS, sans distinguer les deux), compte désactivé (ERR_USER_DISABLED), verrouillé (ERR_USER_LOCKED) ou mot de passe expiré (ERR_CREDENTIALS_EXPIRED)")
     })
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> login(

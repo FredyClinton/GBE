@@ -9,7 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -49,6 +51,28 @@ public class ApplicationExceptionHandler {
                 .message(ERR_USER_DISABLED.getDefaultMessage())
                 .build();
         return ResponseEntity.status(ERR_USER_DISABLED.getHttpStatus()).body(body);
+    }
+
+    /** Compte verrouillé (is_account_locked) : refusé au login, sans quoi le gestionnaire générique répondait 500. */
+    @ExceptionHandler(LockedException.class)
+    public ResponseEntity<ErrorResponse> handleLockedException(LockedException ex) {
+        log.debug(ex.getMessage(), ex);
+        return reponse(ErrorCode.ERR_USER_LOCKED);
+    }
+
+    /** Mot de passe expiré (credentials_expired) : refusé au login, sans quoi le gestionnaire générique répondait 500. */
+    @ExceptionHandler(CredentialsExpiredException.class)
+    public ResponseEntity<ErrorResponse> handleCredentialsExpiredException(CredentialsExpiredException ex) {
+        log.debug(ex.getMessage(), ex);
+        return reponse(ErrorCode.ERR_CREDENTIALS_EXPIRED);
+    }
+
+    private static ResponseEntity<ErrorResponse> reponse(ErrorCode code) {
+        final ErrorResponse body = ErrorResponse.builder()
+                .code(code.getCode())
+                .message(code.getDefaultMessage())
+                .build();
+        return ResponseEntity.status(code.getHttpStatus()).body(body);
     }
 
     @ExceptionHandler(BadCredentialsException.class)

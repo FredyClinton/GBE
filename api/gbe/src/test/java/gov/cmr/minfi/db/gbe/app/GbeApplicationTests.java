@@ -901,4 +901,37 @@ class GbeApplicationTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.firstLogin").value(true));
     }
+
+    /** Compte verrouillé ou mot de passe expiré : 401 typé au login (avant : 500 du gestionnaire générique). */
+    @Test
+    void connexion_compteVerrouilleOuMotDePasseExpire_401() throws Exception {
+        // bcrypt(Admin@1234), même hash que le super-admin de V3
+        final String hash = "$2a$10$7TxRVM4bA3S5DwNwmAG6Qe6oQ205pgCf77XcAecqL4jik3/Ptg4U6";
+        final String insertion = """
+                INSERT INTO users (id, created_date, first_name, last_name, email, phone_number, password, role_id,
+                                   is_enabled, is_account_locked, credentials_expired, is_email_verified,
+                                   phone_verified, first_login, mfa_enabled)
+                VALUES (?, CURRENT_DATE, 'Test', 'Connexion', ?, ?, ?,
+                        (SELECT id FROM roles WHERE name = 'ROLE_AGENT'),
+                        true, ?, ?, false, false, true, false)
+                """;
+        jdbcTemplate.update(insertion, UUID.randomUUID().toString(), "verrouille@test.cm", "+237699000101", hash,
+                true, false);
+        jdbcTemplate.update(insertion, UUID.randomUUID().toString(), "expire@test.cm", "+237699000102", hash,
+                false, true);
+
+        mockMvc.perform(post("/api/v1/auth/login").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"verrouille@test.cm\",\"password\":\"Admin@1234\"}"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("ERR_USER_LOCKED"));
+        mockMvc.perform(post("/api/v1/auth/login").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"expire@test.cm\",\"password\":\"Admin@1234\"}"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("ERR_CREDENTIALS_EXPIRED"));
+        // E-mail inconnu : même réponse qu'un mauvais mot de passe (pas de 404 qui révélerait les comptes existants)
+        mockMvc.perform(post("/api/v1/auth/login").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"inconnu@test.cm\",\"password\":\"Admin@1234\"}"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("BAD_CREDENTIALS"));
+    }
 }

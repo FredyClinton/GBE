@@ -116,8 +116,12 @@ Covered by `CreditBudgetaireTest`. Keep it in sync when adding transitions.
 - Throw `BusinessException(ErrorCode.XXX, args...)` from services; add new codes to `ErrorCode`.
 - Entities extend `BaseEntity` (UUID string id, `createdDate/By`, `lastModifiedAt/By`), filled by `JpaConfig` +
   `ApplicatorAuditoreAware`.
-- Password login → if MFA enabled, short-lived MFA token → TOTP verification → access + refresh tokens. `firstLogin`
-  forces a password change; a missing MFA secret is generated at login.
+- Password login always returns a short-lived MFA token (never access tokens); MFA is mandatory. `firstLogin = true`:
+  the response also carries the QR code (secret generated at login if missing) and `/setup-mfa` enables MFA, sets
+  `firstLogin = false` and returns the tokens; afterwards `/verify` exchanges MFA token + TOTP code for access + refresh
+  tokens. `firstLogin` is about MFA setup only: there is no password-change route. TOTP parameters (SHA1, 6 digits,
+  30 s) live in one place in `TwoFactorAuthenticationService`, shared by the QR code and the verifier. Locked account /
+  expired password at login give 401 `ERR_USER_LOCKED` / `ERR_CREDENTIALS_EXPIRED`.
 - `POST /auth/refresh` (`JwtService.extraireSujetRefreshToken`): returns a new access token and the same refresh token.
   A malformed, expired or wrong-type token (access/MFA), or an account deleted, disabled or locked since login, gives
   401 `REFRESH_TOKEN_INVALIDE`; a missing token gives 400.
