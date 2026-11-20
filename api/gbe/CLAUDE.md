@@ -187,7 +187,9 @@ The schema is owned by Flyway (`src/main/resources/db/migration`); Hibernate onl
   `V25__permission_signer_acte.sql`: permission `SIGNER_ACTE` (ORDONNATEUR / MINISTRE defaults, CHECK rebuilt, existing mandates and super-admin aligned).
   `V26__seuils_forme_acte.sql`: table `seuils_forme_acte` (TTC ceilings, exclusive: BCA 5 000 000, LC 50 000 000, marché none; CHECK lists `TypeActe`).
   `V27__codes_programme_sans_prefixe.sql`: programme codes lose the `60.` prefix (`60.181` → `181`); the copies in
-  `actions.code_programme` and `credit_budgetaire.code_imputation` are aligned (`actions.code` keeps `60.181.2`).
+  `actions.code_programme` and `credit_budgetaire.code_imputation` are aligned.
+  `V28__codes_action_numero_seul.sql`: an action code becomes its number alone (`60.181.2 ` → `2`, unique within the
+  programme), `credit_budgetaire.code_imputation` aligned.
 - Any entity change needs a new `V<n>__description.sql`. Never edit an applied migration.
 - Pre-Flyway databases get a baseline at version 2 (`baseline-on-migrate`), so only V3+ run on them.
 
